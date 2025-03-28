@@ -1,0 +1,32 @@
+.kapazitaetsabweichung-container {
+      padding: 2rem; // Innenabstand für die gesamte Komponente
+    
+      // Container für das Filterfeld
+      .filter-container {
+        width: 200px; // Breite des Filters
+        margin-bottom: 1rem; // Abstand nach unten, um Raum zur Tabelle zu schaffen
+      }
+    
+      // Stildefinitionen für die Abweichungstabelle
+      .abweichung-tabelle {
+        width: 100%; // Tabelle nimmt die volle Breite ein
+        margin-bottom: 1rem; // Abstand nach unten zur Export-Schaltfläche
+    
+        // Abstand und Textausrichtung für Tabellenzellen und Kopfzellen
+        th, td {
+          padding: 8px;
+          text-align: left;
+        }
+    
+        // Hervorhebung von negativen Abweichungen in Rot
+        .negativ {
+          color: #e53935; // Rot für negative Werte
+        }
+    
+        // Hervorhebung von positiven Abweichungen in Grün
+        .positiv {
+          color: #43a047; // Grün für positive Werte
+        }
+      }
+    }
+    

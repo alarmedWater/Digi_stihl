@@ -1,0 +1,99 @@
+<!-- Container für das gesamte Formular zum Anlegen eines neuen Mitarbeiters -->
+<div class="mitarbeiter-form-container">
+  
+  <!-- Überschrift der Formularseite -->
+  <h2>Mitarbeiter anlegen</h2>
+
+  <!-- Mitarbeiter-Formular, welches an 'mitarbeiterForm' gebunden ist -->
+  <form [formGroup]="mitarbeiterForm" (ngSubmit)="onSubmit()">
+
+    <!-- Eingabefeld: Vorname des Mitarbeiters -->
+    <mat-form-field appearance="fill">
+      <mat-label>Vorname</mat-label>
+      <input matInput formControlName="vorname" required />
+    </mat-form-field>
+
+    <!-- Eingabefeld: Nachname des Mitarbeiters -->
+    <mat-form-field appearance="fill">
+      <mat-label>Nachname</mat-label>
+      <input matInput formControlName="nachname" required />
+    </mat-form-field>
+
+    <!-- Eingabefeld: Eintrittsdatum des Mitarbeiters -->
+    <mat-form-field appearance="fill">
+      <mat-label>Eintritt</mat-label>
+      <input matInput [matDatepicker]="pickerEintritt" formControlName="eintritt" required />
+      <mat-datepicker-toggle matIconSuffix [for]="pickerEintritt"></mat-datepicker-toggle>
+      <mat-datepicker #pickerEintritt></mat-datepicker>
+    </mat-form-field>
+
+    <!-- Eingabefeld: FTE (Beschäftigungsgrad des Mitarbeiters) -->
+    <mat-form-field appearance="fill">
+      <mat-label>FTE</mat-label>
+      <input matInput type="number" formControlName="fte" required />
+    </mat-form-field>
+
+    <!-- Dropdown-Auswahlfeld: Bereich des Mitarbeiters -->
+    <mat-form-field appearance="fill">
+      <mat-label>Bereich</mat-label>
+      <mat-select formControlName="bereich" required>
+        <mat-option value="HR">HR</mat-option>
+        <mat-option value="IT">IT</mat-option>
+        <mat-option value="Vertrieb">Vertrieb</mat-option>
+        <mat-option value="Produktion">Produktion</mat-option>
+        <mat-option value="Verwaltung">Verwaltung</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Eingabefeld: Kostenstelle des Mitarbeiters -->
+    <mat-form-field appearance="fill">
+      <mat-label>Kostenstelle</mat-label>
+      <input matInput formControlName="kostenstelle" required />
+    </mat-form-field>
+
+    <!-- Optionales Eingabefeld: Funktion des Mitarbeiters -->
+    <mat-form-field appearance="fill">
+      <mat-label>Funktion</mat-label>
+      <input matInput formControlName="funktion" />
+    </mat-form-field>
+
+    <!-- Dropdown-Auswahlfeld: Arbeitsverhältnis des Mitarbeiters -->
+    <mat-form-field appearance="fill">
+      <mat-label>Arbeitsverhältnis</mat-label>
+      <mat-select formControlName="arbeitsverhaeltnis" required>
+        <mat-option value="Festanstellung">Festanstellung</mat-option>
+        <mat-option value="Befristet">Befristet</mat-option>
+        <mat-option value="Werkstudent">Werkstudent</mat-option>
+        <mat-option value="Praktikant">Praktikant</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Optionales Eingabefeld: Befristungsdatum -->
+    <mat-form-field appearance="fill">
+      <mat-label>Befristung bis</mat-label>
+      <input matInput [matDatepicker]="pickerBefristung" formControlName="befristung" />
+      <mat-datepicker-toggle matIconSuffix [for]="pickerBefristung"></mat-datepicker-toggle>
+      <mat-datepicker #pickerBefristung></mat-datepicker>
+    </mat-form-field>
+
+    <!-- Optionales Eingabefeld: Kündigungsdatum -->
+    <mat-form-field appearance="fill">
+      <mat-label>Kündigung zum</mat-label>
+      <input matInput [matDatepicker]="pickerKuendigung" formControlName="kuendigung" />
+      <mat-datepicker-toggle matIconSuffix [for]="pickerKuendigung"></mat-datepicker-toggle>
+      <mat-datepicker #pickerKuendigung></mat-datepicker>
+    </mat-form-field>
+
+    <!-- Optionales Textfeld: Zusätzliche Bemerkungen -->
+    <mat-form-field appearance="fill">
+      <mat-label>Bemerkung</mat-label>
+      <textarea matInput formControlName="bemerkung" rows="4"></textarea>
+    </mat-form-field>
+
+    <!-- Absende-Button: Deaktiviert, bis alle Pflichtfelder ausgefüllt sind -->
+    <button type="submit" mat-raised-button color="primary" [disabled]="!mitarbeiterForm.valid">
+      Mitarbeiter speichern
+    </button>
+
+  </form>
+</div>

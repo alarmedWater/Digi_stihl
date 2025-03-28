@@ -1,0 +1,64 @@
+<div class="kapazitaetsabweichung-container">
+      <h2>Kapazitätsabweichungen</h2>
+    
+      <!-- Filterbereich -->
+      <div class="filter-container">
+        <mat-form-field appearance="fill">
+          <mat-label>Bereich filtern</mat-label>
+          <mat-select [(ngModel)]="gewaehlterBereich" (selectionChange)="filterAnwenden()">
+            <mat-option value="">Alle</mat-option>
+            <mat-option *ngFor="let bereich of bereiche" [value]="bereich">
+              {{bereich}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    
+      <!-- Tabelle mit Daten -->
+      <table mat-table [dataSource]="gefilterteListe" class="abweichung-tabelle">
+        <!-- Mitarbeiter-Spalte -->
+        <ng-container matColumnDef="mitarbeiter">
+          <th mat-header-cell *matHeaderCellDef> Mitarbeiter </th>
+          <td mat-cell *matCellDef="let element"> {{element.mitarbeiter}} </td>
+        </ng-container>
+    
+        <!-- Bereich-Spalte -->
+        <ng-container matColumnDef="bereich">
+          <th mat-header-cell *matHeaderCellDef> Bereich </th>
+          <td mat-cell *matCellDef="let element"> {{element.bereich}} </td>
+        </ng-container>
+    
+        <!-- Zeitraum-Spalte -->
+        <ng-container matColumnDef="zeitraum">
+          <th mat-header-cell *matHeaderCellDef> Zeitraum </th>
+          <td mat-cell *matCellDef="let element"> {{element.zeitraum}} </td>
+        </ng-container>
+    
+        <!-- Geplante Kapazität-Spalte -->
+        <ng-container matColumnDef="geplant">
+          <th mat-header-cell *matHeaderCellDef> Geplant (FTE) </th>
+          <td mat-cell *matCellDef="let element"> {{element.geplant}} </td>
+        </ng-container>
+    
+        <!-- Tatsächliche Kapazität-Spalte -->
+        <ng-container matColumnDef="tatsaechlich">
+          <th mat-header-cell *matHeaderCellDef> Tatsächlich (FTE) </th>
+          <td mat-cell *matCellDef="let element"> {{element.tatsaechlich}} </td>
+        </ng-container>
+    
+        <!-- Abweichung-Spalte -->
+        <ng-container matColumnDef="abweichung">
+          <th mat-header-cell *matHeaderCellDef> Abweichung </th>
+          <td mat-cell *matCellDef="let element" [ngClass]="{'negativ': element.abweichung < 0, 'positiv': element.abweichung >= 0}">
+            {{element.abweichung}}
+          </td>
+        </ng-container>
+    
+        <tr mat-header-row *matHeaderRowDef="angezeigteSpalten"></tr>
+        <tr mat-row *matRowDef="let row; columns: angezeigteSpalten;"></tr>
+      </table>
+    
+      <!-- Button zum CSV-Export -->
+      <button mat-raised-button color="primary" (click)="exportieren()">Als CSV exportieren</button>
+    </div>
+    

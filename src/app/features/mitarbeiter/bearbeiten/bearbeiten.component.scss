@@ -1,0 +1,50 @@
+/* Container für die Mitarbeiterliste und Suchfeld */
+.container {
+      padding: 2rem;
+    }
+    
+    /* Suchfeld für die Mitarbeiterliste */
+    .filter-input {
+      margin-bottom: 1rem;
+      width: 300px;
+    }
+
+    /* Filter-Input Schriftfarbe auf schwarz setzen */
+      mat-form-field.filter-input input {
+            color: #000 !important; /* Schwarz */
+            opacity: 1; /* Voll sichtbar */
+    }
+    
+    
+    /* Tabelle für die Mitarbeiterübersicht */
+    .mat-table {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    
+    /* Buttons in der Tabelle */
+    .mat-button {
+      margin-right: 0.5rem;
+    }
+    
+    /* Anpassung der Bearbeitungsmaske (Dialog) */
+    .custom-dialog-container .mat-dialog-container {
+      border-radius: none !important; /* Entfernt die runden Ecken */
+      width: 700px;                 /* Breite der Bearbeitungsmaske */
+      max-width: none !important;   /* Überschreibt die Standardbegrenzung */
+    }
+    
+    /* Formularfelder in der Bearbeitungsmaske */
+    .bearbeiten-form mat-form-field {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    
+    /* Buttons am Ende des Formulars in der Bearbeitungsmaske */
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    

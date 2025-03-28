@@ -1,0 +1,61 @@
+// Grundstil der Host-Komponente; sorgt für Flexbox-Layout
+:host {
+      display: flex;
+    }
+    
+    // Container, der Sidebar und Hauptinhalt umschließt; Höhe ist volle Bildschirmhöhe
+    .sidenav-container {
+      height: 100vh;
+    }
+    
+    // Styling der Sidebar (Navigationsleiste)
+    .sidenav {
+      width: 280px;                       // feste Breite der Sidebar
+      padding: 1rem;                      // Innenabstand
+      background-color: #f3a837;          // hellorange Hintergrundfarbe
+      color: white;                       // Textfarbe in der Sidebar
+      font-weight: 600;                   // Schriftstärke
+    }
+    
+    // Styling der Navigationslinks innerhalb der Sidebar
+    mat-nav-list a {
+      color: #111;                        // Schriftfarbe der Navigationslinks (schwarz)
+      text-decoration: none;              // keine Unterstreichung der Links
+      margin-bottom: 0.5rem;              // Abstand zwischen Links nach unten
+      border-radius: 4px;                 // abgerundete Ecken
+      white-space: normal;                // erlaubt Zeilenumbrüche, sodass Text nicht über Sidebar hinausragt
+      word-break: break-word;             // lange Wörter werden umgebrochen
+      font-size: 1rem;                    // Schriftgröße der Links
+    }
+    
+    // Styling des aktiven Navigationslinks
+    mat-nav-list a.active-link {
+      background-color: #111;             // Hintergrundfarbe schwarz für aktiven Link
+      color: white;                       // Schriftfarbe weiß für Kontrast
+    }
+    
+    // Hover-Effekt der Navigationslinks beim Mouseover
+    mat-nav-list a:hover {
+      background-color: #524e4a;          // dunkelgrauer Hover-Effekt
+      color: white;                       // Schriftfarbe weiß für gute Lesbarkeit
+    }
+    
+    // Styling des Hauptinhaltsbereichs rechts neben der Sidebar
+    .main-content {
+      padding: 2rem;                      // großzügiger Innenabstand
+      flex: 1;                            // nimmt verfügbaren Raum ein
+      background-color: #fdfdfd;          // heller Hintergrund für den Inhaltsbereich
+      color: #111;                        // Schriftfarbe schwarz
+      font-family: Arial, sans-serif;     // Schriftart
+    }
+    
+    // Styling des Buttons zum Ein- und Ausklappen der Sidebar
+    .toggle-btn {
+      background-color: transparent;      // transparenter Hintergrund
+      border: none;                       // keine sichtbare Umrandung
+      color: #111;                        // Schriftfarbe Schwarz (angepasst)
+      cursor: pointer;                    // zeigt klickbare Schaltfläche an
+      font-size: 1.2rem;                  // etwas größere Schriftgröße
+      padding: 0.5rem 1rem;               // Innenabstand für Klickkomfort
+    }
+    

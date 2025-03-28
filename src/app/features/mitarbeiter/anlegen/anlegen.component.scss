@@ -1,0 +1,22 @@
+// Container für das gesamte Mitarbeiterformular
+.mitarbeiter-form-container {
+  display: flex;                  // aktiviert flexibles Layout
+  flex-direction: column;         // ordnet alle Elemente vertikal an
+  max-width: 600px;               // maximale Breite des Containers
+  gap: 1rem;                      // gleichmäßiger Abstand zwischen den Formularfeldern
+
+  // Stilisierung aller Material-Formularfelder innerhalb des Containers
+  mat-form-field {
+    width: 80%;                   // Breite der Eingabefelder auf 80% beschränken
+  }
+
+  // Stilisierung des Absende-Buttons
+  button {
+    align-self: flex-start;       // positioniert Button linksbündig innerhalb des Containers
+    margin-top: 1rem;             // oberer Abstand zum vorherigen Element
+    background-color: rgb(192, 189, 189); // grauer Hintergrund des Buttons
+    color: white;                 // Schriftfarbe Weiß für besseren Kontrast
+  }
+}
+
+    
