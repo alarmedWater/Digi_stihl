@@ -1,1 +1,47 @@
-<p>indir-mitarbeiter works!</p>
+<div class="auswertung-container">
+      <h2>Kapazitätsauswertung – Indirekte Mitarbeitende</h2>
+    
+      <!-- Filter für Abteilung -->
+      <mat-form-field appearance="fill" class="filter-dropdown">
+        <mat-label>Abteilung wählen</mat-label>
+        <mat-select [(ngModel)]="ausgewaehlteAbteilung" (selectionChange)="filternNachAbteilung()">
+          <mat-option value="">Alle Abteilungen</mat-option>
+          <mat-option *ngFor="let abt of abteilungen" [value]="abt">{{ abt }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    
+      <!-- Scrollbare Tabelle -->
+      <div class="table-scroll-container">
+        <table mat-table [dataSource]="gefilterteDaten" class="fte-tabelle">
+    
+          <!-- Name -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Name </th>
+            <td mat-cell *matCellDef="let row"> {{ row.name }} </td>
+          </ng-container>
+    
+          <!-- Abteilung -->
+          <ng-container matColumnDef="abteilung">
+            <th mat-header-cell *matHeaderCellDef> Abteilung </th>
+            <td mat-cell *matCellDef="let row"> {{ row.abteilung }} </td>
+          </ng-container>
+    
+          <!-- Dynamisch erzeugte Monatsspalten -->
+          <ng-container *ngFor="let monat of monateLabels; let i = index" [matColumnDef]="'monat' + (i + 1)">
+            <th mat-header-cell *matHeaderCellDef> {{ monat }} </th>
+            <td mat-cell *matCellDef="let row"
+                [ngClass]="{
+                  'fte-positiv': row.fte[i] > 0,
+                  'fte-negativ': row.fte[i] < 0
+                }">
+              {{ row.fte[i] }}
+            </td>
+          </ng-container>
+    
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+    </div>
+    
+    

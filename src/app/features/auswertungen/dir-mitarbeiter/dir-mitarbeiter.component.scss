@@ -1,0 +1,57 @@
+.auswertung-container {
+      padding: 24px;
+      max-width: 100%;
+    }
+    
+    .filter-dropdown {
+      margin-bottom: 16px;
+      min-width: 250px;
+      display: block;
+    }
+    
+    .table-scroll-container {
+      overflow-x: auto;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    
+    .fte-tabelle {
+      width: max-content;
+      min-width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th.mat-header-cell,
+    td.mat-cell {
+      white-space: nowrap;
+      text-align: center;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    
+    th.mat-header-cell {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    
+    td.mat-cell:first-child {
+      font-weight: 500;
+      color: #000;
+      text-align: left;
+    }
+    
+    td.mat-cell:nth-child(2) {
+      color: #555;
+      text-align: left;
+    }
+    
+    .fte-positiv {
+      color: green;
+      font-weight: 600;
+    }
+    
+    .fte-negativ {
+      color: red;
+      font-weight: 600;
+    }
+    

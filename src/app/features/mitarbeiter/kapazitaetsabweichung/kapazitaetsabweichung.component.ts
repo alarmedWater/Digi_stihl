@@ -1,70 +1,146 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { AbweichungDialogComponent, AbweichungData, Mitarbeiter } from './abweichung-dialog/abweichung-dialog.component';
+import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { MatInputModule } from '@angular/material/input';
+import { FormsModule } from '@angular/forms'; // für [(ngModel)]
+import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-kapazitaetsabweichung',
   standalone: true,
-  imports: [
-    MatTableModule, MatButtonModule,
-    MatFormFieldModule, MatSelectModule,
-    FormsModule, CommonModule
-  ],
   templateUrl: './kapazitaetsabweichung.component.html',
-  styleUrls: ['./kapazitaetsabweichung.component.scss']
+  styleUrls: ['./kapazitaetsabweichung.component.scss'],
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatTableModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    FormsModule,
+    MatIconModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+  ],
 })
 export class KapazitaetsabweichungComponent implements OnInit {
 
-  // Definition der Tabellenspalten
-  angezeigteSpalten: string[] = ['mitarbeiter', 'bereich', 'zeitraum', 'geplant', 'tatsaechlich', 'abweichung'];
+  // Gesamtübersicht aller gespeicherten Abweichungen
+  abweichungen: (AbweichungData & { name: string })[] = [];
 
-  // Beispielhafte Daten zur Darstellung von Kapazitätsabweichungen
-  kapazitaetsListe = [
-    { mitarbeiter: 'Max Mustermann', bereich: 'Produktion', zeitraum: 'März 2025', geplant: 1.0, tatsaechlich: 0.8, abweichung: -0.2 },
-    { mitarbeiter: 'Lisa Müller', bereich: 'Vertrieb', zeitraum: 'März 2025', geplant: 1.0, tatsaechlich: 1.1, abweichung: 0.1 },
+  // Gefilterte Liste zur Anzeige in der Tabelle
+  gefilterteAbweichungen: (AbweichungData & { name: string })[] = [];
+
+  // Textfeld für Live-Filterung
+  filterText: string = '';
+
+  // Spalten in der Tabelle
+  displayedColumns: string[] = ['name', 'zeitraum', 'kapazitaet', 'bemerkung', 'aktion'];
+
+  // Beispielhafte Mitarbeitendenliste – später vom Backend laden
+  mitarbeiterListe: Mitarbeiter[] = [
+    { id: 1, vorname: 'Max', nachname: 'Müller' },
+    { id: 2, vorname: 'Lisa', nachname: 'Schmidt' },
+    { id: 3, vorname: 'Ali', nachname: 'Yılmaz' },
   ];
 
-  // Gefilterte Liste, standardmäßig gleich der vollständigen Liste
-  gefilterteListe = [...this.kapazitaetsListe];
-
-  // Liste verfügbarer Bereiche für den Filter
-  bereiche = ['Produktion', 'Vertrieb', 'Verwaltung', 'IT', 'Personal'];
-
-  // Ausgewählter Bereich zum Filtern der Kapazitätsliste
-  gewaehlterBereich = '';
+  constructor(private dialog: MatDialog) {}
 
   ngOnInit(): void {
-    this.filterAnwenden();
+    this.applyFilter(); // Initialfilter bei Start (wenn Daten vorhanden)
   }
 
-  // Anwenden des Filters basierend auf dem ausgewählten Bereich
-  filterAnwenden(): void {
-    this.gefilterteListe = this.gewaehlterBereich 
-      ? this.kapazitaetsListe.filter(item => item.bereich === this.gewaehlterBereich) 
-      : this.kapazitaetsListe;
+  // Neue Abweichung erfassen
+  neueAbweichung(): void {
+    const dialogRef = this.dialog.open(AbweichungDialogComponent, {
+      width: '500px',
+      data: {
+        mitarbeiter: this.mitarbeiterListe
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: AbweichungData) => {
+      if (result) {
+        const name = this.getNameById(result.employeeId);
+        this.abweichungen.push({ ...result, name });
+        this.applyFilter();
+      }
+    });
   }
 
-  // Exportiert die gefilterte Liste als CSV-Datei
+  // Abweichung bearbeiten
+  bearbeiten(abweichung: AbweichungData & { name: string }): void {
+    const dialogRef = this.dialog.open(AbweichungDialogComponent, {
+      width: '500px',
+      data: {
+        abweichung,
+        mitarbeiter: this.mitarbeiterListe
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: AbweichungData) => {
+      if (result) {
+        const index = this.abweichungen.indexOf(abweichung);
+        const name = this.getNameById(result.employeeId);
+        if (index !== -1) {
+          this.abweichungen[index] = { ...result, name };
+          this.applyFilter();
+        }
+      }
+    });
+  }
+
+  // Abweichung löschen
+  loeschen(abweichung: AbweichungData & { name: string }): void {
+    const index = this.abweichungen.indexOf(abweichung);
+    if (index !== -1) {
+      this.abweichungen.splice(index, 1);
+      this.applyFilter();
+    }
+  }
+
+  // Filtert nach Name oder Bemerkung
+  applyFilter(): void {
+    const ft = this.filterText.trim().toLowerCase();
+    this.gefilterteAbweichungen = this.abweichungen.filter(a =>
+      a.name.toLowerCase().includes(ft) ||
+      a.bemerkung?.toLowerCase().includes(ft)
+    );
+  }
+
+  // Ermittelt vollständigen Namen anhand der ID
+  private getNameById(id: number): string {
+    const mitarbeiter = this.mitarbeiterListe.find(m => m.id === id);
+    return mitarbeiter ? `${mitarbeiter.vorname} ${mitarbeiter.nachname}` : 'Unbekannt';
+  }
+
+  // Exportiert Tabelle als CSV-Datei
   exportieren(): void {
-    const csvInhalt = this.arrayZuCSV(this.gefilterteListe);
-    const blob = new Blob([csvInhalt], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = 'kapazitaetsabweichungen.csv';
-    link.click();
-    URL.revokeObjectURL(url);
-  }
+    const csvRows = [
+      ['Name', 'Startdatum', 'Enddatum', 'Neue Kapazität', 'Bemerkung'],
+      ...this.gefilterteAbweichungen.map(a => [
+        a.name,
+        a.startdatum.toLocaleDateString(),
+        a.enddatum.toLocaleDateString(),
+        a.neueKapazitaet.toString(),
+        a.bemerkung || ''
+      ])
+    ];
 
-  // Konvertiert ein Array von Objekten in CSV-Format
-  arrayZuCSV(daten: any[]): string {
-    const kopfzeile = Object.keys(daten[0]).join(';');
-    const zeilen = daten.map(row => Object.values(row).join(';'));
-    return [kopfzeile, ...zeilen].join('\r\n');
-  }
+    const csvContent = csvRows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'kapazitaetsabweichungen.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
 }
