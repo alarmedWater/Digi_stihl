@@ -1,0 +1,53 @@
+<!-- Dialog-Überschrift -->
+<h2 mat-dialog-title>Kapazitätsabweichung</h2>
+
+<!-- Formularcontainer -->
+<form [formGroup]="abweichungForm" mat-dialog-content>
+
+  <!-- Auswahl des Mitarbeiters -->
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Mitarbeiter</mat-label>
+    <mat-select formControlName="employeeId" required>
+      <!-- Durchlaufen aller übergebenen Mitarbeitenden -->
+      <mat-option *ngFor="let mitarbeiter of mitarbeiterListe" [value]="mitarbeiter.id">
+        {{ mitarbeiter.vorname }} {{ mitarbeiter.nachname }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Startdatum der Abweichung -->
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Startdatum</mat-label>
+    <input matInput [matDatepicker]="pickerStart" formControlName="startdatum" required>
+    <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+    <mat-datepicker #pickerStart></mat-datepicker>
+  </mat-form-field>
+
+  <!-- Enddatum der Abweichung -->
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Enddatum</mat-label>
+    <input matInput [matDatepicker]="pickerEnde" formControlName="enddatum" required>
+    <mat-datepicker-toggle matSuffix [for]="pickerEnde"></mat-datepicker-toggle>
+    <mat-datepicker #pickerEnde></mat-datepicker>
+  </mat-form-field>
+
+  <!-- Neue Kapazität (z. B. 0.5 für 50%) -->
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Neue Kapazität (FTE)</mat-label>
+    <input matInput type="number" step="0.1" formControlName="neueKapazitaet" required>
+  </mat-form-field>
+
+  <!-- Freitextfeld für Bemerkung -->
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Bemerkung</mat-label>
+    <textarea matInput formControlName="bemerkung" rows="3"></textarea>
+  </mat-form-field>
+</form>
+
+<!-- Aktionsbuttons unten im Dialog -->
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onAbbrechen()">Abbrechen</button>
+  <button mat-flat-button color="primary" (click)="onSpeichern()" [disabled]="!abweichungForm.valid">
+    Speichern
+  </button>
+</mat-dialog-actions>

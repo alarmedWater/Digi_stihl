@@ -1,0 +1,33 @@
+.dialog-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem; // Abstand zwischen den Formularfeldern
+      padding: 1.5rem;
+    
+      // Optional: Maximalbreite setzen
+      max-width: 600px;
+    
+      // Damit es in der Mitte besser aussieht
+      mat-form-field {
+        width: 100%;
+      }
+    
+      // Optional: Stil für das Hinweis-Label oder Überschrift
+      h2 {
+        margin-top: 0;
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #333;
+      }
+    
+      .actions {
+        display: flex;
+        justify-content: flex-end; // Buttons am rechten Rand
+        gap: 1rem;
+    
+        button {
+          min-width: 100px;
+        }
+      }
+    }
+    
