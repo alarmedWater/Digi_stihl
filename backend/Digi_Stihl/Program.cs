@@ -1,4 +1,6 @@
 using Digi_Stihl.Data;
+using Digi_Stihl.Repositories; 
+using Digi_Stihl.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+// Repositories registrieren
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
+// Services:
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
 
 var app = builder.Build();
 
