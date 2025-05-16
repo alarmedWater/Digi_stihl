@@ -1,1 +1,29 @@
-<p>befristung works!</p>
+<h2>Befristete Mitarbeitende</h2>
+
+<!-- Eingabefeld für Suchfilter -->
+<input
+  type="text"
+  [(ngModel)]="suchbegriff"
+  placeholder="Suche nach Name, Abteilung, Beschäftigungsart..."
+/>
+
+<!-- Tabelle mit gefilterten Mitarbeitenden -->
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Abteilung</th>
+      <th>Beschäftigungsart</th>
+      <th>Befristet bis</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let mitarbeiter of gefilterteBefristete">
+      <td>{{ mitarbeiter.name }}</td>
+      <td>{{ mitarbeiter.abteilung }}</td>
+      <td>{{ mitarbeiter.beschaeftigungsart }}</td>
+      <td>{{ mitarbeiter.befristetBis }}</td>
+    </tr>
+  </tbody>
+</table>
+

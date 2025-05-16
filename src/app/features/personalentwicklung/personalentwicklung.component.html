@@ -1,1 +1,30 @@
-<p>personalentwicklung works!</p>
+<div class="personalentwicklung-wrapper">
+      <h2>Personalentwicklung – Übersicht</h2>
+    
+      <!-- Tabelle mit Personalentwicklungsdaten -->
+      <table class="entwicklungstabelle">
+        <thead>
+          <tr>
+            <th>Jahr</th>
+            <th>Monat</th>
+            <th>Direkte</th>
+            <th>Indirekte</th>
+            <th>Gesamt ohne Azubis</th>
+            <th>Sonstige Belegschaft</th>
+            <th>Gesamt</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let eintrag of daten">
+            <td>{{ eintrag.jahr }}</td>
+            <td>{{ eintrag.monat }}</td>
+            <td>{{ eintrag.direkte }}</td>
+            <td>{{ eintrag.indirekte }}</td>
+            <td>{{ eintrag.ohneAzubis }}</td>
+            <td>{{ eintrag.sonstige }}</td>
+            <td>{{ eintrag.gesamt }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    

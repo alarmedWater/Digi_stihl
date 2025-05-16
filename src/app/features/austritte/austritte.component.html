@@ -1,1 +1,25 @@
-<p>austritte works!</p>
+<!-- src/app/features/austritte/austritte.component.html -->
+
+<h2>Austritte</h2>
+
+<!-- Suchfeld -->
+<input type="text" [(ngModel)]="suchbegriff" placeholder="Suche nach Name oder Datum" />
+
+<!-- Tabelle mit gefilterten Daten -->
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Abteilung</th>
+      <th>Austrittsdatum</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let mitarbeiter of gefilterteAustritte">
+      <td>{{ mitarbeiter.name }}</td>
+      <td>{{ mitarbeiter.abteilung }}</td>
+      <td>{{ mitarbeiter.austrittsdatum }}</td>
+    </tr>
+  </tbody>
+</table>
+

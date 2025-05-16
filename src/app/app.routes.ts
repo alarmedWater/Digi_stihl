@@ -4,7 +4,7 @@ import { BearbeitenComponent } from './features/mitarbeiter/bearbeiten/bearbeite
 import { KapazitaetsabweichungComponent } from './features/mitarbeiter/kapazitaetsabweichung/kapazitaetsabweichung.component';
 import { DirMitarbeiterComponent } from './features/auswertungen/dir-mitarbeiter/dir-mitarbeiter.component';
 import { IndirMitarbeiterComponent } from './features/auswertungen/indir-mitarbeiter/indir-mitarbeiter.component';
-import { AtzComponent } from './features/atz/atz.component';
+import { ATZComponent } from './features/atz/atz.component';
 import { BefristungComponent } from './features/befristung/befristung.component';
 import { AustritteComponent } from './features/austritte/austritte.component';
 import { FluktuationComponent } from './features/fluktuation/fluktuation.component';
@@ -16,7 +16,7 @@ export const routes: Routes = [
   { path: 'kapazitaetsabweichung', component: KapazitaetsabweichungComponent },
   { path: 'kapazitaetsauswertung-dir', component: DirMitarbeiterComponent },
   { path: 'kapazitaetsauswertung-indir', component: IndirMitarbeiterComponent },
-  { path: 'atz', component: AtzComponent },
+  { path: 'atz', component: ATZComponent },
   { path: 'befristung', component: BefristungComponent },
   { path: 'austritte', component: AustritteComponent },
   { path: 'fluktuation', component: FluktuationComponent },

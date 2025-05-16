@@ -1,18 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ATZComponent } from './atz.component';
 
-import { AtzComponent } from './atz.component';
-
-describe('AtzComponent', () => {
-  let component: AtzComponent;
-  let fixture: ComponentFixture<AtzComponent>;
+describe('ATZComponent', () => {
+  let component: ATZComponent;
+  let fixture: ComponentFixture<ATZComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AtzComponent]
-    })
-    .compileComponents();
+      imports: [ATZComponent], // für Standalone-Komponente
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(AtzComponent);
+    fixture = TestBed.createComponent(ATZComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
