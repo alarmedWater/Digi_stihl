@@ -1,0 +1,6 @@
+@Digi_Stihl_HostAddress = http://localhost:5036
+
+GET {{Digi_Stihl_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
