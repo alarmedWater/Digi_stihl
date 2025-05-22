@@ -1,7 +1,9 @@
 using Digi_Stihl.Data;
 using Digi_Stihl.Repositories; 
 using Digi_Stihl.Services;
+using Digi_Stihl.Mappings
 using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,10 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
 // Services:
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
+
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 
 var app = builder.Build();
