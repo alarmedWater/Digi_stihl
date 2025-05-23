@@ -1,8 +1,10 @@
-// Datei: /backend/Digi_Stihl/DTOs/EmployeeDto.cs
 namespace Digi_Stihl.DTOs
 {
     public class EmployeeDto
     {
+        // Neu: die ID, damit CreatedAtAction funktioniert
+        public int EmployeeId { get; set; }
+
         public string Name { get; set; } = string.Empty;
         public string Vorname { get; set; } = string.Empty;
         public DateTime Eintritt { get; set; }

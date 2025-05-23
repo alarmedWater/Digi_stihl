@@ -1,85 +1,67 @@
+using AutoMapper;
 using Digi_Stihl.DTOs;
 using Digi_Stihl.Models;
 using Digi_Stihl.Repositories;
 
-namespace Digi_Stihl.Services;
-
-public class EmployeeService : IEmployeeService
+namespace Digi_Stihl.Services
 {
-    private readonly IEmployeeRepository _repo;
-
-    public EmployeeService(IEmployeeRepository repo)
+    public class EmployeeService : IEmployeeService
     {
-        _repo = repo;
-    }
+        private readonly IEmployeeRepository _repo;
+        private readonly IMapper _mapper;
 
-    public async Task<Employee> CreateEmployeeAsync(EmployeeDto dto)
-    {
-        var entity = new Employee
+        public EmployeeService(IEmployeeRepository repo, IMapper mapper)
         {
-            Name = dto.Name,
-            Vorname = dto.Vorname,
-            Eintritt = dto.Eintritt,
-            Befristung = dto.Befristung,
-            Verlaengerung1 = dto.Verlaengerung1,
-            Verlaengerung2 = dto.Verlaengerung2,
-            BefristungMax = dto.BefristungMax,
-            Freistellung = dto.Freistellung,
-            Kuendigung = dto.Kuendigung,
-            Austrittsart = dto.Austrittsart,
-            Bemerkung = dto.Bemerkung,
-            Funktion = dto.Funktion,
-            Kostenstelle = dto.Kostenstelle,
-            FTE = dto.FTE,
-            Bereich = dto.Bereich,
-            Mengenabhaengig = dto.Mengenabhaengig,
-            Arbeitsverhaeltnis = dto.Arbeitsverhaeltnis
-        };
+            _repo   = repo;
+            _mapper = mapper;
+        }
 
-        await _repo.AddAsync(entity);
-        return entity;
+        public async Task<EmployeeDto> CreateEmployeeAsync(EmployeeDto dto)
+        {
+            // DTO -> Entity
+            var entity = _mapper.Map<Employee>(dto);
+            await _repo.AddAsync(entity);
+
+            // Entity (with generated ID) -> DTO
+            return _mapper.Map<EmployeeDto>(entity);
+        }
+
+        public async Task<EmployeeDto?> UpdateEmployeeAsync(int id, EmployeeDto dto)
+        {
+            var existing = await _repo.GetByIdAsync(id);
+            if (existing == null) 
+                return null;
+
+            // Map incoming DTO onto existing entity
+            _mapper.Map(dto, existing);
+            await _repo.UpdateAsync(existing);
+
+            // Return updated DTO
+            return _mapper.Map<EmployeeDto>(existing);
+        }
+
+        public async Task<bool> DeleteEmployeeAsync(int id)
+        {
+            var existing = await _repo.GetByIdAsync(id);
+            if (existing == null) 
+                return false;
+
+            await _repo.DeleteByIdAsync(id);
+            return true;
+        }
+
+        public async Task<EmployeeDto?> GetEmployeeByIdAsync(int id)
+        {
+            var entity = await _repo.GetByIdAsync(id);
+            return entity == null 
+                ? null 
+                : _mapper.Map<EmployeeDto>(entity);
+        }
+
+        public async Task<IList<EmployeeDto>> GetEmployeesAsync(EmployeeFilterDto filters)
+        {
+            var entities = await _repo.GetFilteredAsync(filters);
+            return _mapper.Map<IList<EmployeeDto>>(entities);
+        }
     }
-
-    public async Task<Employee?> UpdateEmployeeAsync(int id, EmployeeDto dto)
-    {
-        var existing = await _repo.GetByIdAsync(id);
-        if (existing == null) return null;
-
-        // Feldaktualisierung
-        existing.Name = dto.Name;
-        existing.Vorname = dto.Vorname;
-        existing.Eintritt = dto.Eintritt;
-        existing.Befristung = dto.Befristung;
-        existing.Verlaengerung1 = dto.Verlaengerung1;
-        existing.Verlaengerung2 = dto.Verlaengerung2;
-        existing.BefristungMax = dto.BefristungMax;
-        existing.Freistellung = dto.Freistellung;
-        existing.Kuendigung = dto.Kuendigung;
-        existing.Austrittsart = dto.Austrittsart;
-        existing.Bemerkung = dto.Bemerkung;
-        existing.Funktion = dto.Funktion;
-        existing.Kostenstelle = dto.Kostenstelle;
-        existing.FTE = dto.FTE;
-        existing.Bereich = dto.Bereich;
-        existing.Mengenabhaengig = dto.Mengenabhaengig;
-        existing.Arbeitsverhaeltnis = dto.Arbeitsverhaeltnis;
-
-        await _repo.UpdateAsync(existing);
-        return existing;
-    }
-
-    public async Task<bool> DeleteEmployeeAsync(int id)
-    {
-        var existing = await _repo.GetByIdAsync(id);
-        if (existing == null) return false;
-
-        await _repo.DeleteByIdAsync(id);
-        return true;
-    }
-
-    public Task<Employee?> GetEmployeeByIdAsync(int id)
-        => _repo.GetByIdAsync(id);
-
-    public Task<IList<Employee>> GetEmployeesAsync(EmployeeFilterDto filters)
-        => _repo.GetFilteredAsync(filters);
 }
