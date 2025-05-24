@@ -10,3 +10,8 @@ npm start
 run backend with:
 cd ~/Documents/Digi/backend   # or wherever your .NET project lives
 dotnet run
+
+
+Datenban starten in DOcker:
+cd ~/Documents/Digi/Digi_stihl/database
+docker-compose up -d

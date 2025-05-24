@@ -20,6 +20,11 @@ namespace Digi_Stihl.Services
         {
             // DTO -> Entity
             var entity = _mapper.Map<Employee>(dto);
+
+            // GUID einmalig generieren
+            entity.EmployeeGuid = Guid.NewGuid();
+
+            // Speichern
             await _repo.AddAsync(entity);
 
             // Entity (with generated ID) -> DTO
