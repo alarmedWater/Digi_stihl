@@ -2,7 +2,7 @@ using AutoMapper;
 using Digi_Stihl.Models;
 using Digi_Stihl.DTOs;
 
-namespace Digi_Stihl.Mappings
+namespace Digi_Stihl.MappingProfiles
 {
     public class MappingProfile : Profile
     {

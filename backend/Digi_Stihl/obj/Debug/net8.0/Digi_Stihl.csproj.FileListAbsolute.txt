@@ -5,6 +5,8 @@
 /home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/bin/Debug/net8.0/Digi_Stihl.runtimeconfig.json
 /home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/bin/Debug/net8.0/Digi_Stihl.dll
 /home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/bin/Debug/net8.0/Digi_Stihl.pdb
+/home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/bin/Debug/net8.0/AutoMapper.dll
+/home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/bin/Debug/net8.0/AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 /home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/bin/Debug/net8.0/Azure.Core.dll
 /home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/bin/Debug/net8.0/Azure.Identity.dll
 /home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/bin/Debug/net8.0/Humanizer.dll
