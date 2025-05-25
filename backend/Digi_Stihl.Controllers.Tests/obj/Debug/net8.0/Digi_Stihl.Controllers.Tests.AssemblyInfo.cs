@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Digi_Stihl.Controllers.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+60ff011425e6ddd7a63a7e7d807b822d208f886e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b7219ff48acb706679d827bf4213f84cffeb3233")]
 [assembly: System.Reflection.AssemblyProductAttribute("Digi_Stihl.Controllers.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Digi_Stihl.Controllers.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

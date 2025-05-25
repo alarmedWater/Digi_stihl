@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "V/PTHrXipTc=",
+  "dgSpecHash": "h2m+Hd2qgsQ=",
   "success": true,
   "projectFilePath": "/home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl.Services.Tests/Digi_Stihl.Services.Tests.csproj",
   "expectedPackageFiles": [
+    "/home/parallels/.nuget/packages/automapper/12.0.1/automapper.12.0.1.nupkg.sha512",
+    "/home/parallels/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/12.0.1/automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
     "/home/parallels/.nuget/packages/azure.core/1.38.0/azure.core.1.38.0.nupkg.sha512",
     "/home/parallels/.nuget/packages/azure.identity/1.11.4/azure.identity.1.11.4.nupkg.sha512",
     "/home/parallels/.nuget/packages/castle.core/5.1.1/castle.core.5.1.1.nupkg.sha512",
@@ -11,7 +13,7 @@
     "/home/parallels/.nuget/packages/microsoft.aspnetcore.openapi/8.0.14/microsoft.aspnetcore.openapi.8.0.14.nupkg.sha512",
     "/home/parallels/.nuget/packages/microsoft.bcl.asyncinterfaces/1.1.1/microsoft.bcl.asyncinterfaces.1.1.1.nupkg.sha512",
     "/home/parallels/.nuget/packages/microsoft.codecoverage/17.13.0/microsoft.codecoverage.17.13.0.nupkg.sha512",
-    "/home/parallels/.nuget/packages/microsoft.csharp/4.5.0/microsoft.csharp.4.5.0.nupkg.sha512",
+    "/home/parallels/.nuget/packages/microsoft.csharp/4.7.0/microsoft.csharp.4.7.0.nupkg.sha512",
     "/home/parallels/.nuget/packages/microsoft.data.sqlclient/5.1.6/microsoft.data.sqlclient.5.1.6.nupkg.sha512",
     "/home/parallels/.nuget/packages/microsoft.data.sqlclient.sni.runtime/5.1.1/microsoft.data.sqlclient.sni.runtime.5.1.1.nupkg.sha512",
     "/home/parallels/.nuget/packages/microsoft.entityframeworkcore/9.0.4/microsoft.entityframeworkcore.9.0.4.nupkg.sha512",
