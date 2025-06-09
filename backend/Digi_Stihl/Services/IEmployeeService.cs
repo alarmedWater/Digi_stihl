@@ -1,13 +1,14 @@
+// /Services/IEmployeeService.cs
 using Digi_Stihl.DTOs;
-using Digi_Stihl.Models;
 
-namespace Digi_Stihl.Services;
-
-public interface IEmployeeService
+namespace Digi_Stihl.Services
 {
-    Task<Employee> CreateEmployeeAsync(EmployeeDto dto);
-    Task<Employee?> UpdateEmployeeAsync(int id, EmployeeDto dto);
-    Task<bool> DeleteEmployeeAsync(int id);
-    Task<Employee?> GetEmployeeByIdAsync(int id);
-    Task<IList<Employee>> GetEmployeesAsync(EmployeeFilterDto filters);
+    public interface IEmployeeService
+    {
+        Task<EmployeeDto> CreateEmployeeAsync(EmployeeDto dto);
+        Task<EmployeeDto?> UpdateEmployeeAsync(int id, EmployeeDto dto);
+        Task<bool> DeleteEmployeeAsync(int id);
+        Task<EmployeeDto?> GetEmployeeByIdAsync(int id);
+        Task<IList<EmployeeDto>> GetEmployeesAsync(EmployeeFilterDto filters);
+    }
 }
