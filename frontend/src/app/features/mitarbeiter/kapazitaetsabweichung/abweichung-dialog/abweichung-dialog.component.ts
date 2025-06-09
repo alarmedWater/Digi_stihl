@@ -41,7 +41,7 @@ export interface Mitarbeiter {
     MatDatepickerModule,
     MatNativeDateModule,
     MatSelectModule,
-    MatDialogModule,   // ✅ Wichtig für <mat-dialog-actions>
+    MatDialogModule,   // Wichtig für <mat-dialog-actions>
     NgIf,
     NgFor
   ]

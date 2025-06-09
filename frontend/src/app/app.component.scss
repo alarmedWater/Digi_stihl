@@ -12,7 +12,7 @@
     .sidenav {
       width: 280px;                       // feste Breite der Sidebar
       padding: 1rem;                      // Innenabstand
-      background-color: #f3a837;          // hellorange Hintergrundfarbe
+      background-color: #f37a1f;          // hellorange Hintergrundfarbe
       color: white;                       // Textfarbe in der Sidebar
       font-weight: 600;                   // Schriftstärke
     }
@@ -36,7 +36,7 @@
     
     // Hover-Effekt der Navigationslinks beim Mouseover
     mat-nav-list a:hover {
-      background-color: #524e4a;          // dunkelgrauer Hover-Effekt
+      background-color: #1f1d1c;          // dunkelgrauer Hover-Effekt
       color: white;                       // Schriftfarbe weiß für gute Lesbarkeit
     }
     

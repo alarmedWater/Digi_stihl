@@ -5264,19 +5264,19 @@
     ]
   },
   "packageFolders": {
-    "/home/parallels/.nuget/packages/": {}
+    "C:\\Users\\Chedhlyg\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/Digi_Stihl.csproj",
+      "projectUniqueName": "C:\\Users\\Chedhlyg\\personalplanung-tool\\backend\\Digi_Stihl\\Digi_Stihl.csproj",
       "projectName": "Digi_Stihl",
-      "projectPath": "/home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/Digi_Stihl.csproj",
-      "packagesPath": "/home/parallels/.nuget/packages/",
-      "outputPath": "/home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/obj/",
+      "projectPath": "C:\\Users\\Chedhlyg\\personalplanung-tool\\backend\\Digi_Stihl\\Digi_Stihl.csproj",
+      "packagesPath": "C:\\Users\\Chedhlyg\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Chedhlyg\\personalplanung-tool\\backend\\Digi_Stihl\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/parallels/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\Chedhlyg\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -5347,7 +5347,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/home/parallels/.dotnet/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.410/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

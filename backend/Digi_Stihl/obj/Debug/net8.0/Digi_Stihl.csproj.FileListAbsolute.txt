@@ -168,3 +168,14 @@
 /home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/obj/Debug/net8.0/Digi_Stihl.pdb
 /home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/obj/Debug/net8.0/Digi_Stihl.genruntimeconfig.cache
 /home/parallels/Documents/Digi/Digi_stihl/backend/Digi_Stihl/obj/Debug/net8.0/ref/Digi_Stihl.dll
+C:\Users\Chedhlyg\personalplanung-tool\backend\Digi_Stihl\obj\Debug\net8.0\Digi_Stihl.csproj.AssemblyReference.cache
+C:\Users\Chedhlyg\personalplanung-tool\backend\Digi_Stihl\obj\Debug\net8.0\Digi_Stihl.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Chedhlyg\personalplanung-tool\backend\Digi_Stihl\obj\Debug\net8.0\Digi_Stihl.AssemblyInfoInputs.cache
+C:\Users\Chedhlyg\personalplanung-tool\backend\Digi_Stihl\obj\Debug\net8.0\Digi_Stihl.AssemblyInfo.cs
+C:\Users\Chedhlyg\personalplanung-tool\backend\Digi_Stihl\obj\Debug\net8.0\Digi_Stihl.csproj.CoreCompileInputs.cache
+C:\Users\Chedhlyg\personalplanung-tool\backend\Digi_Stihl\obj\Debug\net8.0\Digi_Stihl.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Chedhlyg\personalplanung-tool\backend\Digi_Stihl\obj\Debug\net8.0\Digi_Stihl.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Chedhlyg\personalplanung-tool\backend\Digi_Stihl\obj\Debug\net8.0\Digi_Stihl.sourcelink.json
+C:\Users\Chedhlyg\personalplanung-tool\backend\Digi_Stihl\obj\Debug\net8.0\Digi_Stihl.dll
+C:\Users\Chedhlyg\personalplanung-tool\backend\Digi_Stihl\obj\Debug\net8.0\refint\Digi_Stihl.dll
+C:\Users\Chedhlyg\personalplanung-tool\backend\Digi_Stihl\obj\Debug\net8.0\Digi_Stihl.pdb

@@ -1,7 +1,7 @@
 using Digi_Stihl.Data;
 using Digi_Stihl.Repositories; 
 using Digi_Stihl.Services;
-using Digi_Stihl.Mappings
+using Digi_Stihl.Mappings;
 using Microsoft.EntityFrameworkCore;
 
 
