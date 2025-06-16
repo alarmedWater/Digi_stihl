@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Digi_Stihl.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250524101507_UpdateEmployeeModel")]
-    partial class UpdateEmployeeModel
+    [Migration("20250616190257_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,24 +34,24 @@ namespace Digi_Stihl.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CapacityDeviationId"));
 
                     b.Property<string>("Bemerkung")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Enddatum")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("NeueKapazitaet")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(5,2)");
 
-                    b.Property<DateTime>("Startdatum")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
 
                     b.HasKey("CapacityDeviationId");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex("EmployeeId", "Year", "Month")
+                        .IsUnique();
 
                     b.ToTable("CapacityDeviations");
                 });
@@ -72,6 +72,38 @@ namespace Digi_Stihl.Migrations
                     b.HasKey("Kostenstelle");
 
                     b.ToTable("Departments");
+
+                    b.HasData(
+                        new
+                        {
+                            Kostenstelle = "D001",
+                            Abteilungsname = "Produktion",
+                            Bereichsnummer = "01"
+                        },
+                        new
+                        {
+                            Kostenstelle = "D002",
+                            Abteilungsname = "Vertrieb",
+                            Bereichsnummer = "02"
+                        },
+                        new
+                        {
+                            Kostenstelle = "D003",
+                            Abteilungsname = "Personal",
+                            Bereichsnummer = "03"
+                        },
+                        new
+                        {
+                            Kostenstelle = "D004",
+                            Abteilungsname = "IT",
+                            Bereichsnummer = "04"
+                        },
+                        new
+                        {
+                            Kostenstelle = "D005",
+                            Abteilungsname = "Verwaltung",
+                            Bereichsnummer = "05"
+                        });
                 });
 
             modelBuilder.Entity("Digi_Stihl.Models.Employee", b =>
@@ -82,11 +114,8 @@ namespace Digi_Stihl.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"));
 
-                    b.Property<string>("Arbeitsverhaeltnis")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Austrittsart")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Arbeitsverhaeltnis")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("Befristung")
                         .HasColumnType("datetime2");
@@ -97,8 +126,8 @@ namespace Digi_Stihl.Migrations
                     b.Property<string>("Bemerkung")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Bereich")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Bereich")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("Eintritt")
                         .HasColumnType("datetime2");
@@ -107,8 +136,11 @@ namespace Digi_Stihl.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal?>("FTE")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int?>("ExitReasonId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("FTE")
+                        .HasColumnType("decimal(3,2)");
 
                     b.Property<DateTime?>("Freistellung")
                         .HasColumnType("datetime2");
@@ -121,9 +153,6 @@ namespace Digi_Stihl.Migrations
 
                     b.Property<DateTime?>("Kuendigung")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Mengenabhaengig")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -140,6 +169,8 @@ namespace Digi_Stihl.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("EmployeeId");
+
+                    b.HasIndex("ExitReasonId");
 
                     b.HasIndex("Kostenstelle");
 
@@ -158,9 +189,44 @@ namespace Digi_Stihl.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Reason")
+                        .HasColumnType("int");
+
                     b.HasKey("ExitReasonId");
 
                     b.ToTable("ExitReasons");
+
+                    b.HasData(
+                        new
+                        {
+                            ExitReasonId = 1,
+                            Description = "Eigenkündigung",
+                            Reason = 0
+                        },
+                        new
+                        {
+                            ExitReasonId = 2,
+                            Description = "Kündigung durch Arbeitgeber",
+                            Reason = 1
+                        },
+                        new
+                        {
+                            ExitReasonId = 3,
+                            Description = "Eintritt in Altersteilzeit",
+                            Reason = 2
+                        },
+                        new
+                        {
+                            ExitReasonId = 4,
+                            Description = "Ruhestand",
+                            Reason = 3
+                        },
+                        new
+                        {
+                            ExitReasonId = 5,
+                            Description = "Ende der Probezeit",
+                            Reason = 4
+                        });
                 });
 
             modelBuilder.Entity("Digi_Stihl.Models.FluctuationReport", b =>
@@ -178,7 +244,7 @@ namespace Digi_Stihl.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Fluktuationsrate")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<int>("Gesamtmitarbeiter")
                         .HasColumnType("int");
@@ -210,11 +276,17 @@ namespace Digi_Stihl.Migrations
 
             modelBuilder.Entity("Digi_Stihl.Models.Employee", b =>
                 {
+                    b.HasOne("Digi_Stihl.Models.ExitReason", "ExitReason")
+                        .WithMany()
+                        .HasForeignKey("ExitReasonId");
+
                     b.HasOne("Digi_Stihl.Models.Department", "Department")
                         .WithMany("Employees")
                         .HasForeignKey("Kostenstelle");
 
                     b.Navigation("Department");
+
+                    b.Navigation("ExitReason");
                 });
 
             modelBuilder.Entity("Digi_Stihl.Models.Department", b =>

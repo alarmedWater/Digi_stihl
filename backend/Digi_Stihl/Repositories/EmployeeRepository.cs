@@ -45,30 +45,44 @@ namespace Digi_Stihl.Repositories
 
         public async Task<IList<Employee>> GetFilteredAsync(EmployeeFilterDto f)
         {
-            var q = _db.Employees.AsQueryable();
+            var q = _db.Employees
+                    .Include(e => e.Department)
+                    .Include(e => e.ExitReason)
+                    .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(f.Name))
                 q = q.Where(e => e.Name.Contains(f.Name));
+
             if (!string.IsNullOrWhiteSpace(f.Vorname))
                 q = q.Where(e => e.Vorname.Contains(f.Vorname));
+
             if (f.EintrittFrom.HasValue)
                 q = q.Where(e => e.Eintritt >= f.EintrittFrom.Value);
+
             if (f.EintrittTo.HasValue)
                 q = q.Where(e => e.Eintritt <= f.EintrittTo.Value);
+
             if (!string.IsNullOrWhiteSpace(f.Funktion))
-                q = q.Where(e => e.Funktion.Contains(f.Funktion));
+                q = q.Where(e => e.Funktion!.Contains(f.Funktion));
+
             if (!string.IsNullOrWhiteSpace(f.Kostenstelle))
                 q = q.Where(e => e.Kostenstelle == f.Kostenstelle);
-            if (!string.IsNullOrWhiteSpace(f.Bereich))
-                q = q.Where(e => e.Bereich == f.Bereich);
-            if (!string.IsNullOrWhiteSpace(f.Mengenabhaengig))
-                q = q.Where(e => e.Mengenabhaengig == f.Mengenabhaengig);
-            if (!string.IsNullOrWhiteSpace(f.Arbeitsverhaeltnis))
-                q = q.Where(e => e.Arbeitsverhaeltnis == f.Arbeitsverhaeltnis);
-            if (!string.IsNullOrWhiteSpace(f.Austrittsart))
-                q = q.Where(e => e.Austrittsart == f.Austrittsart);
+
+            // Bereich (Enum) filtern
+            if (f.Bereich.HasValue)
+                q = q.Where(e => e.Bereich == f.Bereich.Value);
+
+            // Arbeitsverhaeltnis (Enum) filtern
+            if (f.Arbeitsverhaeltnis.HasValue)
+                q = q.Where(e => e.Arbeitsverhaeltnis == f.Arbeitsverhaeltnis.Value);
+
+            // Optional: nach ExitReasonId filtern
+            if (f.ExitReasonId.HasValue)
+                q = q.Where(e => e.ExitReasonId == f.ExitReasonId.Value);
+
             if (f.MinFTE.HasValue)
                 q = q.Where(e => e.FTE >= f.MinFTE.Value);
+
             if (f.MaxFTE.HasValue)
                 q = q.Where(e => e.FTE <= f.MaxFTE.Value);
 

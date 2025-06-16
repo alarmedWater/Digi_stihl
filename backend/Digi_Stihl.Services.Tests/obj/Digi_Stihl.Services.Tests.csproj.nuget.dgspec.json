@@ -49,7 +49,11 @@
           "dependencies": {
             "Microsoft.EntityFrameworkCore.InMemory": {
               "target": "Package",
-              "version": "[9.0.4, )"
+              "version": "[9.0.5, )"
+            },
+            "Microsoft.EntityFrameworkCore.Relational": {
+              "target": "Package",
+              "version": "[9.0.5, )"
             },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",

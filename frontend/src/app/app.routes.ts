@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { AnlegenComponent } from './features/mitarbeiter/anlegen/anlegen.component';
-import { BearbeitenComponent } from './features/mitarbeiter/bearbeiten/bearbeiten.component';
+import { AnlegenComponent } from './features/mitarbeiter/components/anlegen/anlegen.component';
+import { BearbeitenComponent } from './features/mitarbeiter/components/bearbeiten/bearbeiten.component';
 import { KapazitaetsabweichungComponent } from './features/mitarbeiter/kapazitaetsabweichung/kapazitaetsabweichung.component';
 import { DirMitarbeiterComponent } from './features/auswertungen/dir-mitarbeiter/dir-mitarbeiter.component';
 import { IndirMitarbeiterComponent } from './features/auswertungen/indir-mitarbeiter/indir-mitarbeiter.component';

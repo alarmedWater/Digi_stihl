@@ -11,8 +11,10 @@ namespace Digi_Stihl.MappingProfiles
             // Entity ↔ DTO
             CreateMap<Employee, EmployeeDto>().ReverseMap();
 
+            // MappingProfiles/MappingProfile.cs
+            CreateMap<CapacityDeviation, CapacityDeviationDto>().ReverseMap();
+
             // später für weitere Paare:
-            // CreateMap<CapacityDeviation, CapacityDeviationDto>().ReverseMap();
             // CreateMap<FluctuationReport, FluctuationReportDto>().ReverseMap();
 
         }

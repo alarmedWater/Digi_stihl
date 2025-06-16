@@ -1,3 +1,7 @@
+// DTOs/EmployeeFilterDto.cs
+
+using Digi_Stihl.Models;
+
 namespace Digi_Stihl.DTOs
 {
     public class EmployeeFilterDto
@@ -8,10 +12,14 @@ namespace Digi_Stihl.DTOs
         public DateTime? EintrittTo { get; set; }
         public string? Funktion { get; set; }
         public string? Kostenstelle { get; set; }
-        public string? Bereich { get; set; }
-        public string? Mengenabhaengig { get; set; }
-        public string? Arbeitsverhaeltnis { get; set; }
-        public string? Austrittsart { get; set; }
+
+        // Neu: Enums statt Strings
+        public BereichTyp? Bereich { get; set; }
+        public Arbeitsverhaeltnis? Arbeitsverhaeltnis { get; set; }
+
+        // Optional: Filter nach ExitReason
+        public int? ExitReasonId { get; set; }
+
         public decimal? MinFTE { get; set; }
         public decimal? MaxFTE { get; set; }
     }

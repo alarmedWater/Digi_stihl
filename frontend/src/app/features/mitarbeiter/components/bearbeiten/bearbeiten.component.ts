@@ -5,7 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MitarbeiterService } from '../../../services/mitarbeiter.service';
+import { MitarbeiterService } from '../../services/mitarbeiter.service';
 import { CommonModule } from '@angular/common';
 
 // Interface zur Typisierung der Mitarbeiter-Daten

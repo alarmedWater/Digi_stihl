@@ -1,3 +1,4 @@
+//ApplicationDbContextFactory.cs
 using Digi_Stihl.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
