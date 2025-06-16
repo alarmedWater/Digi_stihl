@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Digi_Stihl.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250616190257_InitialCreate")]
+    [Migration("20250616200917_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

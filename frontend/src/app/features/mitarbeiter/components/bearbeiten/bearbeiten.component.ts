@@ -1,28 +1,49 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, Validators, FormGroup, FormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MitarbeiterService } from '../../services/mitarbeiter.service';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  FormGroup,
+  FormsModule
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-// Interface zur Typisierung der Mitarbeiter-Daten
+import { MatTableModule } from '@angular/material/table';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule }      from '@angular/material/input';
+import { MatButtonModule }     from '@angular/material/button';
+import {
+  MatDialog,
+  MatDialogModule,
+  MAT_DIALOG_DATA,
+  MatDialogRef
+} from '@angular/material/dialog';
+import { MatSelectModule }     from '@angular/material/select';
+
+import { MitarbeiterService } from '../../services/mitarbeiter.service';
+import { EmployeeDto }        from '../../models/employee';
+
+// Union-Typen direkt inline
+type Bereich = 'Direkt' | 'Indirekt';
+type Arbeitsverhaeltnis = 'Befristet' | 'Unbefristet';
+
 interface Mitarbeiter {
   id: number;
   vorname: string;
   nachname: string;
   kostenstelle: string;
-  bereich: string;
+  bereich: Bereich;
   eintritt: string;
+  // Felder, die wir fürs Update nachreichen
+  arbeitsverhaeltnis: Arbeitsverhaeltnis;
+  fte: number;
 }
 
-// Hauptkomponente für die Bearbeitung der Mitarbeiterdaten
 @Component({
   selector: 'app-bearbeiten',
   standalone: true,
   imports: [
+    CommonModule,
     ReactiveFormsModule,
     FormsModule,
     MatTableModule,
@@ -30,22 +51,27 @@ interface Mitarbeiter {
     MatInputModule,
     MatButtonModule,
     MatDialogModule,
-    CommonModule
+    MatSelectModule
   ],
   templateUrl: './bearbeiten.component.html',
   styleUrls: ['./bearbeiten.component.scss'],
 })
 export class BearbeitenComponent implements OnInit {
-  displayedColumns: string[] = ['vorname', 'nachname', 'kostenstelle', 'bereich', 'eintritt', 'aktion'];
+  displayedColumns = [
+    'vorname',
+    'nachname',
+    'kostenstelle',
+    'bereich',
+    'eintritt',
+    'aktion'
+  ];
 
   mitarbeiterListe: Mitarbeiter[] = [];
   gefilterteListe: Mitarbeiter[] = [];
-
-  filterWert: string = '';
+  filterWert = '';
 
   constructor(
-    private mitarbeiterService: MitarbeiterService,
-    private fb: FormBuilder,
+    private svc: MitarbeiterService,
     private dialog: MatDialog
   ) {}
 
@@ -53,110 +79,135 @@ export class BearbeitenComponent implements OnInit {
     this.loadMitarbeiter();
   }
 
-  // Mitarbeiterdaten vom Server laden
-  loadMitarbeiter(): void {
-    this.mitarbeiterService.getMitarbeiter().subscribe((daten: Mitarbeiter[]) => {
-      this.mitarbeiterListe = daten;
-      this.gefilterteListe = daten;
-    });
+  private loadMitarbeiter(): void {
+    this.svc.getMitarbeiter()
+      .subscribe((dtos: EmployeeDto[]) => {
+        this.mitarbeiterListe = dtos.map(dto => ({
+          id:                 dto.employeeId!,     // assert nie undefined
+          vorname:            dto.vorname,
+          nachname:           dto.name,
+          kostenstelle:       dto.kostenstelle!,
+          bereich:            dto.bereich,
+          eintritt:           dto.eintritt,
+          arbeitsverhaeltnis: dto.arbeitsverhaeltnis,
+          fte:                dto.fte
+        }));
+        this.gefilterteListe = [...this.mitarbeiterListe];
+      });
   }
 
-  // Filterfunktion zur Suche innerhalb der Mitarbeiterliste
   applyFilter(): void {
-    const filterValue = this.filterWert.trim().toLowerCase();
-    this.gefilterteListe = this.mitarbeiterListe.filter(
-      (mitarbeiter: Mitarbeiter) =>
-        mitarbeiter.vorname.toLowerCase().includes(filterValue) ||
-        mitarbeiter.nachname.toLowerCase().includes(filterValue) ||
-        mitarbeiter.bereich.toLowerCase().includes(filterValue)
+    const v = this.filterWert.trim().toLowerCase();
+    this.gefilterteListe = this.mitarbeiterListe.filter(m =>
+      m.vorname.toLowerCase().includes(v)
+      || m.nachname.toLowerCase().includes(v)
+      || m.bereich.toLowerCase().includes(v)
     );
   }
 
-  // Öffnet Dialogfenster zur Bearbeitung der Mitarbeiterdaten
-  bearbeiten(mitarbeiter: Mitarbeiter): void {
-    const dialogRef = this.dialog.open(MitarbeiterBearbeitenDialog, {
-      width: 'auto',
-      height: 'auto',
-      data: mitarbeiter,
-      panelClass: 'custom-dialog-container' // Eigene CSS-Klasse für geradlinige Ränder
+  bearbeiten(m: Mitarbeiter): void {
+    const ref = this.dialog.open(MitarbeiterBearbeitenDialog, {
+      width:  '400px',
+      data:   m
     });
-
-    // Aktualisiert Mitarbeiterliste nach Schließen des Dialogs, falls Änderungen vorgenommen wurden
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadMitarbeiter();
-      }
+    ref.afterClosed().subscribe(changed => {
+      if (changed) this.loadMitarbeiter();
     });
   }
 }
 
-// Dialogkomponente zur Bearbeitung eines einzelnen Mitarbeiters
 @Component({
   selector: 'mitarbeiter-bearbeiten-dialog',
   standalone: true,
   imports: [
+    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    MatDialogModule,
+    MatSelectModule
   ],
   template: `
-    <h2>Mitarbeiter bearbeiten</h2>
-    <form [formGroup]="mitarbeiterForm">
-      <mat-form-field>
-        <input matInput placeholder="Vorname" formControlName="vorname">
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput placeholder="Nachname" formControlName="nachname">
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput placeholder="Kostenstelle" formControlName="kostenstelle">
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput placeholder="Bereich" formControlName="bereich">
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput type="date" placeholder="Eintritt" formControlName="eintritt">
-      </mat-form-field>
-      <div class="actions">
-        <button mat-button (click)="abbrechen()">Abbrechen</button>
-        <button mat-button color="primary" (click)="speichern()">Speichern</button>
-      </div>
-    </form>
+    <h2 mat-dialog-title>Mitarbeiter bearbeiten</h2>
+    <mat-dialog-content>
+      <form [formGroup]="f">
+        <mat-form-field class="full-width">
+          <mat-label>Vorname</mat-label>
+          <input matInput formControlName="vorname">
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Nachname</mat-label>
+          <input matInput formControlName="nachname">
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Kostenstelle</mat-label>
+          <input matInput formControlName="kostenstelle">
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Bereich</mat-label>
+          <mat-select formControlName="bereich">
+            <mat-option value="Direkt">Direkt</mat-option>
+            <mat-option value="Indirekt">Indirekt</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Eintritt</mat-label>
+          <input matInput type="date" formControlName="eintritt">
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button (click)="abbrechen()">Abbrechen</button>
+      <button mat-flat-button color="primary" (click)="speichern()" [disabled]="f.invalid">
+        Speichern
+      </button>
+    </mat-dialog-actions>
   `,
+  styles: [`.full-width { width: 100%; }`]
 })
 export class MitarbeiterBearbeitenDialog {
-  mitarbeiterForm: FormGroup;
+  f: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    private mitarbeiterService: MitarbeiterService,
+    private svc: MitarbeiterService,
     public dialogRef: MatDialogRef<MitarbeiterBearbeitenDialog>,
     @Inject(MAT_DIALOG_DATA) public data: Mitarbeiter
   ) {
-    // Initialisierung des Formulars mit übergebenen Mitarbeiterdaten
-    this.mitarbeiterForm = this.fb.group({
-      id: [data.id],
-      vorname: [data.vorname, Validators.required],
-      nachname: [data.nachname, Validators.required],
+    this.f = this.fb.group({
+      vorname:      [data.vorname, Validators.required],
+      nachname:     [data.nachname, Validators.required],
       kostenstelle: [data.kostenstelle, Validators.required],
-      bereich: [data.bereich, Validators.required],
-      eintritt: [data.eintritt, Validators.required],
+      bereich:      [data.bereich, Validators.required],
+      eintritt:     [data.eintritt, Validators.required]
     });
   }
 
-  // Speichert die geänderten Mitarbeiterdaten
   speichern(): void {
-    if (this.mitarbeiterForm.valid) {
-      const mitarbeiterDaten: Mitarbeiter = this.mitarbeiterForm.value;
-      this.mitarbeiterService.updateMitarbeiter(mitarbeiterDaten.id, mitarbeiterDaten).subscribe({
+    if (this.f.invalid) return;
+
+    const form = this.f.value;
+    // Wir füllen alle Felder, die das DTO verlangt,
+    // und übernehmen arbeitsverhaeltnis+fte aus den Ursprungsdaten
+    const dto: EmployeeDto = {
+      employeeId:        this.data.id,
+      vorname:           form.vorname,
+      name:              form.nachname,
+      kostenstelle:      form.kostenstelle,
+      bereich:           form.bereich,
+      eintritt:          form.eintritt,
+      arbeitsverhaeltnis: this.data.arbeitsverhaeltnis,
+      fte:                this.data.fte
+    };
+
+    this.svc.updateMitarbeiter(dto.employeeId!, dto)
+      .subscribe({
         next: () => this.dialogRef.close(true),
-        error: (error: any) => console.error('Fehler beim Speichern:', error),
+        error: err => console.error(err)
       });
-    }
   }
 
-  // Schließt den Dialog ohne Änderungen
   abbrechen(): void {
     this.dialogRef.close(false);
   }
