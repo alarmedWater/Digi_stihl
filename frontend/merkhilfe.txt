@@ -1,0 +1,12 @@
+Setup for documentaion an shit 
+
+
+cd ~/Documents/Digi/Digi_shihl/frontend
+npx ng serve --open
+npm start
+
+
+
+run backend with:
+cd ~/Documents/Digi/backend   # or wherever your .NET project lives
+dotnet run
