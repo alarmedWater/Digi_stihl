@@ -52,6 +52,7 @@ namespace Digi_Stihl.Models
         // Foreign Key zum Department
         [ForeignKey("Department")]
         public string? Kostenstelle { get; set; }
+        public bool Mengenabhaengig { get; set; }
         public Department? Department { get; set; }
 
         public string? Funktion { get; set; }

@@ -16,7 +16,7 @@
     <!-- Eingabefeld: Nachname des Mitarbeiters -->
     <mat-form-field appearance="fill">
       <mat-label>Nachname</mat-label>
-      <input matInput formControlName="nachname" required />
+      <input matInput formControlName="name" required />
     </mat-form-field>
 
     <!-- Eingabefeld: Eintrittsdatum des Mitarbeiters -->
@@ -37,11 +37,8 @@
     <mat-form-field appearance="fill">
       <mat-label>Bereich</mat-label>
       <mat-select formControlName="bereich" required>
-        <mat-option value="HR">HR</mat-option>
-        <mat-option value="IT">IT</mat-option>
-        <mat-option value="Vertrieb">Vertrieb</mat-option>
-        <mat-option value="Produktion">Produktion</mat-option>
-        <mat-option value="Verwaltung">Verwaltung</mat-option>
+        <mat-option value="Direkt">Direkt</mat-option>
+        <mat-option value="Indirekt">Indirekt</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -61,10 +58,8 @@
     <mat-form-field appearance="fill">
       <mat-label>Arbeitsverhältnis</mat-label>
       <mat-select formControlName="arbeitsverhaeltnis" required>
-        <mat-option value="Festanstellung">Festanstellung</mat-option>
         <mat-option value="Befristet">Befristet</mat-option>
-        <mat-option value="Werkstudent">Werkstudent</mat-option>
-        <mat-option value="Praktikant">Praktikant</mat-option>
+        <mat-option value="Unbefristet">Unbefristet</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -91,9 +86,21 @@
     </mat-form-field>
 
     <!-- Absende-Button: Deaktiviert, bis alle Pflichtfelder ausgefüllt sind -->
-    <button type="submit" mat-raised-button color="primary" [disabled]="!mitarbeiterForm.valid">
-      Mitarbeiter speichern
+    <button
+      type="submit"
+      mat-raised-button
+      [disabled]="!mitarbeiterForm.valid"
+      [class.btn-disabled]="!mitarbeiterForm.valid"
+      [class.btn-enabled]="mitarbeiterForm.valid"
+      [ngClass]="{
+        'btn-idle':   submitStatus === 'idle',
+        'btn-success': submitStatus === 'success',
+        'btn-error':  submitStatus === 'error'
+      }"
+    >
+      {{ submitStatus === 'success' ? '✔ Erfolgreich' :
+        submitStatus === 'error'   ? '✖ Fehler' :
+        'Mitarbeiter speichern' }}
     </button>
-
   </form>
 </div>

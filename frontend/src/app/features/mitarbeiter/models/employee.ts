@@ -10,11 +10,23 @@ export interface EmployeeDto {
   befristungMax?: string;
   freistellung?: string;
   kuendigung?: string;
+
+  // wenn Du im Backend die Austrittsart als String mapst, hier mit aufnehmen
+  austrittsart?: string;
+
+  exitReasonId?: number;
+  funktion?: string;
+
+  // bemer­kung muss da sein und nullable sein
+  bemerkung?: string;
+
+  kostenstelle: string;
+  fte: number;
+
+  // Enums werden als Strings serialisiert
   arbeitsverhaeltnis: 'Befristet' | 'Unbefristet';
   bereich: 'Direkt' | 'Indirekt';
-  fte: number;
-  kostenstelle: string;
-  funktion?: string;
-  bemerkung?: string;
-  exitReasonId?: number;
+
+
+  mengenabhaengig: boolean;
 }

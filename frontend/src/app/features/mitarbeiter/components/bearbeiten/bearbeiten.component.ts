@@ -138,7 +138,7 @@ export class BearbeitenComponent implements OnInit {
         </mat-form-field>
         <mat-form-field class="full-width">
           <mat-label>Nachname</mat-label>
-          <input matInput formControlName="nachname">
+          <input matInput formControlName="name">
         </mat-form-field>
         <mat-form-field class="full-width">
           <mat-label>Kostenstelle</mat-label>

@@ -3,6 +3,7 @@ using Digi_Stihl.Repositories;
 using Digi_Stihl.Services;
 using Digi_Stihl.MappingProfiles;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Controllers & Swagger/OpenAPI
-builder.Services.AddControllers();
+builder.Services.AddControllers().
+    AddJsonOptions(opts =>
+        {
+            opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

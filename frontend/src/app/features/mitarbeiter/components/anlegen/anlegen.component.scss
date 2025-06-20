@@ -12,10 +12,27 @@
 
   // Stilisierung des Absende-Buttons
   button {
-    align-self: flex-start;       // positioniert Button linksbündig innerhalb des Containers
-    margin-top: 1rem;             // oberer Abstand zum vorherigen Element
-    background-color: rgb(192, 189, 189); // grauer Hintergrund des Buttons
-    color: white;                 // Schriftfarbe Weiß für besseren Kontrast
+    // gemeinsame Basis
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+
+  // Wenn das Formular ungültig ist (disabled)
+  button.btn-disabled {
+    background-color: #c0bdbd !important;  // hellbraun
+    cursor: not-allowed !important;
+  }
+
+  // Wenn das Formular gültig ist (enabled)
+  button.btn-enabled {
+    background-color: #424242 !important;  // dunkelgrau
+    cursor: pointer !important;
+  }
+
+  // Erfolg/Misserfolg-Snackbar-Styles
+  ::ng-deep .snackbar-error {
+    background-color: #d32f2f !important;  // rot
+    color: white !important;
   }
 }
 
