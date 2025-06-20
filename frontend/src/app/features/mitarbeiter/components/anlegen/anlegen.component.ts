@@ -1,23 +1,19 @@
+// src/app/features/mitarbeiter/components/anlegen/anlegen.component.ts
 import { Component, OnInit } from '@angular/core';
-import { CommonModule }      from '@angular/common';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule
-} from '@angular/forms';
-import { Router }            from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
-// Angular Material
-import { MatFormFieldModule }        from '@angular/material/form-field';
-import { MatInputModule }            from '@angular/material/input';
-import { MatButtonModule }           from '@angular/material/button';
-import { MatSelectModule }           from '@angular/material/select';
-import { MatDatepickerModule }       from '@angular/material/datepicker';
-import { MatNativeDateModule }       from '@angular/material/core';
-import { MatCheckboxModule }         from '@angular/material/checkbox';
-import { MatIconModule }             from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+// Material Modules:
+import { MatFormFieldModule }   from '@angular/material/form-field';
+import { MatInputModule }       from '@angular/material/input';
+import { MatButtonModule }      from '@angular/material/button';
+import { MatSelectModule }      from '@angular/material/select';
+import { MatDatepickerModule }  from '@angular/material/datepicker';
+import { MatNativeDateModule }  from '@angular/material/core';
+import { MatCheckboxModule }    from '@angular/material/checkbox';
+import { MatIconModule }        from '@angular/material/icon';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 import { MitarbeiterService } from '../../services/mitarbeiter.service';
 import { EmployeeCreateDto }  from '../../models/employee-create';
@@ -29,19 +25,24 @@ import { ExitReasonDto }      from '../../models/exit-reason';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+
+    // ganz wichtig:
     MatFormFieldModule,
+    MatIconModule,
+
     MatInputModule,
-    MatButtonModule,
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
     MatCheckboxModule,
-    MatIconModule,
-    MatSnackBarModule
+
+    MatButtonModule,
+    MatSnackBarModule,
   ],
   templateUrl: './anlegen.component.html',
   styleUrls: ['./anlegen.component.scss']
 })
+
 export class AnlegenComponent implements OnInit {
   mitarbeiterForm!: FormGroup;
   submitStatus: 'idle' | 'success' | 'error' = 'idle';
@@ -62,12 +63,7 @@ export class AnlegenComponent implements OnInit {
       vorname:            ['', Validators.required],
       name:               ['', Validators.required],
       eintritt:           [null, Validators.required],
-      fte:                [1, [
-                             Validators.required,
-                             Validators.min(0.1),
-                             Validators.max(1)
-                           ]
-                         ],
+      fte:                [1, [ Validators.required, Validators.min(0.1), Validators.max(1) ]],
       bereich:            ['', Validators.required],
       arbeitsverhaeltnis: ['', Validators.required],
       kostenstelle:       ['', Validators.required],
@@ -82,11 +78,10 @@ export class AnlegenComponent implements OnInit {
     this.service.getExitReasons().subscribe({
       next: list => this.exitReasons = list,
       error: () => {
-        // Fallback falls Backend nicht erreichbar
         this.exitReasons = [
           { exitReasonId: 1, reason: 'AN_Kuendigung',  description: 'Eigenkündigung' },
           { exitReasonId: 2, reason: 'AG_Kuendigung',  description: 'Kündigung durch Arbeitgeber' },
-          { exitReasonId: 3, reason: 'Altersteilzeit', description: 'Eintritt in Altersteilzeit' },
+          { exitReasonId: 3, reason: 'Altersteilzeit', description: 'Eintritt in ATZ' },
           { exitReasonId: 4, reason: 'Ruhestand',     description: 'Ruhestand' },
           { exitReasonId: 5, reason: 'Probezeitende',  description: 'Ende der Probezeit' }
         ];
@@ -99,7 +94,6 @@ export class AnlegenComponent implements OnInit {
       this.snack.open('Bitte alle Pflichtfelder ausfüllen', 'OK', { duration: 3000 });
       return;
     }
-
     const f = this.mitarbeiterForm.value;
     const dto: EmployeeCreateDto = {
       name:               f.name,

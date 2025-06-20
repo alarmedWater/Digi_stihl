@@ -86,8 +86,10 @@ export class MitarbeiterService {
   }
 
   getExitReasons(): Observable<ExitReasonDto[]> {
-    return this.http.get<ExitReasonDto[]>(`${this.baseUrl}/exitreasons`);
+    // direkt gegen den ExitReasonsController
+    return this.http.get<ExitReasonDto[]>(`${environment.apiUrl}/ExitReasons`);
   }
+
 
   /** Gemeinsame Error-Handling-Funktion */
   private handleError(error: HttpErrorResponse) {

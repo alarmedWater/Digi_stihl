@@ -14,21 +14,24 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Controllers & Swagger/OpenAPI
-builder.Services.AddControllers().
-    AddJsonOptions(opts =>
-        {
-            opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        });
+builder.Services.AddControllers()
+    .AddJsonOptions(opts =>
+    {
+        // Enums als Strings serialisieren
+        opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// CORS
+// ─── CORS: Erlaube nur Angular-Dev-Server ────────────────────────
 builder.Services.AddCors(opts =>
-    opts.AddDefaultPolicy(policy =>
+{
+    opts.AddPolicy("DevCors", policy =>
         policy.AllowAnyOrigin()
               .AllowAnyHeader()
               .AllowAnyMethod()
-));
+    );
+});
 
 // Repositories & Services
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
@@ -36,6 +39,7 @@ builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<ICapacityRepository, CapacityRepository>();
 builder.Services.AddScoped<ICapacityService, CapacityService>();
 builder.Services.AddScoped<IExitReasonRepository, ExitReasonRepository>();
+
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -50,9 +54,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// HTTPS-Redirect, dann CORS, dann Auth/Zugriff, dann Controller-Routing
 app.UseHttpsRedirection();
-app.UseCors();
+
+// Aktiviere unsere benannte CORS-Policy
+app.UseCors("DevCors");
+
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
