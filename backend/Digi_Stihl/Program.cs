@@ -35,6 +35,7 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<ICapacityRepository, CapacityRepository>();
 builder.Services.AddScoped<ICapacityService, CapacityService>();
+builder.Services.AddScoped<IExitReasonRepository, ExitReasonRepository>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

@@ -1,91 +1,102 @@
-<!-- Container für das gesamte Formular zum Anlegen eines neuen Mitarbeiters -->
 <div class="mitarbeiter-form-container">
-  
-  <!-- Überschrift der Formularseite -->
   <h2>Mitarbeiter anlegen</h2>
 
-  <!-- Mitarbeiter-Formular, welches an 'mitarbeiterForm' gebunden ist -->
   <form [formGroup]="mitarbeiterForm" (ngSubmit)="onSubmit()">
 
-    <!-- Eingabefeld: Vorname des Mitarbeiters -->
     <mat-form-field appearance="fill">
       <mat-label>Vorname</mat-label>
-      <input matInput formControlName="vorname" required />
+      <input matInput placeholder="Max" formControlName="vorname" required>
+      <mat-hint>Pflichtfeld</mat-hint>
     </mat-form-field>
 
-    <!-- Eingabefeld: Nachname des Mitarbeiters -->
     <mat-form-field appearance="fill">
       <mat-label>Nachname</mat-label>
-      <input matInput formControlName="name" required />
+      <input matInput placeholder="Mustermann" formControlName="name" required>
+      <mat-hint>Pflichtfeld</mat-hint>
     </mat-form-field>
 
-    <!-- Eingabefeld: Eintrittsdatum des Mitarbeiters -->
     <mat-form-field appearance="fill">
-      <mat-label>Eintritt</mat-label>
-      <input matInput [matDatepicker]="pickerEintritt" formControlName="eintritt" required />
+      <mat-label>Eintrittsdatum</mat-label>
+      <input matInput [matDatepicker]="pickerEintritt" formControlName="eintritt" required>
       <mat-datepicker-toggle matIconSuffix [for]="pickerEintritt"></mat-datepicker-toggle>
       <mat-datepicker #pickerEintritt></mat-datepicker>
+      <mat-hint>z. B. 2025-07-01</mat-hint>
     </mat-form-field>
 
-    <!-- Eingabefeld: FTE (Beschäftigungsgrad des Mitarbeiters) -->
     <mat-form-field appearance="fill">
       <mat-label>FTE</mat-label>
-      <input matInput type="number" formControlName="fte" required />
+      <input matInput type="number" placeholder="0.8" formControlName="fte" required>
+      <mat-hint>0.1 bis 1.0</mat-hint>
     </mat-form-field>
 
-    <!-- Dropdown-Auswahlfeld: Bereich des Mitarbeiters -->
     <mat-form-field appearance="fill">
       <mat-label>Bereich</mat-label>
       <mat-select formControlName="bereich" required>
-        <mat-option value="Direkt">Direkt</mat-option>
-        <mat-option value="Indirekt">Indirekt</mat-option>
+        <mat-option *ngFor="let b of bereiche" [value]="b">{{ b }}</mat-option>
       </mat-select>
+      <mat-hint>Direkt oder Indirekt</mat-hint>
     </mat-form-field>
 
-    <!-- Eingabefeld: Kostenstelle des Mitarbeiters -->
     <mat-form-field appearance="fill">
       <mat-label>Kostenstelle</mat-label>
-      <input matInput formControlName="kostenstelle" required />
+      <input matInput placeholder="z. B. D002" formControlName="kostenstelle" required>
+      <mat-hint>aus Abteilungen-Tabelle</mat-hint>
     </mat-form-field>
 
-    <!-- Optionales Eingabefeld: Funktion des Mitarbeiters -->
     <mat-form-field appearance="fill">
       <mat-label>Funktion</mat-label>
-      <input matInput formControlName="funktion" />
+      <input matInput placeholder="z. B. Entwickler" formControlName="funktion">
+      <mat-hint>Optional</mat-hint>
     </mat-form-field>
 
-    <!-- Dropdown-Auswahlfeld: Arbeitsverhältnis des Mitarbeiters -->
     <mat-form-field appearance="fill">
       <mat-label>Arbeitsverhältnis</mat-label>
       <mat-select formControlName="arbeitsverhaeltnis" required>
-        <mat-option value="Befristet">Befristet</mat-option>
-        <mat-option value="Unbefristet">Unbefristet</mat-option>
+        <mat-option *ngFor="let av of arbeitsverhaeltnisse" [value]="av">{{ av }}</mat-option>
       </mat-select>
+      <mat-hint>Befristet oder Unbefristet</mat-hint>
     </mat-form-field>
 
-    <!-- Optionales Eingabefeld: Befristungsdatum -->
     <mat-form-field appearance="fill">
       <mat-label>Befristung bis</mat-label>
-      <input matInput [matDatepicker]="pickerBefristung" formControlName="befristung" />
+      <input matInput [matDatepicker]="pickerBefristung" formControlName="befristung">
       <mat-datepicker-toggle matIconSuffix [for]="pickerBefristung"></mat-datepicker-toggle>
       <mat-datepicker #pickerBefristung></mat-datepicker>
+      <mat-hint>Optional</mat-hint>
     </mat-form-field>
 
-    <!-- Optionales Eingabefeld: Kündigungsdatum -->
+    <mat-form-field appearance="fill">
+      <mat-checkbox formControlName="mengenabhaengig">
+        Mengenabhängig?
+      </mat-checkbox>
+      <mat-hint>ja / nein</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Austrittsart</mat-label>
+      <mat-select formControlName="exitReasonId">
+        <mat-option [value]="null">— keine —</mat-option>
+        <mat-option *ngFor="let r of exitReasons" [value]="r.exitReasonId">
+          {{ r.description }}
+        </mat-option>
+      </mat-select>
+      <mat-hint>Optional</mat-hint>
+    </mat-form-field>
+
     <mat-form-field appearance="fill">
       <mat-label>Kündigung zum</mat-label>
-      <input matInput [matDatepicker]="pickerKuendigung" formControlName="kuendigung" />
+      <input matInput [matDatepicker]="pickerKuendigung" formControlName="kuendigung">
       <mat-datepicker-toggle matIconSuffix [for]="pickerKuendigung"></mat-datepicker-toggle>
       <mat-datepicker #pickerKuendigung></mat-datepicker>
+      <mat-hint>Optional</mat-hint>
     </mat-form-field>
 
-    <!-- Optionales Textfeld: Zusätzliche Bemerkungen -->
     <mat-form-field appearance="fill">
       <mat-label>Bemerkung</mat-label>
-      <textarea matInput formControlName="bemerkung" rows="4"></textarea>
+      <textarea matInput rows="4" placeholder="z. B. Urlaubsvertretung" formControlName="bemerkung"></textarea>
+      <mat-hint>Optional</mat-hint>
     </mat-form-field>
 
-    <!-- Absende-Button: Deaktiviert, bis alle Pflichtfelder ausgefüllt sind -->
     <button
       type="submit"
       mat-raised-button
@@ -93,14 +104,17 @@
       [class.btn-disabled]="!mitarbeiterForm.valid"
       [class.btn-enabled]="mitarbeiterForm.valid"
       [ngClass]="{
-        'btn-idle':   submitStatus === 'idle',
+        'btn-idle':    submitStatus === 'idle',
         'btn-success': submitStatus === 'success',
-        'btn-error':  submitStatus === 'error'
+        'btn-error':   submitStatus === 'error'
       }"
     >
-      {{ submitStatus === 'success' ? '✔ Erfolgreich' :
-        submitStatus === 'error'   ? '✖ Fehler' :
-        'Mitarbeiter speichern' }}
+      {{
+        submitStatus === 'success' ? '✔ Erfolgreich' :
+        submitStatus === 'error'   ? '✖ Fehler'      :
+        'Mitarbeiter speichern'
+      }}
     </button>
+
   </form>
 </div>

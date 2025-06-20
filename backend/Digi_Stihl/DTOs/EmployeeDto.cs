@@ -30,6 +30,8 @@ namespace Digi_Stihl.DTOs
         // Optional: Abteilung aus Deinem DepartmentDto, wenn Du es anzeigen willst
         public DepartmentDto? Department { get; set; }
 
+        public ExitReasonDto? ExitReason { get; set; }
+
         // Die Enums aus Deinem Models-Namespace
         public BereichTyp Bereich { get; set; }
         public Arbeitsverhaeltnis Arbeitsverhaeltnis { get; set; }

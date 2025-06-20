@@ -7,6 +7,8 @@ import { environment } from '../../../../environments/environment';
 
 import { EmployeeDto }       from '../models/employee';
 import { EmployeeFilterDto } from '../models/employee-filter';
+import { EmployeeCreateDto } from '../models/employee-create';  
+import { ExitReasonDto } from '../models/exit-reason';  
 
 @Injectable({
   providedIn: 'root'
@@ -49,7 +51,7 @@ export class MitarbeiterService {
   }
 
   /** Neuen Mitarbeitenden anlegen */
-  createMitarbeiter(emp: EmployeeDto): Observable<EmployeeDto> {
+  createMitarbeiter(emp: EmployeeCreateDto): Observable<EmployeeDto> {
     return this.http.post<EmployeeDto>(
         this.baseUrl,
         emp,
@@ -81,6 +83,10 @@ export class MitarbeiterService {
         tap(() => console.debug(`Deleted Mitarbeiter ${id}`)),
         catchError(this.handleError)
       );
+  }
+
+  getExitReasons(): Observable<ExitReasonDto[]> {
+    return this.http.get<ExitReasonDto[]>(`${this.baseUrl}/exitreasons`);
   }
 
   /** Gemeinsame Error-Handling-Funktion */

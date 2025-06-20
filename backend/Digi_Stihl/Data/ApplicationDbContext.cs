@@ -10,17 +10,20 @@ namespace Digi_Stihl.Data
         {
         }
 
-        public DbSet<Employee> Employees               => Set<Employee>();
-        public DbSet<Department> Departments          => Set<Department>();
+        // Deine bisherigen DbSets …
+        public DbSet<Employee> Employees                  => Set<Employee>();
+        public DbSet<Department> Departments             => Set<Department>();
         public DbSet<CapacityDeviation> CapacityDeviations => Set<CapacityDeviation>();
-        public DbSet<ExitReason> ExitReasons          => Set<ExitReason>();
         public DbSet<FluctuationReport> FluctuationReports => Set<FluctuationReport>();
+
+        // Neu: ExitReasons
+        public DbSet<ExitReason> ExitReasons              => Set<ExitReason>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // ─── 1) Static seed for Departments ──────────────────────
+            // 1) Seed Departments
             modelBuilder.Entity<Department>().HasData(
                 new Department { Kostenstelle = "D001", Abteilungsname = "Produktion",  Bereichsnummer = "01" },
                 new Department { Kostenstelle = "D002", Abteilungsname = "Vertrieb",    Bereichsnummer = "02" },
@@ -29,7 +32,7 @@ namespace Digi_Stihl.Data
                 new Department { Kostenstelle = "D005", Abteilungsname = "Verwaltung",  Bereichsnummer = "05" }
             );
 
-            // ─── 2) Static seed for ExitReasons ────────────────────
+            // 2) Seed ExitReasons
             modelBuilder.Entity<ExitReason>().HasData(
                 new ExitReason { ExitReasonId = 1, Reason = ExitReasonType.AN_Kuendigung,  Description = "Eigenkündigung" },
                 new ExitReason { ExitReasonId = 2, Reason = ExitReasonType.AG_Kuendigung,  Description = "Kündigung durch Arbeitgeber" },
@@ -38,12 +41,12 @@ namespace Digi_Stihl.Data
                 new ExitReason { ExitReasonId = 5, Reason = ExitReasonType.Probezeitende,  Description = "Ende der Probezeit" }
             );
 
-            // ─── 3) Explicit decimal precision for FluctuationReport ─
+            // 3) Decimal-Precision für FluctuationReport
             modelBuilder.Entity<FluctuationReport>()
                 .Property(fr => fr.Fluktuationsrate)
                 .HasColumnType("decimal(5,2)");
 
-            // ─── 4) Unique index on (EmployeeId, Year, Month) ─────────
+            // 4) Unique Index auf (EmployeeId, Year, Month)
             modelBuilder.Entity<CapacityDeviation>()
                 .HasIndex(cd => new { cd.EmployeeId, cd.Year, cd.Month })
                 .IsUnique();

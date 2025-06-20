@@ -53,7 +53,7 @@ namespace Digi_Stihl.Controllers
         [Consumes("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<EmployeeDto>> Create([FromBody] EmployeeDto dto)
+        public async Task<ActionResult<EmployeeDto>> Create([FromBody] EmployeeCreateDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

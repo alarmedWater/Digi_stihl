@@ -16,7 +16,7 @@ namespace Digi_Stihl.Services
             _mapper = mapper;
         }
 
-        public async Task<EmployeeDto> CreateEmployeeAsync(EmployeeDto dto)
+        public async Task<EmployeeDto> CreateEmployeeAsync(EmployeeCreateDto dto)
         {
             // DTO -> Entity
             var entity = _mapper.Map<Employee>(dto);
