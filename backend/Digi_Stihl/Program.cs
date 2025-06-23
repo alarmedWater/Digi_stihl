@@ -9,59 +9,61 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ─── 1) SERVICE REGISTRATION ────────────────────────────────────
 
-// Database context (SQL Server / Docker)
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// #1: DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(opts =>
+    opts.UseSqlServer(
+      builder.Configuration.GetConnectionString("DefaultConnection")
+    )
+);
 
-// Controllers & Swagger/OpenAPI
+// #2: Controllers + JSON-Enums
 builder.Services.AddControllers()
-    .AddJsonOptions(opts =>
-    {
-        // Enums als Strings serialisieren
-        opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
+    .AddJsonOptions(o =>
+        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())
+    );
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// ─── CORS: Erlaube nur Angular-Dev-Server ────────────────────────
-builder.Services.AddCors(opts =>
-{
-    opts.AddPolicy("DevCors", policy =>
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-    );
-});
+// #3: CORS – hier komplett auf „AllowAny…“ für Development
+builder.Services.AddCors(o =>
+    o.AddPolicy("DevCors", p =>
+        p.AllowAnyOrigin()
+         .AllowAnyMethod()
+         .AllowAnyHeader()
+    )
+);
 
-// Repositories & Services
+// #4: DI für Repository & Service Layer
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IEmployeeService,    EmployeeService>();
 builder.Services.AddScoped<ICapacityRepository, CapacityRepository>();
-builder.Services.AddScoped<ICapacityService, CapacityService>();
+builder.Services.AddScoped<ICapacityService,    CapacityService>();
 builder.Services.AddScoped<IExitReasonRepository, ExitReasonRepository>();
 
-
-// AutoMapper
+// #5: AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 
 // ─── 2) MIDDLEWARE PIPELINE ──────────────────────────────────────
 
+// Swagger nur in Dev
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Digi_Stihl API V1");
+    });
 }
 
-// HTTPS-Redirect, dann CORS, dann Auth/Zugriff, dann Controller-Routing
-app.UseHttpsRedirection();
+// **kein** HTTPS-Redirect (wir arbeiten HTTP-only im Dev)
+// app.UseHttpsRedirection();
 
-// Aktiviere unsere benannte CORS-Policy
+// CORS muss vor Authorization
 app.UseCors("DevCors");
 
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
