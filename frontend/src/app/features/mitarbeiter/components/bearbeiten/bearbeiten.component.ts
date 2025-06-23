@@ -1,4 +1,5 @@
 // src/app/features/mitarbeiter/components/bearbeiten/bearbeiten.component.ts
+
 import { Component, OnInit, Inject } from '@angular/core';
 import {
   ReactiveFormsModule,
@@ -19,21 +20,8 @@ import { MatSelectModule }       from '@angular/material/select';
 import { MitarbeiterService } from '../../services/mitarbeiter.service';
 import { EmployeeDto }        from '../../models/employee';
 
-// Union-Typen für einfache Felder
 type Bereich = 'Direkt' | 'Indirekt';
 type Arbeitsverhaeltnis = 'Befristet' | 'Unbefristet';
-
-interface Mitarbeiter {
-  id: number;
-  vorname: string;
-  nachname: string;
-  kostenstelle: string;
-  bereich: Bereich;
-  eintritt: string;
-  arbeitsverhaeltnis: Arbeitsverhaeltnis;
-  fte: number;
-  mengenabhaengig: boolean;
-}
 
 @Component({
   selector: 'app-bearbeiten',
@@ -54,9 +42,8 @@ interface Mitarbeiter {
 })
 export class BearbeitenComponent implements OnInit {
   displayedColumns = ['vorname','nachname','kostenstelle','bereich','eintritt','aktion'];
-
-  mitarbeiterListe: Mitarbeiter[] = [];
-  gefilterteListe: Mitarbeiter[] = [];
+  mitarbeiterListe: EmployeeDto[] = [];
+  gefilterteListe: EmployeeDto[] = [];
   filterWert = '';
 
   constructor(
@@ -69,35 +56,25 @@ export class BearbeitenComponent implements OnInit {
   }
 
   private loadMitarbeiter(): void {
-    this.svc.getMitarbeiter().subscribe((dtos: EmployeeDto[]) => {
-      this.mitarbeiterListe = dtos.map(dto => ({
-        id:                 dto.employeeId!,
-        vorname:            dto.vorname,
-        nachname:           dto.name,
-        kostenstelle:       dto.kostenstelle,
-        bereich:            dto.bereich,
-        eintritt:           dto.eintritt,
-        arbeitsverhaeltnis: dto.arbeitsverhaeltnis,
-        fte:                dto.fte,
-        mengenabhaengig:    dto.mengenabhaengig
-      }));
-      this.gefilterteListe = [...this.mitarbeiterListe];
+    this.svc.getMitarbeiter().subscribe(list => {
+      this.mitarbeiterListe = list;
+      this.gefilterteListe = [...list];
     });
   }
 
   applyFilter(): void {
     const v = this.filterWert.trim().toLowerCase();
-    this.gefilterteListe = this.mitarbeiterListe.filter(m =>
-      m.vorname.toLowerCase().includes(v) ||
-      m.nachname.toLowerCase().includes(v) ||
-      m.bereich.toLowerCase().includes(v)
+    this.gefilterteListe = this.mitarbeiterListe.filter(e =>
+      e.vorname.toLowerCase().includes(v) ||
+      e.name.toLowerCase().includes(v) ||
+      e.bereich.toLowerCase().includes(v)
     );
   }
 
-  bearbeiten(m: Mitarbeiter): void {
+  bearbeiten(emp: EmployeeDto): void {
     const ref = this.dialog.open(MitarbeiterBearbeitenDialog, {
-      width:  '450px',
-      data:   m
+      width:  '700px',
+      data:   emp
     });
     ref.afterClosed().subscribe(changed => {
       if (changed) this.loadMitarbeiter();
@@ -121,14 +98,47 @@ export class BearbeitenComponent implements OnInit {
     <h2 mat-dialog-title>Mitarbeiter bearbeiten</h2>
     <mat-dialog-content [formGroup]="f">
       <form class="bearbeiten-form">
+
+        <!-- Persönliche Daten -->
         <mat-form-field class="full-width">
           <mat-label>Vorname</mat-label>
           <input matInput formControlName="vorname">
         </mat-form-field>
         <mat-form-field class="full-width">
           <mat-label>Nachname</mat-label>
-          <input matInput formControlName="nachname">
+          <input matInput formControlName="name">
         </mat-form-field>
+
+        <!-- Beschäftigungsdetails -->
+        <mat-form-field class="full-width">
+          <mat-label>Eintritt</mat-label>
+          <input matInput type="date" formControlName="eintritt">
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Arbeitsverhältnis</mat-label>
+          <mat-select formControlName="arbeitsverhaeltnis">
+            <mat-option value="Befristet">Befristet</mat-option>
+            <mat-option value="Unbefristet">Unbefristet</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Befristung Anfang</mat-label>
+          <input matInput type="date" formControlName="befristung">
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Befristung Max</mat-label>
+          <input matInput type="date" formControlName="befristungMax">
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Verlängerung 1</mat-label>
+          <input matInput type="date" formControlName="verlaengerung1">
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Verlängerung 2</mat-label>
+          <input matInput type="date" formControlName="verlaengerung2">
+        </mat-form-field>
+
+        <!-- Organisatorisches -->
         <mat-form-field class="full-width">
           <mat-label>Kostenstelle</mat-label>
           <input matInput formControlName="kostenstelle">
@@ -140,10 +150,8 @@ export class BearbeitenComponent implements OnInit {
             <mat-option value="Indirekt">Indirekt</mat-option>
           </mat-select>
         </mat-form-field>
-        <mat-form-field class="full-width">
-          <mat-label>Eintritt</mat-label>
-          <input matInput type="date" formControlName="eintritt">
-        </mat-form-field>
+
+        <!-- Arbeitsumfang -->
         <mat-form-field class="full-width">
           <mat-label>FTE</mat-label>
           <input matInput type="number" formControlName="fte" min="0" max="1" step="0.01">
@@ -155,6 +163,35 @@ export class BearbeitenComponent implements OnInit {
             <mat-option [value]="false">Nein</mat-option>
           </mat-select>
         </mat-form-field>
+
+        <!-- Austritt & Grund -->
+        <mat-form-field class="full-width">
+          <mat-label>Kündigung</mat-label>
+          <input matInput type="date" formControlName="kuendigung">
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Austrittsart</mat-label>
+          <input matInput formControlName="austrittsart">
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Exit Reason ID</mat-label>
+          <input matInput type="number" formControlName="exitReasonId">
+        </mat-form-field>
+
+        <!-- Sonstiges -->
+        <mat-form-field class="full-width">
+          <mat-label>Funktion</mat-label>
+          <input matInput formControlName="funktion">
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Freistellung</mat-label>
+          <input matInput type="date" formControlName="freistellung">
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Bemerkung</mat-label>
+          <textarea matInput formControlName="bemerkung"></textarea>
+        </mat-form-field>
+
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end" class="actions">
@@ -176,45 +213,47 @@ export class MitarbeiterBearbeitenDialog {
     private fb: FormBuilder,
     private svc: MitarbeiterService,
     public dialogRef: MatDialogRef<MitarbeiterBearbeitenDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: Mitarbeiter
+    @Inject(MAT_DIALOG_DATA) public data: EmployeeDto
   ) {
-    // FormGroup um alle Felder inkl. mengenabhaengig
     this.f = this.fb.group({
-      vorname:         [data.vorname, Validators.required],
-      nachname:        [data.nachname, Validators.required],
+      vorname:          [data.vorname, Validators.required],
+      name:             [data.name, Validators.required],
+      eintritt:         [data.eintritt, Validators.required],
+      arbeitsverhaeltnis: [data.arbeitsverhaeltnis, Validators.required],
+      befristung:       [data.befristung],
+      befristungMax:    [data.befristungMax],
+      verlaengerung1:   [data.verlaengerung1],
+      verlaengerung2:   [data.verlaengerung2],
+
       kostenstelle:    [data.kostenstelle, Validators.required],
       bereich:         [data.bereich, Validators.required],
-      eintritt:        [data.eintritt, Validators.required],
-      fte:             [data.fte, [Validators.required, Validators.min(0.1), Validators.max(1)]],
-      mengenabhaengig: [data.mengenabhaengig, Validators.required]
+
+      fte:             [data.fte, [Validators.required, Validators.min(0), Validators.max(1)]],
+      mengenabhaengig: [data.mengenabhaengig, Validators.required],
+
+      kuendigung:      [data.kuendigung],
+      austrittsart:    [data.austrittsart],
+      exitReasonId:    [data.exitReasonId],
+      funktion:        [data.funktion],
+      freistellung:    [data.freistellung],
+      bemerkung:       [data.bemerkung]
     });
   }
 
   speichern(): void {
     if (this.f.invalid) return;
 
-    const v = this.f.value;
-    const dto: EmployeeDto = {
-      employeeId:         this.data.id,
-      vorname:            v.vorname,
-      name:               v.nachname,
-      kostenstelle:       v.kostenstelle,
-      bereich:            v.bereich,
-      eintritt:           v.eintritt,
-      fte:                v.fte,
-      mengenabhaengig:    v.mengenabhaengig,
-      arbeitsverhaeltnis: this.data.arbeitsverhaeltnis,
-      // Alle nicht-bearbeiteten Felder vom Original
-      funktion:           '',          // oder this.data.funktion falls vorhanden
-      befristung:        undefined,
-      kuendigung:         undefined,
-      exitReasonId:       undefined,
+    const v = this.f.value as Partial<EmployeeDto>;
+    const updateDto: EmployeeDto = {
+      ...this.data,
+      ...v
     };
 
-    this.svc.updateMitarbeiter(dto.employeeId!, dto).subscribe({
-      next: () => this.dialogRef.close(true),
-      error: err => console.error('Update-Fehler', err)
-    });
+    this.svc.updateMitarbeiter(updateDto.employeeId!, updateDto)
+      .subscribe({
+        next: () => this.dialogRef.close(true),
+        error: err => console.error('Update-Fehler', err)
+      });
   }
 
   abbrechen(): void {

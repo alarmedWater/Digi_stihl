@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common'; // für ngFor, ngIf usw.
-import { FormsModule } from '@angular/forms';   // für ngModel
+// src/app/features/befristung/befristung.component.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule }  from '@angular/forms';
+import { MitarbeiterService } from '../mitarbeiter/services/mitarbeiter.service';
 
-// Definition eines Interfaces für die Struktur der Befristeten-Daten
 interface BefristeterMitarbeiter {
   name: string;
   abteilung: string;
@@ -12,24 +13,39 @@ interface BefristeterMitarbeiter {
 
 @Component({
   selector: 'app-befristung',
-  standalone: true, // Standalone-Komponente
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './befristung.component.html',
   styleUrls: ['./befristung.component.scss']
 })
-export class BefristungComponent {
-  // Liste mit Dummy-Daten
-  befristeteMitarbeiter: BefristeterMitarbeiter[] = [
-    { name: 'Anna Weber', abteilung: 'Marketing', beschaeftigungsart: 'Teilzeit', befristetBis: '2025-06-30' },
-    { name: 'Peter Neumann', abteilung: 'IT', beschaeftigungsart: 'Vollzeit', befristetBis: '2024-12-31' },
-    { name: 'Julia König', abteilung: 'Vertrieb', beschaeftigungsart: 'Werkstudent', befristetBis: '2025-03-15' },
-    { name: 'Lars Meier', abteilung: 'HR', beschaeftigungsart: 'Aushilfe', befristetBis: '2025-09-01' }
-  ];
+export class BefristungComponent implements OnInit {
+  // die initial leere Liste, gefüllt aus dem Service
+  befristeteMitarbeiter: BefristeterMitarbeiter[] = [];
 
-  // Suchbegriff für Filterfunktion
   suchbegriff: string = '';
 
-  // Filterfunktion: gibt nur die Einträge zurück, die zum Suchbegriff passen
+  constructor(private mitarbeiterService: MitarbeiterService) {}
+
+  ngOnInit() {
+    // nur Befristete laden
+    this.mitarbeiterService
+      .getMitarbeiter({ arbeitsverhaeltnis: 'Befristet' })
+      .subscribe({
+        next: list => {
+          // Mappe aus EmployeeDto zu Deinem Interface:
+          this.befristeteMitarbeiter = list.map(e => ({
+            name: `${e.vorname} ${e.name}`,
+            abteilung: e.kostenstelle,           // oder: e.abteilung falls Du das mitjoinst
+            beschaeftigungsart: e.arbeitsverhaeltnis,
+            befristetBis: e.befristungMax ?? ''    // Dein Feld für „bis“
+          }));
+        },
+        error: err => {
+          console.error('Fehler beim Laden der befristeten MA:', err);
+        }
+      });
+  }
+
   get gefilterteBefristete(): BefristeterMitarbeiter[] {
     const begriff = this.suchbegriff.toLowerCase();
     return this.befristeteMitarbeiter.filter(m =>

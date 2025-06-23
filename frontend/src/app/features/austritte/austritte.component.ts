@@ -1,8 +1,16 @@
 // src/app/features/austritte/austritte.component.ts
 
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';     // Für ngFor, ngIf etc.
-import { FormsModule } from '@angular/forms';       // Für [(ngModel)]
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule }  from '@angular/forms';
+import { MitarbeiterService } from '../mitarbeiter/services/mitarbeiter.service';
+import { EmployeeDto } from '../mitarbeiter/models/employee';
+
+interface Austritt {
+  name: string;
+  abteilung: string;
+  austrittsdatum: string;
+}
 
 @Component({
   selector: 'app-austritte',
@@ -11,24 +19,35 @@ import { FormsModule } from '@angular/forms';       // Für [(ngModel)]
   templateUrl: './austritte.component.html',
   styleUrls: ['./austritte.component.scss']
 })
-export class AustritteComponent {
-
-  // Dummy-Daten: Liste mit ausgetretenen Mitarbeitenden
-  austritte = [
-    { name: 'Max Müller', abteilung: 'Produktion', austrittsdatum: '2024-03-31' },
-    { name: 'Lisa Schulz', abteilung: 'Logistik', austrittsdatum: '2023-12-15' },
-    { name: 'Thomas Becker', abteilung: 'IT', austrittsdatum: '2024-06-30' }
-  ];
-
-  // Suchbegriff für Filterung (Name oder Datum)
+export class AustritteComponent implements OnInit {
+  austritte: Austritt[] = [];
   suchbegriff: string = '';
 
-  // Gefilterte Liste basierend auf dem eingegebenen Suchbegriff
-  get gefilterteAustritte() {
+  constructor(private mitarbeiterService: MitarbeiterService) {}
+
+  ngOnInit(): void {
+    this.mitarbeiterService.getMitarbeiter()
+      .subscribe({
+        next: (list: EmployeeDto[]) => {
+          this.austritte = list
+            // nur solche mit Austrittsdatum
+            .filter(e => !!e.kuendigung)
+            // mappe auf unsere Anzeige-Daten
+            .map(e => ({
+              name: `${e.vorname} ${e.name}`,
+              abteilung: e.kostenstelle,     // oder andere Info, falls Du joinst
+              austrittsdatum: e.kuendigung!
+            }));
+        },
+        error: err => console.error('Fehler beim Laden der Austritte:', err)
+      });
+  }
+
+  get gefilterteAustritte(): Austritt[] {
     const begriff = this.suchbegriff.toLowerCase();
-    return this.austritte.filter(m =>
-      m.name.toLowerCase().includes(begriff) ||
-      m.austrittsdatum.includes(begriff)
+    return this.austritte.filter(a =>
+      a.name.toLowerCase().includes(begriff) ||
+      a.austrittsdatum.includes(begriff)
     );
   }
 }
