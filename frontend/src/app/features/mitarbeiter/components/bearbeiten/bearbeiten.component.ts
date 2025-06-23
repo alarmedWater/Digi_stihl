@@ -14,14 +14,17 @@ import { MatTableModule }        from '@angular/material/table';
 import { MatFormFieldModule }    from '@angular/material/form-field';
 import { MatInputModule }        from '@angular/material/input';
 import { MatButtonModule }       from '@angular/material/button';
-import { MatDialog, MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MatDialog,
+  MatDialogModule,
+  MAT_DIALOG_DATA,
+  MatDialogRef
+} from '@angular/material/dialog';
 import { MatSelectModule }       from '@angular/material/select';
 
 import { MitarbeiterService } from '../../services/mitarbeiter.service';
 import { EmployeeDto }        from '../../models/employee';
-
-type Bereich = 'Direkt' | 'Indirekt';
-type Arbeitsverhaeltnis = 'Befristet' | 'Unbefristet';
+import { ExitReasonDto }      from '../../models/exit-reason';
 
 @Component({
   selector: 'app-bearbeiten',
@@ -41,7 +44,28 @@ type Arbeitsverhaeltnis = 'Befristet' | 'Unbefristet';
   styleUrls: ['./bearbeiten.component.scss'],
 })
 export class BearbeitenComponent implements OnInit {
-  displayedColumns = ['vorname','nachname','kostenstelle','bereich','eintritt','aktion'];
+  displayedColumns = [
+    'employeeId',
+    'vorname',
+    'name',
+    'eintritt',
+    'arbeitsverhaeltnis',
+    'befristung',
+    'befristungMax',
+    'verlaengerung1',
+    'verlaengerung2',
+    'freistellung',
+    'kuendigung',
+    'exitReasonId',
+    'austrittsart',
+    'funktion',
+    'bemerkung',
+    'kostenstelle',
+    'fte',
+    'bereich',
+    'mengenabhaengig',
+    'aktion'
+  ];
   mitarbeiterListe: EmployeeDto[] = [];
   gefilterteListe: EmployeeDto[] = [];
   filterWert = '';
@@ -73,14 +97,17 @@ export class BearbeitenComponent implements OnInit {
 
   bearbeiten(emp: EmployeeDto): void {
     const ref = this.dialog.open(MitarbeiterBearbeitenDialog, {
-      width:  '700px',
-      data:   emp
+      width: '700px',
+      data: emp
     });
     ref.afterClosed().subscribe(changed => {
-      if (changed) this.loadMitarbeiter();
+      if (changed) {
+        this.loadMitarbeiter();
+      }
     });
   }
 }
+
 
 @Component({
   selector: 'mitarbeiter-bearbeiten-dialog',
@@ -109,7 +136,7 @@ export class BearbeitenComponent implements OnInit {
           <input matInput formControlName="name">
         </mat-form-field>
 
-        <!-- Beschäftigungsdetails -->
+        <!-- Eintritt & Arbeitsverhältnis -->
         <mat-form-field class="full-width">
           <mat-label>Eintritt</mat-label>
           <input matInput type="date" formControlName="eintritt">
@@ -121,6 +148,8 @@ export class BearbeitenComponent implements OnInit {
             <mat-option value="Unbefristet">Unbefristet</mat-option>
           </mat-select>
         </mat-form-field>
+
+        <!-- Befristungen & Verlängerungen -->
         <mat-form-field class="full-width">
           <mat-label>Befristung Anfang</mat-label>
           <input matInput type="date" formControlName="befristung">
@@ -166,16 +195,16 @@ export class BearbeitenComponent implements OnInit {
 
         <!-- Austritt & Grund -->
         <mat-form-field class="full-width">
+          <mat-label>Exit Reason</mat-label>
+          <mat-select formControlName="exitReasonId">
+            <mat-option *ngFor="let ex of exitReasons" [value]="ex.exitReasonId">
+              {{ ex.reason }} – {{ ex.description }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="full-width">
           <mat-label>Kündigung</mat-label>
           <input matInput type="date" formControlName="kuendigung">
-        </mat-form-field>
-        <mat-form-field class="full-width">
-          <mat-label>Austrittsart</mat-label>
-          <input matInput formControlName="austrittsart">
-        </mat-form-field>
-        <mat-form-field class="full-width">
-          <mat-label>Exit Reason ID</mat-label>
-          <input matInput type="number" formControlName="exitReasonId">
         </mat-form-field>
 
         <!-- Sonstiges -->
@@ -208,6 +237,7 @@ export class BearbeitenComponent implements OnInit {
 })
 export class MitarbeiterBearbeitenDialog {
   f: FormGroup;
+  exitReasons: ExitReasonDto[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -216,44 +246,38 @@ export class MitarbeiterBearbeitenDialog {
     @Inject(MAT_DIALOG_DATA) public data: EmployeeDto
   ) {
     this.f = this.fb.group({
-      vorname:          [data.vorname, Validators.required],
-      name:             [data.name, Validators.required],
-      eintritt:         [data.eintritt, Validators.required],
+      vorname:            [data.vorname, Validators.required],
+      name:               [data.name, Validators.required],
+      eintritt:           [data.eintritt, Validators.required],
       arbeitsverhaeltnis: [data.arbeitsverhaeltnis, Validators.required],
-      befristung:       [data.befristung],
-      befristungMax:    [data.befristungMax],
-      verlaengerung1:   [data.verlaengerung1],
-      verlaengerung2:   [data.verlaengerung2],
+      befristung:         [data.befristung],
+      befristungMax:      [data.befristungMax],
+      verlaengerung1:     [data.verlaengerung1],
+      verlaengerung2:     [data.verlaengerung2],
+      kostenstelle:       [data.kostenstelle, Validators.required],
+      bereich:            [data.bereich, Validators.required],
+      fte:                [data.fte, [Validators.required, Validators.min(0), Validators.max(1)]],
+      mengenabhaengig:    [data.mengenabhaengig, Validators.required],
+      exitReasonId:       [data.exitReasonId],
+      kuendigung:         [data.kuendigung],
+      funktion:           [data.funktion],
+      freistellung:       [data.freistellung],
+      bemerkung:          [data.bemerkung]
+    });
 
-      kostenstelle:    [data.kostenstelle, Validators.required],
-      bereich:         [data.bereich, Validators.required],
-
-      fte:             [data.fte, [Validators.required, Validators.min(0), Validators.max(1)]],
-      mengenabhaengig: [data.mengenabhaengig, Validators.required],
-
-      kuendigung:      [data.kuendigung],
-      austrittsart:    [data.austrittsart],
-      exitReasonId:    [data.exitReasonId],
-      funktion:        [data.funktion],
-      freistellung:    [data.freistellung],
-      bemerkung:       [data.bemerkung]
+    this.svc.getExitReasons().subscribe({
+      next: list => this.exitReasons = list,
+      error: () => this.exitReasons = []
     });
   }
 
   speichern(): void {
     if (this.f.invalid) return;
-
-    const v = this.f.value as Partial<EmployeeDto>;
-    const updateDto: EmployeeDto = {
-      ...this.data,
-      ...v
-    };
-
-    this.svc.updateMitarbeiter(updateDto.employeeId!, updateDto)
-      .subscribe({
-        next: () => this.dialogRef.close(true),
-        error: err => console.error('Update-Fehler', err)
-      });
+    const updateDto: EmployeeDto = { ...this.data, ...this.f.value };
+    this.svc.updateMitarbeiter(updateDto.employeeId!, updateDto).subscribe({
+      next: () => this.dialogRef.close(true),
+      error: err => console.error('Update-Fehler', err)
+    });
   }
 
   abbrechen(): void {
