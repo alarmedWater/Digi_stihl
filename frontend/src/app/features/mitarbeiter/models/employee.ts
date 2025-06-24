@@ -1,4 +1,7 @@
 // src/app/features/models/employee.ts
+import { ExitReasonDto } from './exit-reason';
+
+
 export interface EmployeeDto {
   employeeId?: number;       // null für Neuanlage
   name: string;
@@ -15,6 +18,8 @@ export interface EmployeeDto {
   austrittsart?: string;
 
   exitReasonId?: number;
+  exitReason?: ExitReasonDto;
+
   funktion?: string;
 
   // bemer­kung muss da sein und nullable sein

@@ -11,6 +11,7 @@ interface ATZMitarbeiter {
   name: string;
   abteilung: string;
   austrittsdatum: string;
+  bemerkung: string; // NEU
 }
 
 @Component({
@@ -40,7 +41,8 @@ export class ATZComponent implements OnInit {
           this.atzMitarbeiter = atzList.map(e => ({
             name: `${e.vorname} ${e.name}`,
             abteilung: e.kostenstelle,
-            austrittsdatum: e.kuendigung ?? ''
+            austrittsdatum:  e.kuendigung ? this.formatDatum(e.kuendigung) : '', //e.kuendigung ?? ''
+            bemerkung: e.bemerkung ?? '' // NEU
           }));
         },
         error: err => console.error('Fehler beim Laden der ATZ-Mitarbeiter:', err)
@@ -56,4 +58,13 @@ export class ATZComponent implements OnInit {
       m.austrittsdatum.includes(begriff)
     );
   }
+
+  private formatDatum(isoString: string): string {
+    const datum = new Date(isoString);
+    const tag = datum.getDate().toString().padStart(2, '0');
+    const monat = (datum.getMonth() + 1).toString().padStart(2, '0');
+    const jahr = datum.getFullYear();
+    return `${tag}-${monat}-${jahr}`;
+  }
+  
 }

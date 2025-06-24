@@ -37,7 +37,7 @@ export class BefristungComponent implements OnInit {
             name: `${e.vorname} ${e.name}`,
             abteilung: e.kostenstelle,           // oder: e.abteilung falls Du das mitjoinst
             beschaeftigungsart: e.arbeitsverhaeltnis,
-            befristetBis: e.befristungMax ?? ''    // Dein Feld für „bis“
+            befristetBis: e.befristungMax ? this.formatDatum(e.befristungMax) : '' // Dein Feld für „bis“    
           }));
         },
         error: err => {
@@ -55,4 +55,13 @@ export class BefristungComponent implements OnInit {
       m.befristetBis.includes(begriff)
     );
   }
+
+  private formatDatum(isoString: string): string {
+    const datum = new Date(isoString);
+    const tag = datum.getDate().toString().padStart(2, '0');
+    const monat = (datum.getMonth() + 1).toString().padStart(2, '0');
+    const jahr = datum.getFullYear();
+    return `${tag}-${monat}-${jahr}`;
+  }
+  
 }

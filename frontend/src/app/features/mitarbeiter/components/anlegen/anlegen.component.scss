@@ -8,6 +8,10 @@
   width: 100%;                    // nimmt im Parent-Container ggf. 100% ein
   margin: 0 auto;                 // zentriert optional
   gap: 1rem;                      // gleichmäßiger Abstand zwischen den Formularfeldern
+  
+  height: 100vh;
+  overflow-y: auto;
+  padding-bottom: 2rem;
 
   // Alle Material-Formularfelder innerhalb des Containers
   mat-form-field {

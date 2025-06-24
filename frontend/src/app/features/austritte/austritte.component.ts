@@ -10,6 +10,7 @@ interface Austritt {
   name: string;
   abteilung: string;
   austrittsdatum: string;
+  austrittsart: string; // NEU
 }
 
 @Component({
@@ -36,7 +37,8 @@ export class AustritteComponent implements OnInit {
             .map(e => ({
               name: `${e.vorname} ${e.name}`,
               abteilung: e.kostenstelle,     // oder andere Info, falls Du joinst
-              austrittsdatum: e.kuendigung!
+              austrittsdatum: e.kuendigung ? this.formatDatum(e.kuendigung) : '',
+              austrittsart: e.exitReason?.description ?? ''  // NEU: Zugriff auf exitReason.description
             }));
         },
         error: err => console.error('Fehler beim Laden der Austritte:', err)
@@ -47,7 +49,17 @@ export class AustritteComponent implements OnInit {
     const begriff = this.suchbegriff.toLowerCase();
     return this.austritte.filter(a =>
       a.name.toLowerCase().includes(begriff) ||
-      a.austrittsdatum.includes(begriff)
+      a.austrittsdatum.includes(begriff) ||
+      a.austrittsart.toLowerCase().includes(begriff) // NEU
     );
   }
+
+  private formatDatum(isoString: string): string {
+    const datum = new Date(isoString);
+    const tag = datum.getDate().toString().padStart(2, '0');
+    const monat = (datum.getMonth() + 1).toString().padStart(2, '0');
+    const jahr = datum.getFullYear();
+    return `${tag}-${monat}-${jahr}`;
+  }
+  
 }

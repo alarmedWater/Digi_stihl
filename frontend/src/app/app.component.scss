@@ -12,7 +12,7 @@
     .sidenav {
       width: 280px;                       // feste Breite der Sidebar
       padding: 1rem;                      // Innenabstand
-      background-color: #f3a837;          // hellorange Hintergrundfarbe
+      background-color: #f37a1f;          // hellorange Hintergrundfarbe
       color: white;                       // Textfarbe in der Sidebar
       font-weight: 600;                   // Schriftstärke
     }
@@ -26,6 +26,8 @@
       white-space: normal;                // erlaubt Zeilenumbrüche, sodass Text nicht über Sidebar hinausragt
       word-break: break-word;             // lange Wörter werden umgebrochen
       font-size: 1rem;                    // Schriftgröße der Links
+      display: block;
+      line-height: 1.2;
     }
     
     // Styling des aktiven Navigationslinks
