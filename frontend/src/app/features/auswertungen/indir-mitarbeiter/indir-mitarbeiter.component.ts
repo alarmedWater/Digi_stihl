@@ -1,77 +1,92 @@
+// src/app/features/mitarbeiter/indir-mitarbeiter/indir-mitarbeiter.component.ts
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatSelectModule } from '@angular/material/select';
-import { FormsModule } from '@angular/forms';
+import { CommonModule }        from '@angular/common';
+import { FormsModule }         from '@angular/forms';
+import { MatFormFieldModule }  from '@angular/material/form-field';
+import { MatSelectModule }     from '@angular/material/select';
 
-// Datenmodell für einen Mitarbeitereintrag
-interface IndirekterMitarbeiter {
+import {
+  IndirectCapacityOverviewDto,
+  DepartmentCapacityOverviewDto,
+  EmployeeCapacityDto
+} from '../../mitarbeiter/models/capacity.dtos';
+import { CapacityService } from '../../mitarbeiter/services/capacity.service';
+
+/** Ein einzelner Mitarbeiter mit seinen 24-Monats-FTE-Werten */
+interface MitarbeiterEintrag {
   name: string;
-  abteilung: string;
-  fte: number[]; // FTE-Werte für 24 Monate
+  fte:  number[]; // 24 Werte
+}
+
+/** Block-Definition pro Abteilung */
+interface AbteilungsBlock {
+  departmentName: string;
+  headCount:      number;
+  subtotalFte:    number[]; // 24 Werte
+  totalFte:       number;
+  employees:      MitarbeiterEintrag[];
 }
 
 @Component({
   selector: 'app-indir-mitarbeiter',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatSelectModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatSelectModule
+  ],
   templateUrl: './indir-mitarbeiter.component.html',
   styleUrls: ['./indir-mitarbeiter.component.scss']
 })
 export class IndirMitarbeiterComponent implements OnInit {
+  /** Labels für die nächsten 24 Monate im Header */
+  monateLabels:       string[]           = [];
+  /** Alle Blöcke nach Abteilung */
+  abteilungen:        AbteilungsBlock[]  = [];
+  /** Aktuell gewählte Abteilung für Filter */
+  ausgewaehlteAbteilung = '';
 
-  // Dynamische Monatslabels ab aktuellem Monat
-  monateLabels: string[] = [];
-  gefilterteDaten: IndirekterMitarbeiter[] = [];
-  ausgewaehlteAbteilung: string = '';
-  displayedColumns: string[] = ['name', 'abteilung', ...Array.from({ length: 24 }, (_, i) => `monat${i + 1}`)];
-
-  // Beispiel-Daten (Dummy)
-  daten: IndirekterMitarbeiter[] = [
-    {
-      name: 'Sophie Weber',
-      abteilung: 'Personal',
-      fte: [1, 1, 1, 0.8, 0.8, 0.8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    },
-    {
-      name: 'Tim Schröder',
-      abteilung: 'Controlling',
-      fte: [1, 1, 1, 1, 1, 1, 0.6, 0.6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    }
-  ];
+  constructor(private capacityService: CapacityService) {}
 
   ngOnInit(): void {
-    this.monateLabels = this.generiereMonatsLabels();
-    this.gefilterteDaten = [...this.daten];
-  }
-
-  // Labels wie "Apr 2025", "Mai 2025", ...
-  generiereMonatsLabels(): string[] {
-    const labels: string[] = [];
-    const now = new Date();
-    let monat = now.getMonth();
-    let jahr = now.getFullYear();
-
+    // Monats-Labels erzeugen
+    const heute = new Date();
     for (let i = 0; i < 24; i++) {
-      const date = new Date(jahr, monat + i, 1);
-      const formatter = new Intl.DateTimeFormat('de-DE', { month: 'short', year: 'numeric' });
-      labels.push(formatter.format(date));
+      const m = new Date(heute.getFullYear(), heute.getMonth() + i, 1);
+      this.monateLabels.push(m.toLocaleString('de-DE', { month: 'short', year: 'numeric' }));
     }
 
-    return labels;
+    // Indirekte Übersicht laden
+    this.capacityService
+      .getIndirectOverview(heute.getFullYear(), heute.getMonth() + 1)
+      .subscribe(dto => this.buildAbteilungsBlocks(dto));
   }
 
-  // Gibt eindeutige Abteilungen zurück
-  get abteilungen(): string[] {
-    return [...new Set(this.daten.map(m => m.abteilung))];
+  /** Mappt DTO in Abteilungs-Blöcke */
+  private buildAbteilungsBlocks(dto: IndirectCapacityOverviewDto): void {
+    this.abteilungen = dto.departments.map((dept: DepartmentCapacityOverviewDto) => {
+      const subtotal = dept.subtotalFte;
+      const total = subtotal.reduce((sum, f) => sum + f, 0);
+      const employees: MitarbeiterEintrag[] = dept.employees.map((emp: EmployeeCapacityDto) => ({
+        name: emp.name,
+        fte:  emp.deviations
+      }));
+      return {
+        departmentName: dept.departmentName,
+        headCount:      dept.headCount,
+        subtotalFte:    subtotal,
+        totalFte:       total,
+        employees:      employees
+      };
+    });
   }
 
-  // Filtert die Datenliste nach Abteilung
-  filternNachAbteilung(): void {
+  /** Gefilterte Abteilungs-Blöcke gemäß Auswahl */
+  get gefilterteAbteilungen(): AbteilungsBlock[] {
     if (!this.ausgewaehlteAbteilung) {
-      this.gefilterteDaten = [...this.daten];
-    } else {
-      this.gefilterteDaten = this.daten.filter(d => d.abteilung === this.ausgewaehlteAbteilung);
+      return this.abteilungen;
     }
+    return this.abteilungen.filter(b => b.departmentName === this.ausgewaehlteAbteilung);
   }
 }

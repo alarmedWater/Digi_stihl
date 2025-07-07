@@ -1,4 +1,5 @@
 // DTOs/CapacityDtos.cs
+using System;
 using System.Collections.Generic;
 
 namespace Digi_Stihl.DTOs
@@ -8,12 +9,10 @@ namespace Digi_Stihl.DTOs
     /// </summary>
     public class CapacityFilterDto
     {
-        public string? EmployeeName   { get; set; }
-        public int?    StartYear      { get; set; }
-        public int?    StartMonth     { get; set; }
-        public int?    EndYear        { get; set; }
-        public int?    EndMonth       { get; set; }
-        public string? DepartmentCode { get; set; }
+        public string?    EmployeeName   { get; set; }
+        public DateTime?  StartDate      { get; set; }
+        public DateTime?  EndDate        { get; set; }
+        public string?    DepartmentCode { get; set; }
     }
 
     /// <summary>
@@ -21,26 +20,24 @@ namespace Digi_Stihl.DTOs
     /// </summary>
     public class CreateCapacityDeviationDto
     {
-        public int     EmployeeId      { get; set; }
-        public int     StartYear       { get; set; }
-        public int     StartMonth      { get; set; }
-        public int     EndYear         { get; set; }
-        public int     EndMonth        { get; set; }
-        public decimal NeueKapazitaet  { get; set; }
-        public string? Bemerkung       { get; set; }
+        public int       EmployeeId     { get; set; }
+        public DateTime  StartDate      { get; set; }
+        public DateTime  EndDate        { get; set; }
+        public decimal   NeueKapazitaet { get; set; }
+        public string?   Bemerkung      { get; set; }
     }
 
     /// <summary>
-    /// Einzelner Monats-Eintrag der Kapazitätsabweichung
+    /// Einzelne Kapazitätsabweichung
     /// </summary>
     public class CapacityDeviationDto
     {
-        public int     CapacityDeviationId { get; set; }
-        public int     EmployeeId          { get; set; }
-        public int     Year                { get; set; }
-        public int     Month               { get; set; }
-        public decimal NeueKapazitaet      { get; set; }
-        public string? Bemerkung           { get; set; }
+        public int       CapacityDeviationId { get; set; }
+        public int       EmployeeId          { get; set; }
+        public DateTime  StartDate           { get; set; }
+        public DateTime  EndDate             { get; set; }
+        public decimal   NeueKapazitaet      { get; set; }
+        public string?   Bemerkung           { get; set; }
     }
 
     /// <summary>
@@ -48,10 +45,10 @@ namespace Digi_Stihl.DTOs
     /// </summary>
     public class EmployeeCapacityDto
     {
-        public int       EmployeeId  { get; set; }
-        public string    Name        { get; set; } = string.Empty;
-        public decimal   BaseFte     { get; set; }
-        public decimal[] Deviations  { get; set; } = new decimal[24];
+        public int         EmployeeId  { get; set; }
+        public string      Name        { get; set; } = string.Empty;
+        public decimal     BaseFte     { get; set; }
+        public decimal[]   Deviations  { get; set; } = new decimal[24];
     }
 
     /// <summary>
@@ -59,11 +56,11 @@ namespace Digi_Stihl.DTOs
     /// </summary>
     public class DepartmentCapacityOverviewDto
     {
-        public string                       DepartmentCode { get; set; } = string.Empty;
-        public string                       DepartmentName { get; set; } = string.Empty;
-        public List<EmployeeCapacityDto>   Employees      { get; set; } = new();
-        public decimal[]                    SubtotalFte    { get; set; } = new decimal[24];
-        public int                          HeadCount      { get; set; }
+        public string                     DepartmentCode { get; set; } = string.Empty;
+        public string                     DepartmentName { get; set; } = string.Empty;
+        public List<EmployeeCapacityDto>  Employees      { get; set; } = new();
+        public decimal[]                  SubtotalFte    { get; set; } = new decimal[24];
+        public int                        HeadCount      { get; set; }
     }
 
     /// <summary>
@@ -73,7 +70,7 @@ namespace Digi_Stihl.DTOs
     {
         public int                                   StartYear   { get; set; }
         public int                                   StartMonth  { get; set; }
-        public List<DepartmentCapacityOverviewDto>  Departments { get; set; } = new();
+        public List<DepartmentCapacityOverviewDto>   Departments { get; set; } = new();
     }
 
     /// <summary>
@@ -83,6 +80,6 @@ namespace Digi_Stihl.DTOs
     {
         public int                                   StartYear   { get; set; }
         public int                                   StartMonth  { get; set; }
-        public List<DepartmentCapacityOverviewDto>  Departments { get; set; } = new();
+        public List<DepartmentCapacityOverviewDto>   Departments { get; set; } = new();
     }
 }

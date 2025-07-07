@@ -1,146 +1,233 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { AbweichungDialogComponent, AbweichungData, Mitarbeiter } from './abweichung-dialog/abweichung-dialog.component';
-import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { FormsModule } from '@angular/forms'; // für [(ngModel)]
-import { MatIconModule } from '@angular/material/icon';
+// src/app/features/mitarbeiter/kapazitaetsabweichung/kapazitaetsabweichung.component.ts
+import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { CommonModule }    from '@angular/common';
+import { FormsModule }     from '@angular/forms';
+
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule }  from '@angular/material/paginator';
+import { MatSort, MatSortModule }            from '@angular/material/sort';
+import { MatFormFieldModule }  from '@angular/material/form-field';
+import { MatInputModule }      from '@angular/material/input';
+import { MatButtonModule }     from '@angular/material/button';
+import { MatIconModule }       from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatDialog, MatDialogModule }         from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule }     from '@angular/material/snack-bar';
+
+import { forkJoin, throwError } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
+
+import {
+  AbweichungDialogComponent,
+  AbweichungDialogData,
+  AbweichungData,
+} from './abweichung-dialog/abweichung-dialog.component';
+
+import { CapacityService }    from '../services/capacity.service';
+import { MitarbeiterService } from '../services/mitarbeiter.service';
+import { EmployeeDto }        from '../models/employee';
+import { CreateCapacityDeviationDto } from '../models/capacity.dtos';
+
+interface AbweichungView {
+  capacityDeviationId: number;
+  employeeId:          number;
+  neueKapazitaet:      number;
+  bemerkung?:          string;
+  name:       string;
+  startdatum: Date;
+  enddatum:   Date;
+}
 
 @Component({
   selector: 'app-kapazitaetsabweichung',
   standalone: true,
-  templateUrl: './kapazitaetsabweichung.component.html',
-  styleUrls: ['./kapazitaetsabweichung.component.scss'],
   imports: [
     CommonModule,
-    MatDialogModule,
+    FormsModule,
     MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    FormsModule,
     MatIconModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatDialogModule,
+    MatSnackBarModule,
   ],
+  templateUrl: './kapazitaetsabweichung.component.html',
+  styleUrls: ['./kapazitaetsabweichung.component.scss'],
 })
-export class KapazitaetsabweichungComponent implements OnInit {
+export class KapazitaetsabweichungComponent implements OnInit, AfterViewInit {
+  displayedColumns = ['name', 'zeitraum', 'kapazitaet', 'bemerkung', 'aktion'];
+  dataSource = new MatTableDataSource<AbweichungView>();
+  private employees: EmployeeDto[] = [];
 
-  // Gesamtübersicht aller gespeicherten Abweichungen
-  abweichungen: (AbweichungData & { name: string })[] = [];
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort)      sort!: MatSort;
 
-  // Gefilterte Liste zur Anzeige in der Tabelle
-  gefilterteAbweichungen: (AbweichungData & { name: string })[] = [];
-
-  // Textfeld für Live-Filterung
-  filterText: string = '';
-
-  // Spalten in der Tabelle
-  displayedColumns: string[] = ['name', 'zeitraum', 'kapazitaet', 'bemerkung', 'aktion'];
-
-  // Beispielhafte Mitarbeitendenliste – später vom Backend laden
-  mitarbeiterListe: Mitarbeiter[] = [
-    { id: 1, vorname: 'Max', nachname: 'Müller' },
-    { id: 2, vorname: 'Lisa', nachname: 'Schmidt' },
-    { id: 3, vorname: 'Ali', nachname: 'Yılmaz' },
-  ];
-
-  constructor(private dialog: MatDialog) {}
+  constructor(
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    private capacityService: CapacityService,
+    private mitarbeiterService: MitarbeiterService
+  ) {}
 
   ngOnInit(): void {
-    this.applyFilter(); // Initialfilter bei Start (wenn Daten vorhanden)
+    // Filter-Logik: Name oder Bemerkung
+    this.dataSource.filterPredicate = (data, filter) =>
+      data.name.toLowerCase().includes(filter)
+      || (data.bemerkung?.toLowerCase().includes(filter) ?? false);
+
+    this.loadData();
   }
 
-  // Neue Abweichung erfassen
-  neueAbweichung(): void {
-    const dialogRef = this.dialog.open(AbweichungDialogComponent, {
-      width: '500px',
-      data: {
-        mitarbeiter: this.mitarbeiterListe
-      }
-    });
-
-    dialogRef.afterClosed().subscribe((result: AbweichungData) => {
-      if (result) {
-        const name = this.getNameById(result.employeeId);
-        this.abweichungen.push({ ...result, name });
-        this.applyFilter();
-      }
-    });
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort      = this.sort;
   }
 
-  // Abweichung bearbeiten
-  bearbeiten(abweichung: AbweichungData & { name: string }): void {
-    const dialogRef = this.dialog.open(AbweichungDialogComponent, {
-      width: '500px',
-      data: {
-        abweichung,
-        mitarbeiter: this.mitarbeiterListe
-      }
-    });
-
-    dialogRef.afterClosed().subscribe((result: AbweichungData) => {
-      if (result) {
-        const index = this.abweichungen.indexOf(abweichung);
-        const name = this.getNameById(result.employeeId);
-        if (index !== -1) {
-          this.abweichungen[index] = { ...result, name };
-          this.applyFilter();
-        }
-      }
+  private loadData(): void {
+    forkJoin({
+      emps: this.mitarbeiterService.getMitarbeiter(),
+      devs: this.capacityService.getAbweichungen()
+    }).pipe(
+      catchError(err => {
+        this.snackBar.open('Fehler beim Laden der Daten', 'Schließen', { duration: 3000 });
+        return throwError(() => err);
+      })
+    ).subscribe(({ emps, devs }) => {
+      this.employees = emps;
+      this.dataSource.data = devs.map(d => {
+        const emp = emps.find(e => e.employeeId === d.employeeId)!;
+        return {
+          capacityDeviationId: d.capacityDeviationId,
+          employeeId:          d.employeeId,
+          neueKapazitaet:      d.neueKapazitaet,
+          bemerkung:           d.bemerkung,
+          name:                `${emp.vorname} ${emp.name}`,
+          startdatum:          new Date(d.startDate),
+          enddatum:            new Date(d.endDate),
+        };
+      });
     });
   }
 
-  // Abweichung löschen
-  loeschen(abweichung: AbweichungData & { name: string }): void {
-    const index = this.abweichungen.indexOf(abweichung);
-    if (index !== -1) {
-      this.abweichungen.splice(index, 1);
-      this.applyFilter();
+  applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value
+      .trim()
+      .toLowerCase();
+    this.dataSource.filter = filterValue;
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
     }
   }
 
-  // Filtert nach Name oder Bemerkung
-  applyFilter(): void {
-    const ft = this.filterText.trim().toLowerCase();
-    this.gefilterteAbweichungen = this.abweichungen.filter(a =>
-      a.name.toLowerCase().includes(ft) ||
-      a.bemerkung?.toLowerCase().includes(ft)
-    );
+  bearbeiten(row: AbweichungView): void {
+    const payload: AbweichungData = {
+      id:               row.capacityDeviationId,
+      employeeId:       row.employeeId,
+      startdatum:       row.startdatum,
+      enddatum:         row.enddatum,
+      neueKapazitaet:   row.neueKapazitaet,
+      bemerkung:        row.bemerkung || '',
+    };
+
+    this.dialog.open<AbweichungDialogComponent, AbweichungDialogData>(
+      AbweichungDialogComponent,
+      {
+        width: '500px',
+        data: {
+          abweichung: payload,
+          mitarbeiter: this.employees
+        }
+      }
+    ).afterClosed().subscribe(result => {
+      if (!result) return;
+      const dto: CreateCapacityDeviationDto = {
+        employeeId:     result.employeeId,
+        startDate:      result.startdatum.toISOString().slice(0,10),
+        endDate:        result.enddatum.toISOString().slice(0,10),
+        neueKapazitaet: result.neueKapazitaet,
+        bemerkung:      result.bemerkung,
+      };
+      this.capacityService.updateAbweichung(row.capacityDeviationId, dto)
+        .pipe(
+          finalize(() => this.loadData()),
+          catchError(err => {
+            this.snackBar.open('Fehler beim Aktualisieren', 'Schließen', { duration: 3000 });
+            return throwError(() => err);
+          })
+        )
+        .subscribe(() => {
+          this.snackBar.open('Abweichung aktualisiert', 'OK', { duration: 2000 });
+        });
+    });
   }
 
-  // Ermittelt vollständigen Namen anhand der ID
-  private getNameById(id: number): string {
-    const mitarbeiter = this.mitarbeiterListe.find(m => m.id === id);
-    return mitarbeiter ? `${mitarbeiter.vorname} ${mitarbeiter.nachname}` : 'Unbekannt';
+  loeschen(row: AbweichungView, event: MouseEvent): void {
+    event.stopPropagation();
+    if (!confirm(`Löschen der Abweichung von ${row.name}?`)) return;
+
+    this.capacityService.deleteAbweichung(row.capacityDeviationId)
+      .pipe(
+        finalize(() => this.loadData()),
+        catchError(err => {
+          this.snackBar.open('Fehler beim Löschen', 'Schließen', { duration: 3000 });
+          return throwError(() => err);
+        })
+      )
+      .subscribe(() => {
+        this.snackBar.open('Abweichung gelöscht', 'OK', { duration: 2000 });
+      });
   }
 
-  // Exportiert Tabelle als CSV-Datei
+  neueAbweichung(): void {
+    this.dialog.open<AbweichungDialogComponent, AbweichungDialogData>(
+      AbweichungDialogComponent,
+      {
+        width: '500px',
+        data: { mitarbeiter: this.employees }
+      }
+    ).afterClosed().subscribe(result => {
+      if (!result) return;
+      const dto: CreateCapacityDeviationDto = {
+        employeeId:     result.employeeId,
+        startDate:      result.startdatum.toISOString().slice(0,10),
+        endDate:        result.enddatum.toISOString().slice(0,10),
+        neueKapazitaet: result.neueKapazitaet,
+        bemerkung:      result.bemerkung,
+      };
+      this.capacityService.createAbweichung(dto)
+        .pipe(
+          finalize(() => this.loadData()),
+          catchError(err => {
+            this.snackBar.open('Fehler beim Erstellen', 'Schließen', { duration: 3000 });
+            return throwError(() => err);
+          })
+        )
+        .subscribe(() => {
+          this.snackBar.open('Abweichung erstellt', 'OK', { duration: 2000 });
+        });
+    });
+  }
+
   exportieren(): void {
-    const csvRows = [
-      ['Name', 'Startdatum', 'Enddatum', 'Neue Kapazität', 'Bemerkung'],
-      ...this.gefilterteAbweichungen.map(a => [
-        a.name,
-        a.startdatum.toLocaleDateString(),
-        a.enddatum.toLocaleDateString(),
-        a.neueKapazitaet.toString(),
-        a.bemerkung || ''
-      ])
-    ];
-
-    const csvContent = csvRows.map(r => r.join(',')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'kapazitaetsabweichungen.csv';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    const header = ['Name','Startdatum','Enddatum','Neue Kapazität','Bemerkung'];
+    const rows = this.dataSource.data.map(d => [
+      d.name,
+      d.startdatum.toISOString().slice(0,10),
+      d.enddatum.toISOString().slice(0,10),
+      d.neueKapazitaet.toString(),
+      d.bemerkung||''
+    ]);
+    const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'abweichungen.csv';
+    link.click();
   }
 }

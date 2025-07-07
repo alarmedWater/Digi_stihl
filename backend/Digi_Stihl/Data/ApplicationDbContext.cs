@@ -46,9 +46,9 @@ namespace Digi_Stihl.Data
                 .Property(fr => fr.Fluktuationsrate)
                 .HasColumnType("decimal(5,2)");
 
-            // 4) Unique Index auf (EmployeeId, Year, Month)
+            // 4) Unique Index auf (EmployeeId, StartDate, EndDate)
             modelBuilder.Entity<CapacityDeviation>()
-                .HasIndex(cd => new { cd.EmployeeId, cd.Year, cd.Month })
+                .HasIndex(cd => new { cd.EmployeeId, cd.StartDate, cd.EndDate })
                 .IsUnique();
         }
     }

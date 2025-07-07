@@ -1,7 +1,7 @@
 // MappingProfiles/MappingProfile.cs
 using AutoMapper;
-using Digi_Stihl.Models;
 using Digi_Stihl.DTOs;
+using Digi_Stihl.Models;
 
 namespace Digi_Stihl.MappingProfiles
 {
@@ -9,6 +9,16 @@ namespace Digi_Stihl.MappingProfiles
     {
         public MappingProfile()
         {
+            // ─── CreateCapacityDeviationDto → CapacityDeviation ────
+            CreateMap<CreateCapacityDeviationDto, CapacityDeviation>()
+                .ForMember(dest => dest.StartDate,      opt => opt.MapFrom(src => src.StartDate))
+                .ForMember(dest => dest.EndDate,        opt => opt.MapFrom(src => src.EndDate))
+                .ForMember(dest => dest.NeueKapazitaet, opt => opt.MapFrom(src => src.NeueKapazitaet))
+                .ForMember(dest => dest.Bemerkung,      opt => opt.MapFrom(src => src.Bemerkung));
+
+            // ─── CapacityDeviation ↔ CapacityDeviationDto ───────────
+            CreateMap<CapacityDeviation, CapacityDeviationDto>().ReverseMap();
+
             // ─── Department ─────────────────────────────────────────
             CreateMap<Department, DepartmentDto>().ReverseMap();
 
@@ -17,47 +27,25 @@ namespace Digi_Stihl.MappingProfiles
 
             // ─── Employee → EmployeeDto ─────────────────────────────
             CreateMap<Employee, EmployeeDto>()
-                // Abteilung als DTO
-                .ForMember(dest => dest.Department,
-                           opt => opt.MapFrom(src => src.Department))
-                // Austrittsgrund als DTO
-                .ForMember(dest => dest.ExitReason,
-                           opt => opt.MapFrom(src => src.ExitReason))
-                // alle anderen gleichnamigen Felder automatisch
-                ;
+                .ForMember(dest => dest.Department, opt => opt.MapFrom(src => src.Department))
+                .ForMember(dest => dest.ExitReason, opt => opt.MapFrom(src => src.ExitReason));
 
             // ─── EmployeeCreateDto → Employee ──────────────────────
             CreateMap<EmployeeCreateDto, Employee>()
-                // EmployeeId / Guid generiert das Backend
-                .ForMember(dest => dest.EmployeeId, opt => opt.Ignore())
+                .ForMember(dest => dest.EmployeeId,    opt => opt.Ignore())
                 .ForMember(dest => dest.EmployeeGuid, opt => opt.Ignore())
-                // ExitReasonId wird aus CreateDto übernommen
-                .ForMember(dest => dest.ExitReasonId,
-                           opt => opt.MapFrom(src => src.ExitReasonId))
-                // Department navigational property wird über Kostenstelle gesetzt
-                .ForMember(dest => dest.Department, opt => opt.Ignore())
-                // die nicht im CreateDto vorhandenen Felder ignorieren
+                .ForMember(dest => dest.ExitReasonId, opt => opt.MapFrom(src => src.ExitReasonId))
+                .ForMember(dest => dest.Department,   opt => opt.Ignore())
                 .ForMember(dest => dest.Verlaengerung1, opt => opt.Ignore())
                 .ForMember(dest => dest.Verlaengerung2, opt => opt.Ignore())
-                .ForMember(dest => dest.BefristungMax, opt => opt.Ignore())
-                .ForMember(dest => dest.Freistellung, opt => opt.Ignore())
-            ;
+                .ForMember(dest => dest.BefristungMax,  opt => opt.Ignore())
+                .ForMember(dest => dest.Freistellung,   opt => opt.Ignore());
 
             // ─── EmployeeDto → Employee ─────────────────────────────
             CreateMap<EmployeeDto, Employee>()
-                // EmployeeGuid oder Department nicht überschreiben
                 .ForMember(dest => dest.EmployeeGuid, opt => opt.Ignore())
-                .ForMember(dest => dest.Department, opt => opt.Ignore())
-                // ExitReason navigational property wird über ExitReasonId gesetzt
-                .ForMember(dest => dest.ExitReason, opt => opt.Ignore())
-                // alle anderen gleichnamigen Felder automatisch
-                ;
-
-            // ─── CapacityDeviation ↔ CapacityDeviationDto ───────────
-            CreateMap<CapacityDeviation, CapacityDeviationDto>().ReverseMap();
-
-            // ─── ExitReason ↔ ExitreasonDto ───────────
-            CreateMap<ExitReason, ExitReasonDto>().ReverseMap();
+                .ForMember(dest => dest.Department,   opt => opt.Ignore())
+                .ForMember(dest => dest.ExitReason,   opt => opt.Ignore());
         }
     }
 }

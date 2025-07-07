@@ -4,45 +4,92 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Digi_Stihl.Data;
-using Digi_Stihl.DTOs;
 using Digi_Stihl.Models;
+using Digi_Stihl.DTOs;
 
 namespace Digi_Stihl.Repositories
 {
     public class CapacityRepository : ICapacityRepository
     {
         private readonly ApplicationDbContext _db;
-        public CapacityRepository(ApplicationDbContext db) => _db = db;
 
-        public async Task<IList<CapacityDeviation>> GetDeviationsAsync(CapacityFilterDto f)
+        public CapacityRepository(ApplicationDbContext db)
         {
-            var q = _db.CapacityDeviations.AsQueryable();
+            _db = db;
+        }
 
-            if (!string.IsNullOrWhiteSpace(f.EmployeeName))
-                q = q.Where(cd => cd.Employee!.Name.Contains(f.EmployeeName!));
+        /// <summary>
+        /// Liefert alle Abweichungen gemäß Filter (inkl. Employee-Navigation).
+        /// </summary>
+        public async Task<IList<CapacityDeviation>> GetDeviationsAsync(CapacityFilterDto filter)
+        {
+            var query = _db.CapacityDeviations.AsQueryable();
 
-            if (f.StartYear.HasValue && f.StartMonth.HasValue)
-                q = q.Where(cd => cd.Year > f.StartYear! ||
-                    (cd.Year == f.StartYear! && cd.Month >= f.StartMonth!));
+            if (!string.IsNullOrWhiteSpace(filter.EmployeeName))
+                query = query.Where(cd =>
+                    cd.Employee != null &&
+                    EF.Functions.Like(cd.Employee.Name, $"%{filter.EmployeeName}%"));
 
-            if (f.EndYear.HasValue && f.EndMonth.HasValue)
-                q = q.Where(cd => cd.Year < f.EndYear! ||
-                    (cd.Year == f.EndYear! && cd.Month <= f.EndMonth!));
+            if (filter.StartDate.HasValue)
+                query = query.Where(cd => cd.EndDate >= filter.StartDate.Value);
 
-            if (!string.IsNullOrWhiteSpace(f.DepartmentCode))
-                q = q.Where(cd => cd.Employee!.Kostenstelle == f.DepartmentCode);
+            if (filter.EndDate.HasValue)
+                query = query.Where(cd => cd.StartDate <= filter.EndDate.Value);
 
-            return await q
+            if (!string.IsNullOrWhiteSpace(filter.DepartmentCode))
+                query = query.Where(cd =>
+                    cd.Employee != null &&
+                    cd.Employee.Kostenstelle == filter.DepartmentCode);
+
+            return await query
                 .Include(cd => cd.Employee)
                 .ToListAsync();
         }
 
-        public async Task AddDeviationsAsync(IEnumerable<CapacityDeviation> deviations)
+        /// <summary>
+        /// Fügt eine neue Abweichung hinzu und speichert sie.
+        /// </summary>
+        public async Task AddDeviationAsync(CapacityDeviation deviation)
         {
-            await _db.CapacityDeviations.AddRangeAsync(deviations);
+            _db.CapacityDeviations.Add(deviation);
             await _db.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Holt eine einzelne Abweichung per Primärschlüssel (inkl. Employee).
+        /// </summary>
+        public async Task<CapacityDeviation?> GetDeviationByIdAsync(int id)
+        {
+            return await _db.CapacityDeviations
+                .Include(cd => cd.Employee)
+                .FirstOrDefaultAsync(cd => cd.CapacityDeviationId == id);
+        }
+
+        /// <summary>
+        /// Aktualisiert eine bestehende Abweichung und speichert die Änderungen.
+        /// </summary>
+        public async Task UpdateDeviationAsync(CapacityDeviation deviation)
+        {
+            _db.CapacityDeviations.Update(deviation);
+            await _db.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Löscht die Abweichung mit der angegebenen ID.
+        /// </summary>
+        public async Task DeleteDeviationAsync(int id)
+        {
+            var entity = await _db.CapacityDeviations.FindAsync(id);
+            if (entity == null)
+                return;
+
+            _db.CapacityDeviations.Remove(entity);
+            await _db.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Liefert alle Mitarbeiter eines bestimmten Bereichs (inkl. Department-Navigation).
+        /// </summary>
         public async Task<IList<Employee>> GetEmployeesByTypeAsync(BereichTyp bereich)
         {
             return await _db.Employees

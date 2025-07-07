@@ -1,65 +1,134 @@
-<!-- Gesamter Seitencontainer -->
+<!-- src/app/features/mitarbeiter/kapazitaetsabweichung/kapazitaetsabweichung.component.html -->
 <div class="kapazitaetsabweichung-container">
 
-  <!-- Filterfeld zur Suche nach Namen oder Bemerkung -->
-  <div class="filter-container">
-    <mat-form-field appearance="outline">
+  <!-- Toolbar mit Filter und Actions -->
+  <div class="toolbar">
+    <mat-form-field appearance="outline" class="filter-container">
       <mat-label>Filter</mat-label>
-      <!-- Eingabe mit Two-Way-Binding an 'filterText' + Aufruf von applyFilter() -->
-      <input matInput [(ngModel)]="filterText" (input)="applyFilter()" placeholder="Name oder Grund..." />
+      <input
+        matInput
+        (keyup)="applyFilter($event)"
+        placeholder="Name oder Grund…"
+        aria-label="Filter Abweichungen"
+      />
+      <button
+        *ngIf="dataSource.filter"
+        matSuffix
+        mat-icon-button
+        aria-label="Filter zurücksetzen"
+        (click)="dataSource.filter = ''"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
     </mat-form-field>
+
+    <span class="spacer"></span>
+
+    <button
+      mat-raised-button
+      color="accent"
+      (click)="neueAbweichung()"
+      aria-label="Neue Abweichung erfassen"
+    >
+      <mat-icon>add</mat-icon>
+      Neue Abweichung
+    </button>
+    <button
+      mat-raised-button
+      (click)="exportieren()"
+      aria-label="Abweichungen als CSV exportieren"
+    >
+      <mat-icon>file_download</mat-icon>
+      Exportieren
+    </button>
   </div>
 
-  <!-- Tabelle der gefilterten Abweichungen -->
-  <table mat-table [dataSource]="gefilterteAbweichungen" class="abweichung-tabelle">
+  <!-- Daten-Tabelle -->
+  <table
+    mat-table
+    [dataSource]="dataSource"
+    matSort
+    class="abweichung-tabelle"
+    aria-label="Tabelle Kapazitätsabweichungen"
+  >
 
-    <!-- Spalte für Mitarbeitenden-Namen -->
+    <!-- Spalte: Name -->
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef> Name </th>
-      <td mat-cell *matCellDef="let a"> {{ a.name }} </td>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+      <td mat-cell *matCellDef="let row">{{ row.name }}</td>
     </ng-container>
 
-    <!-- Zeitraum (Startdatum – Enddatum) -->
+    <!-- Spalte: Zeitraum -->
     <ng-container matColumnDef="zeitraum">
-      <th mat-header-cell *matHeaderCellDef> Zeitraum </th>
-      <td mat-cell *matCellDef="let a">
-        {{ a.startdatum | date }} – {{ a.enddatum | date }}
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Zeitraum</th>
+      <td mat-cell *matCellDef="let row">
+        {{ row.startdatum | date:'shortDate' }} – {{ row.enddatum | date:'shortDate' }}
       </td>
     </ng-container>
 
-    <!-- Neue Kapazität mit farblicher Hervorhebung -->
+    <!-- Spalte: Neue Kapazität -->
     <ng-container matColumnDef="kapazitaet">
-      <th mat-header-cell *matHeaderCellDef> Neue Kapazität </th>
-      <td mat-cell *matCellDef="let a"
-          [ngClass]="{ 'negativ': a.neueKapazitaet < 0, 'positiv': a.neueKapazitaet > 0 }">
-        {{ a.neueKapazitaet }}
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Neue Kapazität</th>
+      <td
+        mat-cell
+        *matCellDef="let row"
+        [ngClass]="{ negativ: row.neueKapazitaet < 0, positiv: row.neueKapazitaet > 0 }"
+      >
+        {{ row.neueKapazitaet }}
       </td>
     </ng-container>
 
-    <!-- Grund der Abweichung -->
+    <!-- Spalte: Bemerkung -->
     <ng-container matColumnDef="bemerkung">
-      <th mat-header-cell *matHeaderCellDef> Grund </th>
-      <td mat-cell *matCellDef="let a"> {{ a.bemerkung }} </td>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Grund</th>
+      <td mat-cell *matCellDef="let row">{{ row.bemerkung }}</td>
     </ng-container>
 
-    <!-- Aktionsspalte mit Buttons -->
+    <!-- Spalte: Aktion -->
     <ng-container matColumnDef="aktion">
-      <th mat-header-cell *matHeaderCellDef> Aktion </th>
-      <td mat-cell *matCellDef="let a">
-        <button mat-button color="primary" (click)="bearbeiten(a)">Bearbeiten</button>
-        <button mat-button color="warn" (click)="loeschen(a)">Löschen</button>
+      <th mat-header-cell *matHeaderCellDef>Aktion</th>
+      <td mat-cell *matCellDef="let row">
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="$event.stopPropagation(); bearbeiten(row)"
+          matTooltip="Bearbeiten"
+          aria-label="Bearbeiten"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="$event.stopPropagation(); loeschen(row, $event)"
+          matTooltip="Löschen"
+          aria-label="Löschen"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
       </td>
     </ng-container>
 
-    <!-- Tabellenkopf & Datenzeilen -->
-    <tr mat-header-row *matHeaderRowDef="['name', 'zeitraum', 'kapazitaet', 'bemerkung', 'aktion']"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['name', 'zeitraum', 'kapazitaet', 'bemerkung', 'aktion']"></tr>
+    <!-- Header- & Datenzeilen -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: displayedColumns"
+      class="clickable-row"
+    ></tr>
+
+    <!-- Anzeige, wenn keine Daten vorhanden -->
+    <tr class="mat-row mat-no-data-row" *matNoDataRow>
+      <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+        Keine Abweichungen gefunden.
+      </td>
+    </tr>
   </table>
 
-  <!-- Export- und Erfassungsaktionen -->
-  <div class="aktionen">
-    <button mat-raised-button color="accent" (click)="neueAbweichung()">Neue Abweichung erfassen</button>
-    <button mat-raised-button (click)="exportieren()">Exportieren (CSV)</button>
-  </div>
-
+  <!-- Paginator -->
+  <mat-paginator
+    [pageSizeOptions]="[5, 10, 20]"
+    showFirstLastButtons
+    aria-label="Paginator Kapazitätsabweichungen"
+  ></mat-paginator>
 </div>

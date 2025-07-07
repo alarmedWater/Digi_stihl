@@ -1,93 +1,89 @@
+// src/app/features/mitarbeiter/kapazitaetsabweichung/abweichung-dialog/abweichung-dialog.component.ts
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog'; // MatDialogModule hinzugefügt
-import { CommonModule, NgIf, NgFor } from '@angular/common';
-
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule }  from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule }  from '@angular/material/datepicker';
+import { MatNativeDateModule }  from '@angular/material/core';
+import { MatButtonModule } from '@angular/material/button';
 
-// Interface zur Strukturierung der Abweichungsdaten
-export interface AbweichungData {
-  id?: number;
-  employeeId: number;
-  startdatum: Date;
-  enddatum: Date;
-  neueKapazitaet: number;
-  bemerkung: string;
+import { EmployeeDto } from '../../models/employee';
+
+/**
+ * Payload, das der aufrufende Component dem Dialog übergibt.
+ * - `abweichung` enthält ggf. die zu bearbeitende Abweichung
+ * - `mitarbeiter` ist die Liste aller Mitarbeiter für das Dropdown
+ */
+export interface AbweichungDialogData {
+  abweichung?: AbweichungData;
+  mitarbeiter: EmployeeDto[];
 }
 
-// Interface für die Mitarbeitenden im Auswahlfeld
-export interface Mitarbeiter {
-  id: number;
-  vorname: string;
-  nachname: string;
+/** Struktur der Abweichungsdaten, die zurückgegeben werden */
+export interface AbweichungData {
+  id?: number;
+  employeeId:    number;
+  startdatum:    Date;
+  enddatum:      Date;
+  neueKapazitaet:number;
+  bemerkung:     string;
 }
 
 @Component({
   selector: 'app-abweichung-dialog',
   standalone: true,
-  templateUrl: './abweichung-dialog.component.html',
-  styleUrls: ['./abweichung-dialog.component.scss'],
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
+    MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatSelectModule,
-    MatDialogModule,   // ✅ Wichtig für <mat-dialog-actions>
-    NgIf,
-    NgFor
-  ]
+    MatButtonModule
+  ],
+  templateUrl: './abweichung-dialog.component.html',
+  styleUrls: ['./abweichung-dialog.component.scss'],
 })
 export class AbweichungDialogComponent implements OnInit {
-
-  // Formular zur Bearbeitung oder Erfassung einer Abweichung
+  /** Reactive-Form für die Abweichung */
   abweichungForm!: FormGroup;
 
-  // Liste von Mitarbeitenden zur Anzeige im Dropdown
-  mitarbeiterListe: Mitarbeiter[] = [];
+  /** Liste aller Mitarbeiter für das Dropdown */
+  mitarbeiterListe: EmployeeDto[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<AbweichungDialogComponent>,
-
-    // Injectierte Daten enthalten ggf. eine bestehende Abweichung sowie die Liste der Mitarbeitenden
-    @Inject(MAT_DIALOG_DATA)
-    public data: { abweichung?: AbweichungData, mitarbeiter: Mitarbeiter[] }
+    private dialogRef: MatDialogRef<AbweichungDialogComponent, AbweichungData>,
+    @Inject(MAT_DIALOG_DATA) public data: AbweichungDialogData
   ) {}
 
   ngOnInit(): void {
-    // Mitarbeitendenliste aus den übergebenen Dialogdaten setzen
+    // Mitarbeiterliste aus den übergebenen Daten befüllen
     this.mitarbeiterListe = this.data.mitarbeiter;
 
-    // Formular initialisieren – entweder mit vorhandenen Werten oder leeren Feldern
+    // Formular initialisieren, bestehende Werte (edit) oder leer (neu) übernehmen
     this.abweichungForm = this.fb.group({
-      employeeId: [this.data.abweichung?.employeeId || '', Validators.required],
-      startdatum: [this.data.abweichung?.startdatum || '', Validators.required],
-      enddatum: [this.data.abweichung?.enddatum || '', Validators.required],
-      neueKapazitaet: [
-        this.data.abweichung?.neueKapazitaet || '',
-        [Validators.required, Validators.min(-1), Validators.max(1)]
-      ],
-      bemerkung: [this.data.abweichung?.bemerkung || '']
+      employeeId:     [this.data.abweichung?.employeeId   || null, [Validators.required]],
+      startdatum:     [this.data.abweichung?.startdatum   || null, [Validators.required]],
+      enddatum:       [this.data.abweichung?.enddatum     || null, [Validators.required]],
+      neueKapazitaet: [this.data.abweichung?.neueKapazitaet|| null, [Validators.required, Validators.min(-1), Validators.max(1)]],
+      bemerkung:      [this.data.abweichung?.bemerkung     || '']
     });
   }
 
-  // Speichert die Abweichung und schließt den Dialog
+  /** Schließt den Dialog und liefert die Form-Werte zurück */
   onSpeichern(): void {
     if (this.abweichungForm.valid) {
-      this.dialogRef.close(this.abweichungForm.value);
+      this.dialogRef.close(this.abweichungForm.value as AbweichungData);
     }
   }
 
-  // Schließt den Dialog ohne Änderungen zu übernehmen
+  /** Schließt den Dialog ohne Rückgabe */
   onAbbrechen(): void {
     this.dialogRef.close();
   }

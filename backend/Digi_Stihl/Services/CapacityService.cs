@@ -13,7 +13,7 @@ namespace Digi_Stihl.Services
     public class CapacityService : ICapacityService
     {
         private readonly ICapacityRepository _repo;
-        private readonly IMapper _mapper;
+        private readonly IMapper             _mapper;
 
         public CapacityService(ICapacityRepository repo, IMapper mapper)
         {
@@ -23,119 +23,132 @@ namespace Digi_Stihl.Services
 
         public async Task<IList<CapacityDeviationDto>> GetDeviationsAsync(CapacityFilterDto filter)
         {
-            var ents = await _repo.GetDeviationsAsync(filter);
-            return _mapper.Map<IList<CapacityDeviationDto>>(ents);
+            var entities = await _repo.GetDeviationsAsync(filter);
+            return _mapper.Map<IList<CapacityDeviationDto>>(entities);
         }
 
-        public async Task<IList<CapacityDeviationDto>> CreateDeviationAsync(CreateCapacityDeviationDto dto)
+        public async Task<CapacityDeviationDto?> GetDeviationByIdAsync(int id)
         {
-            var deviations = new List<CapacityDeviation>();
-            int year = dto.StartYear, month = dto.StartMonth;
-            while (year < dto.EndYear || (year == dto.EndYear && month <= dto.EndMonth))
-            {
-                deviations.Add(new CapacityDeviation
-                {
-                    EmployeeId     = dto.EmployeeId,
-                    Year           = year,
-                    Month          = month,
-                    NeueKapazitaet = dto.NeueKapazitaet,
-                    Bemerkung      = dto.Bemerkung
-                });
-                month++;
-                if (month == 13) { month = 1; year++; }
-            }
+            var entity = await _repo.GetDeviationByIdAsync(id);
+            return entity == null
+                ? null
+                : _mapper.Map<CapacityDeviationDto>(entity);
+        }
 
-            var existing = await _repo.GetDeviationsAsync(new CapacityFilterDto
+        public async Task<CapacityDeviationDto> CreateDeviationAsync(CreateCapacityDeviationDto dto)
+        {
+            var overlaps = await _repo.GetDeviationsAsync(new CapacityFilterDto
             {
-                StartYear   = dto.StartYear,
-                StartMonth  = dto.StartMonth,
-                EndYear     = dto.EndYear,
-                EndMonth    = dto.EndMonth
+                StartDate = dto.StartDate,
+                EndDate   = dto.EndDate
             });
-            if (existing.Any())
-                throw new InvalidOperationException("Für den Zeitraum existieren bereits Abweichungen.");
+            if (overlaps.Any(d => d.EmployeeId == dto.EmployeeId))
+                throw new InvalidOperationException("Für diesen Zeitraum existieren bereits Abweichungen.");
 
-            await _repo.AddDeviationsAsync(deviations);
-            return _mapper.Map<IList<CapacityDeviationDto>>(deviations);
+            var entity = _mapper.Map<CapacityDeviation>(dto);
+            await _repo.AddDeviationAsync(entity);
+            return _mapper.Map<CapacityDeviationDto>(entity);
         }
 
-        public async Task<DirectCapacityOverviewDto> GetDirectCapacityOverviewAsync(int startYear, int startMonth)
+        public async Task<CapacityDeviationDto> UpdateDeviationAsync(int id, CreateCapacityDeviationDto dto)
         {
-            return await BuildOverviewAsync(BereichTyp.Direkt, startYear, startMonth);
+            var entity = await _repo.GetDeviationByIdAsync(id);
+            if (entity == null)
+                throw new KeyNotFoundException($"Deviation {id} nicht gefunden.");
+
+            entity.StartDate      = dto.StartDate;
+            entity.EndDate        = dto.EndDate;
+            entity.NeueKapazitaet = dto.NeueKapazitaet;
+            entity.Bemerkung      = dto.Bemerkung;
+
+            await _repo.UpdateDeviationAsync(entity);
+            return _mapper.Map<CapacityDeviationDto>(entity);
         }
+
+        public Task<DirectCapacityOverviewDto> GetDirectCapacityOverviewAsync(int startYear, int startMonth)
+            => BuildOverviewAsync(BereichTyp.Direkt, startYear, startMonth);
 
         public async Task<IndirectCapacityOverviewDto> GetIndirectCapacityOverviewAsync(int startYear, int startMonth)
         {
-            // Nutze dieselbe Logik, mappe aber auf Indirect DTO
-            var directDto = await BuildOverviewAsync(BereichTyp.Indirekt, startYear, startMonth);
+            var direct = await BuildOverviewAsync(BereichTyp.Indirekt, startYear, startMonth);
             return new IndirectCapacityOverviewDto
             {
-                StartYear   = directDto.StartYear,
-                StartMonth  = directDto.StartMonth,
-                Departments = directDto.Departments
+                StartYear   = direct.StartYear,
+                StartMonth  = direct.StartMonth,
+                Departments = direct.Departments
             };
         }
 
         private async Task<DirectCapacityOverviewDto> BuildOverviewAsync(BereichTyp bereich, int startYear, int startMonth)
         {
-            var employees = await _repo.GetEmployeesByTypeAsync(bereich);
-            var endDate   = DateTime.Today.AddMonths(23);
+            var employees  = await _repo.GetEmployeesByTypeAsync(bereich);
+            var startDate  = new DateTime(startYear, startMonth, 1);
             var deviations = await _repo.GetDeviationsAsync(new CapacityFilterDto
             {
-                StartYear   = startYear,
-                StartMonth  = startMonth,
-                EndYear     = endDate.Year,
-                EndMonth    = endDate.Month
+                StartDate = startDate,
+                EndDate   = startDate.AddMonths(23)
             });
 
-            var dto = new DirectCapacityOverviewDto { StartYear = startYear, StartMonth = startMonth };
+            var overview = new DirectCapacityOverviewDto
+            {
+                StartYear  = startYear,
+                StartMonth = startMonth
+            };
+
             for (int offset = 0; offset < 24; offset++)
             {
-                var dt = new DateTime(startYear, startMonth, 1).AddMonths(offset);
+                var monthDate = startDate.AddMonths(offset);
                 foreach (var grp in employees.GroupBy(e => e.Kostenstelle!))
                 {
-                    var depDto = dto.Departments.FirstOrDefault(d => d.DepartmentCode == grp.Key);
-                    if (depDto == null)
-                    {
-                        depDto = new DepartmentCapacityOverviewDto
+                    var depDto = overview.Departments
+                        .FirstOrDefault(d => d.DepartmentCode == grp.Key)
+                        ?? new DepartmentCapacityOverviewDto
                         {
                             DepartmentCode = grp.Key,
                             DepartmentName = grp.First().Department!.Abteilungsname,
                             SubtotalFte    = new decimal[24],
                             HeadCount      = grp.Count(),
                             Employees      = new List<EmployeeCapacityDto>()
-                        };
-                        dto.Departments.Add(depDto);
-                    }
+                        }.Also(d => overview.Departments.Add(d));
 
                     foreach (var emp in grp)
                     {
                         var baseFte = emp.FTE;
-                        var dev = deviations.SingleOrDefault(d =>
+                        var dev = deviations.FirstOrDefault(d =>
                             d.EmployeeId == emp.EmployeeId &&
-                            d.Year       == dt.Year &&
-                            d.Month      == dt.Month);
+                            d.StartDate   <= monthDate &&
+                            d.EndDate     >= monthDate);
                         var cap = baseFte + (dev?.NeueKapazitaet ?? 0m);
 
-                        var empDto = depDto.Employees.FirstOrDefault(e => e.EmployeeId == emp.EmployeeId);
-                        if (empDto == null)
-                        {
-                            empDto = new EmployeeCapacityDto
+                        var empDto = depDto.Employees
+                            .FirstOrDefault(e => e.EmployeeId == emp.EmployeeId)
+                            ?? new EmployeeCapacityDto
                             {
                                 EmployeeId = emp.EmployeeId,
                                 Name       = $"{emp.Name}, {emp.Vorname}",
                                 BaseFte    = emp.FTE,
                                 Deviations = new decimal[24]
-                            };
-                            depDto.Employees.Add(empDto);
-                        }
-
+                            }.Also(e => depDto.Employees.Add(e));
                         empDto.Deviations[offset] = cap;
                         depDto.SubtotalFte[offset] += cap;
                     }
                 }
             }
-            return dto;
+            return overview;
+        }
+
+        public async Task DeleteDeviationAsync(int id)
+        {
+            await _repo.DeleteDeviationAsync(id);
+        }
+    }
+
+    public static class CollectionExtensions
+    {
+        public static T Also<T>(this T obj, Action<T> act)
+        {
+            act(obj);
+            return obj;
         }
     }
 }
