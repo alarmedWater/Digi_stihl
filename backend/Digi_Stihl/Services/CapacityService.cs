@@ -56,6 +56,7 @@ namespace Digi_Stihl.Services
             if (entity == null)
                 throw new KeyNotFoundException($"Deviation {id} nicht gefunden.");
 
+            // Werte überschreiben
             entity.StartDate      = dto.StartDate;
             entity.EndDate        = dto.EndDate;
             entity.NeueKapazitaet = dto.NeueKapazitaet;
@@ -98,6 +99,7 @@ namespace Digi_Stihl.Services
             for (int offset = 0; offset < 24; offset++)
             {
                 var monthDate = startDate.AddMonths(offset);
+
                 foreach (var grp in employees.GroupBy(e => e.Kostenstelle!))
                 {
                     var depDto = overview.Departments
@@ -113,12 +115,15 @@ namespace Digi_Stihl.Services
 
                     foreach (var emp in grp)
                     {
-                        var baseFte = emp.FTE;
                         var dev = deviations.FirstOrDefault(d =>
                             d.EmployeeId == emp.EmployeeId &&
                             d.StartDate   <= monthDate &&
                             d.EndDate     >= monthDate);
-                        var cap = baseFte + (dev?.NeueKapazitaet ?? 0m);
+
+                        // Bei Abweichung nur dev.NeuKapazitaet, sonst Basis-FTE:
+                        var cap = dev != null
+                            ? dev.NeueKapazitaet
+                            : emp.FTE;
 
                         var empDto = depDto.Employees
                             .FirstOrDefault(e => e.EmployeeId == emp.EmployeeId)
@@ -129,11 +134,13 @@ namespace Digi_Stihl.Services
                                 BaseFte    = emp.FTE,
                                 Deviations = new decimal[24]
                             }.Also(e => depDto.Employees.Add(e));
+
                         empDto.Deviations[offset] = cap;
                         depDto.SubtotalFte[offset] += cap;
                     }
                 }
             }
+
             return overview;
         }
 

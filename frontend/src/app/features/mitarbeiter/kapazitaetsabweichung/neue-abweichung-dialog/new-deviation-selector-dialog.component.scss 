@@ -1,5 +1,11 @@
-
-/* src/app/features/mitarbeiter/kapazitaetsabweichung/new-deviation-selector-dialog.component.scss */
 .full-width {
   width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* Optional: Style placeholder text */
+.mat-form-field {
+  .mat-form-field-placeholder {
+    color: rgba(0, 0, 0, 0.6);
+  }
 }

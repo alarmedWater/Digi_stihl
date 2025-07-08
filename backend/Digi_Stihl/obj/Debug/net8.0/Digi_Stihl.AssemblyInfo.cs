@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Digi_Stihl")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ff4c963def59f2eb2c616eb2436f5c8da8d009a3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3f79309ef87b3bd0c3ac4970b1646c825f29b4b7")]
 [assembly: System.Reflection.AssemblyProductAttribute("Digi_Stihl")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Digi_Stihl")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

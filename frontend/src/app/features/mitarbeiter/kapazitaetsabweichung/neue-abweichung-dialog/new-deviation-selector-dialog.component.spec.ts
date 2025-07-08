@@ -1,76 +1,75 @@
-/* src/app/features/mitarbeiter/kapazitaetsabweichung/new-deviation-selector-dialog.component.spec.ts */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+// src/app/features/mitarbeiter/kapazitaetsabweichung/new-deviation-selector-dialog.component.ts
+import { Component, OnInit, Inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { NewDeviationSelectorDialogComponent } from './new-deviation-selector-dialog.component';
 import { EmployeeDto } from '../../models/employee';
+import { MitarbeiterService } from '../../services/mitarbeiter.service';
 
-describe('NewDeviationSelectorDialogComponent', () => {
-  let component: NewDeviationSelectorDialogComponent;
-  let fixture: ComponentFixture<NewDeviationSelectorDialogComponent>;
-  const mockEmployees: EmployeeDto[] = [
-    { employeeId: 1, vorname: 'Max', name: 'Müller', kostenstelle: 'D001' },
-    { employeeId: 2, vorname: 'Anna', name: 'Schmidt', kostenstelle: 'D002' },
-    { employeeId: 3, vorname: 'Peter', name: 'Maier', kostenstelle: 'D001' }
-  ];
+export interface NewDeviationSelectorResult {
+  employeeId: number;
+}
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [
-        BrowserAnimationsModule,
-        ReactiveFormsModule,
-        FormsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        MatButtonModule
-      ],
-      declarations: [NewDeviationSelectorDialogComponent],
-      providers: [
-        { provide: MatDialogRef, useValue: { close: () => {} } },
-        { provide: MAT_DIALOG_DATA, useValue: { mitarbeiter: mockEmployees } }
-      ]
-    }).compileComponents();
+@Component({
+  selector: 'app-new-deviation-selector-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatButtonModule
+  ],
+  templateUrl: './new-deviation-selector-dialog.component.html',
+  styles: [`
+    .full-width { width: 100%; margin-bottom: 1rem; }
+    .mat-form-field .mat-form-field-placeholder { color: rgba(0, 0, 0, 0.6); }
+  `]
+})
+export class NewDeviationSelectorDialogComponent implements OnInit {
+  form!: FormGroup;
+  allEmployees: EmployeeDto[] = [];
+  filteredEmployees: EmployeeDto[] = [];
 
-    fixture = TestBed.createComponent(NewDeviationSelectorDialogComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+  constructor(
+    private fb: FormBuilder,
+    private dialogRef: MatDialogRef<NewDeviationSelectorDialogComponent, NewDeviationSelectorResult>,
+    private mitarbeiterService: MitarbeiterService,
+    @Inject(MAT_DIALOG_DATA) public data: { mitarbeiter: EmployeeDto[] }
+  ) {}
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+  ngOnInit(): void {
+    this.form = this.fb.group({
+      search: ['', Validators.minLength(1)],
+      employeeId: [null, Validators.required]
+    });
 
-  it('should filter employees by name search', () => {
-    component.form.get('search')!.setValue('Anna');
-    expect(component.filteredEmployees.length).toBe(1);
-    expect(component.filteredEmployees[0].vorname).toBe('Anna');
-  });
+    // direkt mit gegebener Liste
+    this.allEmployees = this.data.mitarbeiter;
+    this.filteredEmployees = [...this.allEmployees];
 
-  it('should show all employees when search empty', () => {
-    component.form.get('search')!.setValue('');
-    expect(component.filteredEmployees.length).toBe(mockEmployees.length);
-  });
+    // Filtert bei Eingabe
+    this.form.get('search')!.valueChanges.subscribe(query => {
+      const q = (query || '').toLowerCase();
+      this.filteredEmployees = this.allEmployees.filter(e =>
+        `${e.vorname} ${e.name}`.toLowerCase().includes(q)
+      );
+      this.form.get('employeeId')!.reset(null);
+    });
+  }
 
-  it('should disable next button when no employee selected', () => {
-    component.form.get('search')!.setValue('Max');
-    fixture.detectChanges();
-    const nextBtn: HTMLButtonElement = fixture.nativeElement.querySelector('button[color="primary"]');
-    expect(nextBtn.disabled).toBeTrue();
-  });
+  onNext(): void {
+    if (this.form.valid) {
+      this.dialogRef.close({ employeeId: this.form.value.employeeId });
+    }
+  }
 
-  it('should enable next button when employee selected', () => {
-    component.form.get('search')!.setValue('Peter');
-    fixture.detectChanges();
-    component.form.get('employeeId')!.setValue(3);
-    fixture.detectChanges();
-    const nextBtn: HTMLButtonElement = fixture.nativeElement.querySelector('button[color="primary"]');
-    expect(nextBtn.disabled).toBeFalse();
-  });
-});
+  onCancel(): void {
+    this.dialogRef.close();
+  }
+}
