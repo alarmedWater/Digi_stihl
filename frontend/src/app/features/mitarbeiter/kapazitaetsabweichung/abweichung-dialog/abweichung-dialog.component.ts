@@ -63,23 +63,25 @@ export class AbweichungDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Mitarbeiterliste aus den übergebenen Daten befüllen
     this.mitarbeiterListe = this.data.mitarbeiter;
-
-    // Formular initialisieren, bestehende Werte (edit) oder leer (neu) übernehmen
     this.abweichungForm = this.fb.group({
-      employeeId:     [this.data.abweichung?.employeeId   || null, [Validators.required]],
-      startdatum:     [this.data.abweichung?.startdatum   || null, [Validators.required]],
-      enddatum:       [this.data.abweichung?.enddatum     || null, [Validators.required]],
-      neueKapazitaet: [this.data.abweichung?.neueKapazitaet|| null, [Validators.required, Validators.min(-1), Validators.max(1)]],
-      bemerkung:      [this.data.abweichung?.bemerkung     || '']
+      employeeId:     [this.data.abweichung?.employeeId || null, [Validators.required]],
+      startdatum:     [this.data.abweichung?.startdatum || null, [Validators.required]],
+      enddatum:       [this.data.abweichung?.enddatum   || null, [Validators.required]],
+      neueKapazitaet: [this.data.abweichung?.neueKapazitaet || null, [Validators.required, Validators.min(-1), Validators.max(1)]],
+      bemerkung:      [this.data.abweichung?.bemerkung   || '']
     });
   }
 
-  /** Schließt den Dialog und liefert die Form-Werte zurück */
+  /** Schließt den Dialog und liefert die vollständigen Daten zurück, inkl. id */
   onSpeichern(): void {
     if (this.abweichungForm.valid) {
-      this.dialogRef.close(this.abweichungForm.value as AbweichungData);
+      const formValues = this.abweichungForm.value as Omit<AbweichungData, 'id'>;
+      const result: AbweichungData = {
+        ...formValues,
+        id: this.data.abweichung?.id
+      };
+      this.dialogRef.close(result);
     }
   }
 

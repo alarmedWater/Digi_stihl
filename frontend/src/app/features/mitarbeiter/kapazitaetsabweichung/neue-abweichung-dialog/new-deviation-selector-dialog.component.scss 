@@ -1,0 +1,5 @@
+
+/* src/app/features/mitarbeiter/kapazitaetsabweichung/new-deviation-selector-dialog.component.scss */
+.full-width {
+  width: 100%;
+}

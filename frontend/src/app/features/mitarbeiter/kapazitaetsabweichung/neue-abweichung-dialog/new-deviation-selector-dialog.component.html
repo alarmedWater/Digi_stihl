@@ -1,0 +1,88 @@
+// src/app/features/mitarbeiter/kapazitaetsabweichung/new-deviation-selector-dialog.component.html
+<h2 mat-dialog-title>Neue Abweichung anlegen</h2>
+<form [formGroup]="form" mat-dialog-content>
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Abteilung</mat-label>
+    <mat-select formControlName="department">
+      <mat-option *ngFor="let d of departments" [value]="d">{{ d }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Mitarbeiter</mat-label>
+    <mat-select formControlName="employeeId">
+      <mat-option *ngFor="let m of filteredEmployees" [value]="m.employeeId">
+        {{ m.vorname }} {{ m.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</form>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Abbrechen</button>
+  <button mat-flat-button color="primary" (click)="onNext()" [disabled]="form.invalid">
+    Weiter
+  </button>
+</mat-dialog-actions>
+
+/* src/app/features/mitarbeiter/kapazitaetsabweichung/new-deviation-selector-dialog.component.scss */
+.full-width {
+  width: 100%;
+}
+
+/* src/app/features/mitarbeiter/kapazitaetsabweichung/new-deviation-selector-dialog.component.spec.ts */
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { NewDeviationSelectorDialogComponent } from './new-deviation-selector-dialog.component';
+import { EmployeeDto } from '../../models/employee';
+
+describe('NewDeviationSelectorDialogComponent', () => {
+  let component: NewDeviationSelectorDialogComponent;
+  let fixture: ComponentFixture<NewDeviationSelectorDialogComponent>;
+  const mockEmployees: EmployeeDto[] = [
+    { employeeId: 1, vorname: 'Max', name: 'Müller', kostenstelle: 'D001' },
+    { employeeId: 2, vorname: 'Anna', name: 'Schmidt', kostenstelle: 'D002' }
+  ];
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [
+        BrowserAnimationsModule,
+        ReactiveFormsModule,
+        FormsModule,
+        MatFormFieldModule,
+        MatSelectModule
+      ],
+      declarations: [ NewDeviationSelectorDialogComponent ],
+      providers: [
+        { provide: MatDialogRef, useValue: { close: () => {} } },
+        { provide: MAT_DIALOG_DATA, useValue: { mitarbeiter: mockEmployees } }
+      ]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(NewDeviationSelectorDialogComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should filter employees when department changes', () => {
+    component.form.get('department')!.setValue('D002');
+    expect(component.filteredEmployees.length).toBe(1);
+    expect(component.filteredEmployees[0].kostenstelle).toBe('D002');
+  });
+
+  it('should disable next button when form invalid', () => {
+    const nextButton: HTMLButtonElement = fixture.nativeElement.querySelector('button[color="primary"]');
+    expect(nextButton.disabled).toBeTrue();
+  });
+});
