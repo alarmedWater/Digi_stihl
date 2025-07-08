@@ -1,39 +1,45 @@
+<!-- src/app/features/mitarbeiter/components/fluktuation/fluktuation.component.html -->
 <div class="filter-container">
-      <label for="monat-select">Monat:</label>
-      <select id="monat-select" [(ngModel)]="ausgewaehlterMonat">
-        <option value="">Alle</option>
-        <option *ngFor="let monat of verfuegbareMonate" [value]="monat">{{ monat }}</option>
-      </select>
-    
-      <label for="jahr-select">Jahr:</label>
-      <select id="jahr-select" [(ngModel)]="ausgewaehltesJahr">
-        <option *ngFor="let jahr of verfuegbareJahre" [value]="jahr">{{ jahr }}</option>
-      </select>
-    </div>
-    
-    <table class="fluktuationstabelle">
-      <thead>
-        <tr>
-          <th>Monat</th>
-          <th>AG-Kündigungen</th>
-          <th>AN-Kündigungen</th>
-          <th>Sonstige Kündigungen</th>
-          <th>Gesamt-MA</th>
-          <th>Fluktuation (%)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let eintrag of gefilterteDaten">
-          <td>{{ eintrag.monat }}</td>
-          <td>{{ eintrag.agKuendigungen }}</td>
-          <td>{{ eintrag.anKuendigungen }}</td>
-          <td>{{ eintrag.sonstigeKuendigungen }}</td>
-          <td>{{ eintrag.gesamtmitarbeiter }}</td>
-          <td>{{ eintrag.fluktuationsrate | number: '1.2-2' }}%</td>
-        </tr>
-      </tbody>
-    </table>
-    
-    <p *ngIf="gefilterteDaten.length === 0">
-      Keine Daten für die ausgewählten Filter vorhanden.
-    </p>    
+  <label for="monat-select">Monat:</label>
+  <select id="monat-select" [(ngModel)]="ausgewaehlterMonat">
+    <option value="">Alle</option>
+    <option *ngFor="let m of verfuegbareMonate" [value]="m">
+      {{ m }}
+    </option>
+  </select>
+
+  <label for="jahr-select">Jahr:</label>
+  <select id="jahr-select" [(ngModel)]="ausgewaehltesJahr">
+    <option [ngValue]="null">Alle</option>
+    <option *ngFor="let jahr of verfuegbareJahre" [ngValue]="jahr">
+      {{ jahr }}
+    </option>
+  </select>
+</div>
+
+<table class="fluktuationstabelle">
+  <thead>
+    <tr>
+      <th>Monat</th>
+      <th>AG-Kündigungen</th>
+      <th>AN-Kündigungen</th>
+      <th>Sonstige Kündigungen</th>
+      <th>Gesamt-MA</th>
+      <th>Fluktuation (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let e of gefilterteDaten">
+      <td>{{ e.monat }}</td>
+      <td>{{ e.agKuendigungen }}</td>
+      <td>{{ e.anKuendigungen }}</td>
+      <td>{{ e.sonstigeKuendigungen }}</td>
+      <td>{{ e.gesamtmitarbeiter }}</td>
+      <td>{{ e.fluktuationsrate | number:'1.2-2' }}%</td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="gefilterteDaten.length === 0">
+  Keine Daten für die ausgewählten Filter vorhanden.
+</p>
