@@ -1,0 +1,37 @@
+// Scroll-Container für die Tabelle
+.table-scroll-container {
+      padding: 2rem; // Abstand zum Rand
+    
+      // Tabelle für direkte Mitarbeitende
+      .fte-tabelle {
+        width: 100%;                 // volle Breite
+        border-collapse: collapse;   // zusammengezogene Zellränder
+        background-color: #111;      // schwarzer Tabellenhintergrund
+        color: white;                // weißer Text
+    
+        // Tabellenkopf und Zellen
+        th, td {
+          padding: 10px;             // Innenabstand
+          text-align: left;          // Textausrichtung
+          font-size: 0.95rem;        // Schriftgröße
+          border: 1px solid #333;    // dezente Zellrahmen
+          background-color: #111;    // Hintergrund auch in Zellen schwarz
+          color: white;              // Text immer weiß
+        }
+    
+        // Abteilungsüberschriften / Footerzeilen
+        .dept-block-header,
+        .dept-block-footer,
+        .data-row {
+          background-color: #111;   
+          color: white;             
+        }
+    
+        // Eventuelle alte Klassen neutralisieren
+        .fte-positiv,
+        .fte-negativ {
+          color: white !important;   
+          font-weight: normal;     
+        }
+      }
+    }

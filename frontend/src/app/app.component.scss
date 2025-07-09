@@ -1,6 +1,8 @@
 // Grundstil der Host-Komponente; sorgt für Flexbox-Layout
 :host {
       display: flex;
+      height: 100vh; 
+      overflow: hidden;
     }
     
     // Container, der Sidebar und Hauptinhalt umschließt; Höhe ist volle Bildschirmhöhe

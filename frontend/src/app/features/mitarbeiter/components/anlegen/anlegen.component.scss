@@ -6,7 +6,7 @@
   flex-direction: column;         // ordnet alle Elemente vertikal an
   max-width: 600px;               // maximale Breite des Containers
   width: 100%;                    // nimmt im Parent-Container ggf. 100% ein
-  margin: 0 auto;                 // zentriert optional
+  margin: 0;                 // zentriert optional
   gap: 1rem;                      // gleichmäßiger Abstand zwischen den Formularfeldern
   
   height: 100vh;
@@ -17,7 +17,6 @@
   mat-form-field {
     width: 100%;                  // volle Breite
   }
-
   // Formular-Hinweise (hints) optisch absetzen
   mat-hint {
     font-size: 0.75rem;
@@ -67,7 +66,7 @@
     transform: scale(1.02);
   }
 
-  // Snackbar-Fehler (falls Du noch weitere Overwrites brauchst)
+  // Snackbar-Fehler (falls man noch weitere Overwrites braucht)
   ::ng-deep .snackbar-error {
     background-color: #d32f2f !important;
     color: white !important;
