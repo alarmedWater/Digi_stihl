@@ -1,28 +1,29 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, Validators, FormGroup, FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MitarbeiterService } from '../../../services/mitarbeiter.service';
-import { CommonModule } from '@angular/common';
+import { MatSelectModule } from '@angular/material/select';
+import { forkJoin } from 'rxjs';
 
-// Interface zur Typisierung der Mitarbeiter-Daten
-interface Mitarbeiter {
-  id: number;
-  vorname: string;
-  nachname: string;
-  kostenstelle: string;
-  bereich: string;
-  eintritt: string;
+import { MitarbeiterService } from '../../services/mitarbeiter.service';
+import { DepartmentService }  from '../../services/department.service';
+import { EmployeeDto }        from '../../models/employee';
+import { ExitReasonDto }      from '../../models/exit-reason';
+import { DepartmentDto }      from '../../models/department';
+
+interface EmployeeWithDept extends EmployeeDto {
+  abteilungsname?: string;
 }
 
-// Hauptkomponente für die Bearbeitung der Mitarbeiterdaten
 @Component({
   selector: 'app-bearbeiten',
   standalone: true,
   imports: [
+    CommonModule,
     ReactiveFormsModule,
     FormsModule,
     MatTableModule,
@@ -30,22 +31,41 @@ interface Mitarbeiter {
     MatInputModule,
     MatButtonModule,
     MatDialogModule,
-    CommonModule
+    MatSelectModule
   ],
   templateUrl: './bearbeiten.component.html',
   styleUrls: ['./bearbeiten.component.scss'],
 })
 export class BearbeitenComponent implements OnInit {
-  displayedColumns: string[] = ['vorname', 'nachname', 'kostenstelle', 'bereich', 'eintritt', 'aktion'];
+  displayedColumns = [
+    'employeeId',
+    'vorname',
+    'name',
+    'eintritt',
+    'arbeitsverhaeltnis',
+    'befristung',
+    'befristungMax',
+    'verlaengerung1',
+    'verlaengerung2',
+    'freistellung',
+    'kuendigung',
+    'exitReason',     // show description
+    'funktion',
+    'bemerkung',
+    'abteilungsname',
+    'fte',
+    'bereich',
+    'mengenabhaengig',
+    'aktion'
+  ];
 
-  mitarbeiterListe: Mitarbeiter[] = [];
-  gefilterteListe: Mitarbeiter[] = [];
-
-  filterWert: string = '';
+  mitarbeiterListe: EmployeeWithDept[] = [];
+  gefilterteListe: EmployeeWithDept[] = [];
+  filterWert = '';
 
   constructor(
-    private mitarbeiterService: MitarbeiterService,
-    private fb: FormBuilder,
+    private svc: MitarbeiterService,
+    private deptSvc: DepartmentService,
     private dialog: MatDialog
   ) {}
 
@@ -53,111 +73,190 @@ export class BearbeitenComponent implements OnInit {
     this.loadMitarbeiter();
   }
 
-  // Mitarbeiterdaten vom Server laden
-  loadMitarbeiter(): void {
-    this.mitarbeiterService.getMitarbeiter().subscribe((daten: Mitarbeiter[]) => {
-      this.mitarbeiterListe = daten;
-      this.gefilterteListe = daten;
+  private loadMitarbeiter(): void {
+    forkJoin({
+      emps:  this.svc.getMitarbeiter(),
+      depts: this.deptSvc.getDepartments()
+    }).subscribe(({ emps, depts }) => {
+      const deptMap = new Map<string, string>(
+        depts.map(d => [d.kostenstelle, d.abteilungsname])
+      );
+      this.mitarbeiterListe = emps.map(e => ({
+        ...e,
+        abteilungsname: e.kostenstelle ? deptMap.get(e.kostenstelle) ?? '–' : '–'
+      }));
+      this.gefilterteListe = [...this.mitarbeiterListe];
     });
   }
 
-  // Filterfunktion zur Suche innerhalb der Mitarbeiterliste
   applyFilter(): void {
-    const filterValue = this.filterWert.trim().toLowerCase();
-    this.gefilterteListe = this.mitarbeiterListe.filter(
-      (mitarbeiter: Mitarbeiter) =>
-        mitarbeiter.vorname.toLowerCase().includes(filterValue) ||
-        mitarbeiter.nachname.toLowerCase().includes(filterValue) ||
-        mitarbeiter.bereich.toLowerCase().includes(filterValue)
+    const v = this.filterWert.trim().toLowerCase();
+    this.gefilterteListe = this.mitarbeiterListe.filter(e =>
+      e.vorname.toLowerCase().includes(v) ||
+      e.name.toLowerCase().includes(v) ||
+      (e.abteilungsname?.toLowerCase().includes(v) ?? false) ||
+      e.bereich.toLowerCase().includes(v)
     );
   }
 
-  // Öffnet Dialogfenster zur Bearbeitung der Mitarbeiterdaten
-  bearbeiten(mitarbeiter: Mitarbeiter): void {
-    const dialogRef = this.dialog.open(MitarbeiterBearbeitenDialog, {
-      width: 'auto',
-      height: 'auto',
-      data: mitarbeiter,
-      panelClass: 'custom-dialog-container' // Eigene CSS-Klasse für geradlinige Ränder
+  bearbeiten(emp: EmployeeWithDept): void {
+    const ref = this.dialog.open(MitarbeiterBearbeitenDialog, {
+      width: '700px',
+      data: emp
     });
-
-    // Aktualisiert Mitarbeiterliste nach Schließen des Dialogs, falls Änderungen vorgenommen wurden
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadMitarbeiter();
-      }
+    ref.afterClosed().subscribe(changed => {
+      if (changed) this.loadMitarbeiter();
     });
   }
 }
 
-// Dialogkomponente zur Bearbeitung eines einzelnen Mitarbeiters
 @Component({
   selector: 'mitarbeiter-bearbeiten-dialog',
   standalone: true,
   imports: [
+    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    MatDialogModule,
+    MatSelectModule
   ],
   template: `
-    <h2>Mitarbeiter bearbeiten</h2>
-    <form [formGroup]="mitarbeiterForm">
-      <mat-form-field>
-        <input matInput placeholder="Vorname" formControlName="vorname">
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput placeholder="Nachname" formControlName="nachname">
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput placeholder="Kostenstelle" formControlName="kostenstelle">
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput placeholder="Bereich" formControlName="bereich">
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput type="date" placeholder="Eintritt" formControlName="eintritt">
-      </mat-form-field>
-      <div class="actions">
-        <button mat-button (click)="abbrechen()">Abbrechen</button>
-        <button mat-button color="primary" (click)="speichern()">Speichern</button>
-      </div>
-    </form>
+    <h2 mat-dialog-title>Mitarbeiter bearbeiten</h2>
+    <mat-dialog-content [formGroup]="f">
+      <form class="bearbeiten-form">
+        <!-- Persönliche Daten -->
+        <mat-form-field class="full-width">
+          <mat-label>Vorname</mat-label>
+          <input matInput formControlName="vorname" />
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Nachname</mat-label>
+          <input matInput formControlName="name" />
+        </mat-form-field>
+        <!-- Eintritt & Arbeitsverhältnis -->
+        <mat-form-field class="full-width">
+          <mat-label>Eintritt</mat-label>
+          <input matInput type="date" formControlName="eintritt" />
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Arbeitsverhältnis</mat-label>
+          <mat-select formControlName="arbeitsverhaeltnis">
+            <mat-option value="Befristet">Befristet</mat-option>
+            <mat-option value="Unbefristet">Unbefristet</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- Befristungen & Verlängerungen -->
+        <mat-form-field class="full-width">
+          <mat-label>Befristung Anfang</mat-label>
+          <input matInput type="date" formControlName="befristung" />
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Befristung Max</mat-label>
+          <input matInput type="date" formControlName="befristungMax" />
+        </mat-form-field>
+        <!-- Organisatorisches -->
+        <mat-form-field class="full-width">
+          <mat-label>Kostenstelle</mat-label>
+          <input matInput formControlName="kostenstelle" />
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Bereich</mat-label>
+          <mat-select formControlName="bereich">
+            <mat-option value="Direkt">Direkt</mat-option>
+            <mat-option value="Indirekt">Indirekt</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- Arbeitsumfang -->
+        <mat-form-field class="full-width">
+          <mat-label>FTE</mat-label>
+          <input matInput type="number" formControlName="fte" min="0" max="1" step="0.01" />
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Mengenabhängig</mat-label>
+          <mat-select formControlName="mengenabhaengig">
+            <mat-option [value]="true">Ja</mat-option>
+            <mat-option [value]="false">Nein</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- Austritt & Grund -->
+        <mat-form-field class="full-width">
+          <mat-label>Exit Reason</mat-label>
+          <mat-select formControlName="exitReasonId">
+            <mat-option *ngFor="let ex of exitReasons" [value]="ex.exitReasonId">
+              {{ ex.description }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Kündigung</mat-label>
+          <input matInput type="date" formControlName="kuendigung" />
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Funktion</mat-label>
+          <input matInput formControlName="funktion" />
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Freistellung</mat-label>
+          <input matInput type="date" formControlName="freistellung" />
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Bemerkung</mat-label>
+          <textarea matInput formControlName="bemerkung"></textarea>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end" class="actions">
+      <button mat-button (click)="abbrechen()">Abbrechen</button>
+      <button mat-flat-button color="primary" (click)="speichern()" [disabled]="f.invalid">
+        Speichern
+      </button>
+    </mat-dialog-actions>
   `,
+  styles: [`
+    .full-width { width: 100%; margin-bottom: 1rem; }
+    .actions    { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
+  `]
 })
 export class MitarbeiterBearbeitenDialog {
-  mitarbeiterForm: FormGroup;
+  f: FormGroup;
+  exitReasons: ExitReasonDto[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private mitarbeiterService: MitarbeiterService,
+    private svc: MitarbeiterService,
     public dialogRef: MatDialogRef<MitarbeiterBearbeitenDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: Mitarbeiter
+    @Inject(MAT_DIALOG_DATA) public data: EmployeeDto
   ) {
-    // Initialisierung des Formulars mit übergebenen Mitarbeiterdaten
-    this.mitarbeiterForm = this.fb.group({
-      id: [data.id],
-      vorname: [data.vorname, Validators.required],
-      nachname: [data.nachname, Validators.required],
-      kostenstelle: [data.kostenstelle, Validators.required],
-      bereich: [data.bereich, Validators.required],
-      eintritt: [data.eintritt, Validators.required],
+    this.f = this.fb.group({
+      vorname:          [data.vorname, Validators.required],
+      name:             [data.name, Validators.required],
+      eintritt:         [data.eintritt, Validators.required],
+      arbeitsverhaeltnis: [data.arbeitsverhaeltnis, Validators.required],
+      befristung:       [data.befristung],
+      befristungMax:    [data.befristungMax],
+      verlaengerung1:   [data.verlaengerung1],
+      verlaengerung2:   [data.verlaengerung2],
+      kostenstelle:     [data.kostenstelle, Validators.required],
+      bereich:          [data.bereich, Validators.required],
+      fte:              [data.fte, [Validators.required, Validators.min(0), Validators.max(1)]],
+      mengenabhaengig:  [data.mengenabhaengig, Validators.required],
+      exitReasonId:     [data.exitReasonId],
+      kuendigung:       [data.kuendigung],
+      funktion:         [data.funktion],
+      freistellung:     [data.freistellung],
+      bemerkung:        [data.bemerkung]
     });
+
+    this.svc.getExitReasons().subscribe({ next: list => this.exitReasons = list, error: () => this.exitReasons = [] });
   }
 
-  // Speichert die geänderten Mitarbeiterdaten
   speichern(): void {
-    if (this.mitarbeiterForm.valid) {
-      const mitarbeiterDaten: Mitarbeiter = this.mitarbeiterForm.value;
-      this.mitarbeiterService.updateMitarbeiter(mitarbeiterDaten.id, mitarbeiterDaten).subscribe({
-        next: () => this.dialogRef.close(true),
-        error: (error: any) => console.error('Fehler beim Speichern:', error),
-      });
-    }
+    if (this.f.invalid) return;
+    const updateDto: EmployeeDto = { ...this.data, ...this.f.value };
+    this.svc.updateMitarbeiter(updateDto.employeeId!, updateDto).subscribe({ next: () => this.dialogRef.close(true), error: err => console.error('Update-Fehler', err) });
   }
 
-  // Schließt den Dialog ohne Änderungen
-  abbrechen(): void {
-    this.dialogRef.close(false);
-  }
+  abbrechen(): void { this.dialogRef.close(false); }
 }
