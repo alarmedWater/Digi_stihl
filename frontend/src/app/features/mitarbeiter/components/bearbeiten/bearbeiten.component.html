@@ -1,4 +1,3 @@
-<!-- src/app/features/mitarbeiter/components/bearbeiten/bearbeiten.component.html -->
 <div class="bearbeiten-container">
   <h2 class="title">Mitarbeiter bearbeiten</h2>
 
@@ -44,60 +43,46 @@
       <td mat-cell *matCellDef="let e"> {{ e.arbeitsverhaeltnis }} </td>
     </ng-container>
 
-    <!-- Befristung -->
+    <!-- Befristung bis -->
     <ng-container matColumnDef="befristung">
       <th mat-header-cell *matHeaderCellDef> Befristung bis </th>
-      <td mat-cell *matCellDef="let e">
-        {{ e.befristung ? (e.befristung | date:'dd.MM.yyyy') : '–' }}
-      </td>
+      <td mat-cell *matCellDef="let e"> {{ e.befristung ? (e.befristung | date:'dd.MM.yyyy') : '–' }} </td>
     </ng-container>
 
     <!-- Befristung Max -->
     <ng-container matColumnDef="befristungMax">
       <th mat-header-cell *matHeaderCellDef> Befristung Max </th>
-      <td mat-cell *matCellDef="let e">
-        {{ e.befristungMax ? (e.befristungMax | date:'dd.MM.yyyy') : '–' }}
-      </td>
+      <td mat-cell *matCellDef="let e"> {{ e.befristungMax ? (e.befristungMax | date:'dd.MM.yyyy') : '–' }} </td>
     </ng-container>
 
     <!-- Verlängerung 1 -->
     <ng-container matColumnDef="verlaengerung1">
       <th mat-header-cell *matHeaderCellDef> Verlängerung 1 </th>
-      <td mat-cell *matCellDef="let e">
-        {{ e.verlaengerung1 ? (e.verlaengerung1 | date:'dd.MM.yyyy') : '–' }}
-      </td>
+      <td mat-cell *matCellDef="let e"> {{ e.verlaengerung1 ? (e.verlaengerung1 | date:'dd.MM.yyyy') : '–' }} </td>
     </ng-container>
 
     <!-- Verlängerung 2 -->
     <ng-container matColumnDef="verlaengerung2">
       <th mat-header-cell *matHeaderCellDef> Verlängerung 2 </th>
-      <td mat-cell *matCellDef="let e">
-        {{ e.verlaengerung2 ? (e.verlaengerung2 | date:'dd.MM.yyyy') : '–' }}
-      </td>
+      <td mat-cell *matCellDef="let e"> {{ e.verlaengerung2 ? (e.verlaengerung2 | date:'dd.MM.yyyy') : '–' }} </td>
     </ng-container>
 
     <!-- Freistellung -->
     <ng-container matColumnDef="freistellung">
       <th mat-header-cell *matHeaderCellDef> Freistellung </th>
-      <td mat-cell *matCellDef="let e">
-        {{ e.freistellung ? (e.freistellung | date:'dd.MM.yyyy') : '–' }}
-      </td>
+      <td mat-cell *matCellDef="let e"> {{ e.freistellung ? (e.freistellung | date:'dd.MM.yyyy') : '–' }} </td>
     </ng-container>
 
     <!-- Kündigung -->
     <ng-container matColumnDef="kuendigung">
       <th mat-header-cell *matHeaderCellDef> Kündigung </th>
-      <td mat-cell *matCellDef="let e">
-        {{ e.kuendigung ? (e.kuendigung | date:'dd.MM.yyyy') : '–' }}
-      </td>
+      <td mat-cell *matCellDef="let e"> {{ e.kuendigung ? (e.kuendigung | date:'dd.MM.yyyy') : '–' }} </td>
     </ng-container>
 
-    <!-- Austrittsart (ExitReason) -->
+    <!-- Austrittsart -->
     <ng-container matColumnDef="exitReason">
       <th mat-header-cell *matHeaderCellDef> Austrittsart </th>
-      <td mat-cell *matCellDef="let e">
-        {{ e.exitReason?.description || '–' }}
-      </td>
+      <td mat-cell *matCellDef="let e"> {{ e.exitReason?.description || '–' }} </td>
     </ng-container>
 
     <!-- Funktion -->
@@ -133,21 +118,17 @@
     <!-- Mengenabhängig -->
     <ng-container matColumnDef="mengenabhaengig">
       <th mat-header-cell *matHeaderCellDef> Mengenabhängig </th>
-      <td mat-cell *matCellDef="let e">
-        {{ e.mengenabhaengig ? 'Ja' : 'Nein' }}
-      </td>
+      <td mat-cell *matCellDef="let e"> {{ e.mengenabhaengig ? 'Ja' : 'Nein' }} </td>
     </ng-container>
 
     <!-- Aktionen -->
     <ng-container matColumnDef="aktion">
       <th mat-header-cell *matHeaderCellDef> Aktionen </th>
-      <td mat-cell *matCellDef="let e">
-        <button mat-button (click)="bearbeiten(e)">Bearbeiten</button>
-      </td>
+      <td mat-cell *matCellDef="let e"> <button mat-button (click)="bearbeiten(e)">Bearbeiten</button> </td>
     </ng-container>
 
-    <!-- Header- & Row-Definitionen -->
+    <!-- Header + Rows -->
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row        *matRowDef="let row; columns: displayedColumns;"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
 </div>

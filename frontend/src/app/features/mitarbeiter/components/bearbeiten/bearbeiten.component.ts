@@ -1,27 +1,12 @@
-// src/app/features/mitarbeiter/components/bearbeiten/bearbeiten.component.ts
-
 import { Component, OnInit, Inject } from '@angular/core';
-import {
-  ReactiveFormsModule,
-  FormBuilder,
-  Validators,
-  FormGroup,
-  FormsModule
-} from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
-import { MatTableModule }        from '@angular/material/table';
-import { MatFormFieldModule }    from '@angular/material/form-field';
-import { MatInputModule }        from '@angular/material/input';
-import { MatButtonModule }       from '@angular/material/button';
-import {
-  MatDialog,
-  MatDialogModule,
-  MAT_DIALOG_DATA,
-  MatDialogRef
-} from '@angular/material/dialog';
-import { MatSelectModule }       from '@angular/material/select';
-
+import { ReactiveFormsModule, FormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatSelectModule } from '@angular/material/select';
 import { forkJoin } from 'rxjs';
 
 import { MitarbeiterService } from '../../services/mitarbeiter.service';
@@ -64,11 +49,10 @@ export class BearbeitenComponent implements OnInit {
     'verlaengerung2',
     'freistellung',
     'kuendigung',
-    'exitReasonId',
-    'austrittsart',
+    'exitReason',     // show description
     'funktion',
     'bemerkung',
-    'abteilungsname',  // neu
+    'abteilungsname',
     'fte',
     'bereich',
     'mengenabhaengig',
@@ -76,7 +60,7 @@ export class BearbeitenComponent implements OnInit {
   ];
 
   mitarbeiterListe: EmployeeWithDept[] = [];
-  gefilterteListe:  EmployeeWithDept[] = [];
+  gefilterteListe: EmployeeWithDept[] = [];
   filterWert = '';
 
   constructor(
@@ -94,14 +78,12 @@ export class BearbeitenComponent implements OnInit {
       emps:  this.svc.getMitarbeiter(),
       depts: this.deptSvc.getDepartments()
     }).subscribe(({ emps, depts }) => {
-      // Map Kostenstelle → Abteilungsname
-      const deptMap = new Map<string,string>(
+      const deptMap = new Map<string, string>(
         depts.map(d => [d.kostenstelle, d.abteilungsname])
       );
-      // Mitarbeiter erweitern
       this.mitarbeiterListe = emps.map(e => ({
         ...e,
-        abteilungsname: e.kostenstelle ? deptMap.get(e.kostenstelle) : undefined
+        abteilungsname: e.kostenstelle ? deptMap.get(e.kostenstelle) ?? '–' : '–'
       }));
       this.gefilterteListe = [...this.mitarbeiterListe];
     });
@@ -128,7 +110,6 @@ export class BearbeitenComponent implements OnInit {
   }
 }
 
-
 @Component({
   selector: 'mitarbeiter-bearbeiten-dialog',
   standalone: true,
@@ -145,21 +126,19 @@ export class BearbeitenComponent implements OnInit {
     <h2 mat-dialog-title>Mitarbeiter bearbeiten</h2>
     <mat-dialog-content [formGroup]="f">
       <form class="bearbeiten-form">
-
         <!-- Persönliche Daten -->
         <mat-form-field class="full-width">
           <mat-label>Vorname</mat-label>
-          <input matInput formControlName="vorname">
+          <input matInput formControlName="vorname" />
         </mat-form-field>
         <mat-form-field class="full-width">
           <mat-label>Nachname</mat-label>
-          <input matInput formControlName="name">
+          <input matInput formControlName="name" />
         </mat-form-field>
-
         <!-- Eintritt & Arbeitsverhältnis -->
         <mat-form-field class="full-width">
           <mat-label>Eintritt</mat-label>
-          <input matInput type="date" formControlName="eintritt">
+          <input matInput type="date" formControlName="eintritt" />
         </mat-form-field>
         <mat-form-field class="full-width">
           <mat-label>Arbeitsverhältnis</mat-label>
@@ -168,29 +147,19 @@ export class BearbeitenComponent implements OnInit {
             <mat-option value="Unbefristet">Unbefristet</mat-option>
           </mat-select>
         </mat-form-field>
-
         <!-- Befristungen & Verlängerungen -->
         <mat-form-field class="full-width">
           <mat-label>Befristung Anfang</mat-label>
-          <input matInput type="date" formControlName="befristung">
+          <input matInput type="date" formControlName="befristung" />
         </mat-form-field>
         <mat-form-field class="full-width">
           <mat-label>Befristung Max</mat-label>
-          <input matInput type="date" formControlName="befristungMax">
+          <input matInput type="date" formControlName="befristungMax" />
         </mat-form-field>
-        <mat-form-field class="full-width">
-          <mat-label>Verlängerung 1</mat-label>
-          <input matInput type="date" formControlName="verlaengerung1">
-        </mat-form-field>
-        <mat-form-field class="full-width">
-          <mat-label>Verlängerung 2</mat-label>
-          <input matInput type="date" formControlName="verlaengerung2">
-        </mat-form-field>
-
         <!-- Organisatorisches -->
         <mat-form-field class="full-width">
           <mat-label>Kostenstelle</mat-label>
-          <input matInput formControlName="kostenstelle">
+          <input matInput formControlName="kostenstelle" />
         </mat-form-field>
         <mat-form-field class="full-width">
           <mat-label>Bereich</mat-label>
@@ -199,11 +168,10 @@ export class BearbeitenComponent implements OnInit {
             <mat-option value="Indirekt">Indirekt</mat-option>
           </mat-select>
         </mat-form-field>
-
         <!-- Arbeitsumfang -->
         <mat-form-field class="full-width">
           <mat-label>FTE</mat-label>
-          <input matInput type="number" formControlName="fte" min="0" max="1" step="0.01">
+          <input matInput type="number" formControlName="fte" min="0" max="1" step="0.01" />
         </mat-form-field>
         <mat-form-field class="full-width">
           <mat-label>Mengenabhängig</mat-label>
@@ -212,35 +180,31 @@ export class BearbeitenComponent implements OnInit {
             <mat-option [value]="false">Nein</mat-option>
           </mat-select>
         </mat-form-field>
-
         <!-- Austritt & Grund -->
         <mat-form-field class="full-width">
           <mat-label>Exit Reason</mat-label>
           <mat-select formControlName="exitReasonId">
             <mat-option *ngFor="let ex of exitReasons" [value]="ex.exitReasonId">
-              {{ ex.reason }} – {{ ex.description }}
+              {{ ex.description }}
             </mat-option>
           </mat-select>
         </mat-form-field>
         <mat-form-field class="full-width">
           <mat-label>Kündigung</mat-label>
-          <input matInput type="date" formControlName="kuendigung">
+          <input matInput type="date" formControlName="kuendigung" />
         </mat-form-field>
-
-        <!-- Sonstiges -->
         <mat-form-field class="full-width">
           <mat-label>Funktion</mat-label>
-          <input matInput formControlName="funktion">
+          <input matInput formControlName="funktion" />
         </mat-form-field>
         <mat-form-field class="full-width">
           <mat-label>Freistellung</mat-label>
-          <input matInput type="date" formControlName="freistellung">
+          <input matInput type="date" formControlName="freistellung" />
         </mat-form-field>
         <mat-form-field class="full-width">
           <mat-label>Bemerkung</mat-label>
           <textarea matInput formControlName="bemerkung"></textarea>
         </mat-form-field>
-
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end" class="actions">
@@ -252,7 +216,7 @@ export class BearbeitenComponent implements OnInit {
   `,
   styles: [`
     .full-width { width: 100%; margin-bottom: 1rem; }
-    .actions   { display:flex; justify-content:flex-end; gap:1rem; margin-top:1rem; }
+    .actions    { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
   `]
 })
 export class MitarbeiterBearbeitenDialog {
@@ -266,41 +230,33 @@ export class MitarbeiterBearbeitenDialog {
     @Inject(MAT_DIALOG_DATA) public data: EmployeeDto
   ) {
     this.f = this.fb.group({
-      vorname:         [data.vorname, Validators.required],
-      name:            [data.name, Validators.required],
-      eintritt:        [data.eintritt, Validators.required],
+      vorname:          [data.vorname, Validators.required],
+      name:             [data.name, Validators.required],
+      eintritt:         [data.eintritt, Validators.required],
       arbeitsverhaeltnis: [data.arbeitsverhaeltnis, Validators.required],
-      befristung:      [data.befristung],
-      befristungMax:   [data.befristungMax],
-      verlaengerung1:  [data.verlaengerung1],
-      verlaengerung2:  [data.verlaengerung2],
-      kostenstelle:    [data.kostenstelle, Validators.required],
-      bereich:         [data.bereich, Validators.required],
-      fte:             [data.fte, [Validators.required, Validators.min(0), Validators.max(1)]],
-      mengenabhaengig: [data.mengenabhaengig, Validators.required],
-      exitReasonId:    [data.exitReasonId],
-      kuendigung:      [data.kuendigung],
-      funktion:        [data.funktion],
-      freistellung:    [data.freistellung],
-      bemerkung:       [data.bemerkung]
+      befristung:       [data.befristung],
+      befristungMax:    [data.befristungMax],
+      verlaengerung1:   [data.verlaengerung1],
+      verlaengerung2:   [data.verlaengerung2],
+      kostenstelle:     [data.kostenstelle, Validators.required],
+      bereich:          [data.bereich, Validators.required],
+      fte:              [data.fte, [Validators.required, Validators.min(0), Validators.max(1)]],
+      mengenabhaengig:  [data.mengenabhaengig, Validators.required],
+      exitReasonId:     [data.exitReasonId],
+      kuendigung:       [data.kuendigung],
+      funktion:         [data.funktion],
+      freistellung:     [data.freistellung],
+      bemerkung:        [data.bemerkung]
     });
 
-    this.svc.getExitReasons().subscribe({
-      next: list => this.exitReasons = list,
-      error: () => this.exitReasons = []
-    });
+    this.svc.getExitReasons().subscribe({ next: list => this.exitReasons = list, error: () => this.exitReasons = [] });
   }
 
   speichern(): void {
     if (this.f.invalid) return;
     const updateDto: EmployeeDto = { ...this.data, ...this.f.value };
-    this.svc.updateMitarbeiter(updateDto.employeeId!, updateDto).subscribe({
-      next: () => this.dialogRef.close(true),
-      error: err => console.error('Update-Fehler', err)
-    });
+    this.svc.updateMitarbeiter(updateDto.employeeId!, updateDto).subscribe({ next: () => this.dialogRef.close(true), error: err => console.error('Update-Fehler', err) });
   }
 
-  abbrechen(): void {
-    this.dialogRef.close(false);
-  }
+  abbrechen(): void { this.dialogRef.close(false); }
 }
