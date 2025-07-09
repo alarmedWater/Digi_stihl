@@ -10,26 +10,24 @@ namespace Digi_Stihl.Data
         {
         }
 
-        // Deine bisherigen DbSets …
-        public DbSet<Employee> Employees                  => Set<Employee>();
-        public DbSet<Department> Departments             => Set<Department>();
+        public DbSet<Employee> Employees                    => Set<Employee>();
+        public DbSet<Department> Departments               => Set<Department>();
         public DbSet<CapacityDeviation> CapacityDeviations => Set<CapacityDeviation>();
         public DbSet<FluctuationReport> FluctuationReports => Set<FluctuationReport>();
-
-        // Neu: ExitReasons
         public DbSet<ExitReason> ExitReasons              => Set<ExitReason>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // 1) Seed Departments
+            // 1) Seed Departments (jetzt inkl. D007 “Auszubildende”)
             modelBuilder.Entity<Department>().HasData(
                 new Department { Kostenstelle = "D001", Abteilungsname = "Produktion",  Bereichsnummer = "01" },
                 new Department { Kostenstelle = "D002", Abteilungsname = "Vertrieb",    Bereichsnummer = "02" },
                 new Department { Kostenstelle = "D003", Abteilungsname = "Personal",    Bereichsnummer = "03" },
                 new Department { Kostenstelle = "D004", Abteilungsname = "IT",          Bereichsnummer = "04" },
-                new Department { Kostenstelle = "D005", Abteilungsname = "Verwaltung",  Bereichsnummer = "05" }
+                new Department { Kostenstelle = "D005", Abteilungsname = "Verwaltung",  Bereichsnummer = "05" },
+                new Department { Kostenstelle = "D007", Abteilungsname = "Auszubildende", Bereichsnummer = "07" }
             );
 
             // 2) Seed ExitReasons

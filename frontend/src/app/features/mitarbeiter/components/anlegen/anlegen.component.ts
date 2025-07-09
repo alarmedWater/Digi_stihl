@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
-// Material Modules:
+// Material Modules
 import { MatFormFieldModule }   from '@angular/material/form-field';
 import { MatInputModule }       from '@angular/material/input';
 import { MatButtonModule }      from '@angular/material/button';
@@ -13,7 +13,7 @@ import { MatDatepickerModule }  from '@angular/material/datepicker';
 import { MatNativeDateModule }  from '@angular/material/core';
 import { MatCheckboxModule }    from '@angular/material/checkbox';
 import { MatIconModule }        from '@angular/material/icon';
-import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { MitarbeiterService } from '../../services/mitarbeiter.service';
 import { EmployeeCreateDto }  from '../../models/employee-create';
@@ -26,23 +26,19 @@ import { ExitReasonDto }      from '../../models/exit-reason';
     CommonModule,
     ReactiveFormsModule,
 
-    // ganz wichtig:
     MatFormFieldModule,
-    MatIconModule,
-
     MatInputModule,
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
     MatCheckboxModule,
-
+    MatIconModule,
     MatButtonModule,
     MatSnackBarModule,
   ],
   templateUrl: './anlegen.component.html',
   styleUrls: ['./anlegen.component.scss']
 })
-
 export class AnlegenComponent implements OnInit {
   mitarbeiterForm!: FormGroup;
   submitStatus: 'idle' | 'success' | 'error' = 'idle';
@@ -59,11 +55,12 @@ export class AnlegenComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Formular initialisieren
     this.mitarbeiterForm = this.fb.group({
       vorname:            ['', Validators.required],
       name:               ['', Validators.required],
       eintritt:           [null, Validators.required],
-      fte:                [1, [ Validators.required, Validators.min(0.1), Validators.max(1) ]],
+      fte:                [1, [Validators.required, Validators.min(0.1), Validators.max(1)]],
       bereich:            ['', Validators.required],
       arbeitsverhaeltnis: ['', Validators.required],
       kostenstelle:       ['', Validators.required],
@@ -75,13 +72,15 @@ export class AnlegenComponent implements OnInit {
       bemerkung:          ['']
     });
 
+    // ExitReasons vom Backend laden (Fallback auf Hardcoded-Liste bei Fehler)
     this.service.getExitReasons().subscribe({
       next: list => this.exitReasons = list,
       error: () => {
+        console.warn('ExitReasons konnten nicht geladen werden, verwende Default.');
         this.exitReasons = [
           { exitReasonId: 1, reason: 'AN_Kuendigung',  description: 'Eigenkündigung' },
           { exitReasonId: 2, reason: 'AG_Kuendigung',  description: 'Kündigung durch Arbeitgeber' },
-          { exitReasonId: 3, reason: 'Altersteilzeit', description: 'Eintritt in ATZ' },
+          { exitReasonId: 3, reason: 'Altersteilzeit', description: 'Eintritt in Altersteilzeit' },
           { exitReasonId: 4, reason: 'Ruhestand',     description: 'Ruhestand' },
           { exitReasonId: 5, reason: 'Probezeitende',  description: 'Ende der Probezeit' }
         ];
@@ -94,6 +93,7 @@ export class AnlegenComponent implements OnInit {
       this.snack.open('Bitte alle Pflichtfelder ausfüllen', 'OK', { duration: 3000 });
       return;
     }
+
     const f = this.mitarbeiterForm.value;
     const dto: EmployeeCreateDto = {
       name:               f.name,
@@ -113,7 +113,8 @@ export class AnlegenComponent implements OnInit {
 
     this.service.createMitarbeiter(dto).subscribe({
       next: () => {
-        this.giveFeedback('success', '✔ Erfolgreich angelegt');
+        this.giveFeedback('success', '✔ Mitarbeiter erfolgreich angelegt!');
+        // Nach 3 Sek. zurück zur Liste navigieren
         setTimeout(() => this.router.navigate(['/mitarbeiter']), 3000);
       },
       error: err => {
@@ -129,6 +130,7 @@ export class AnlegenComponent implements OnInit {
       duration: 3000,
       panelClass: status === 'error' ? ['snackbar-error'] : undefined
     });
+    // Status nach Ablauf zurücksetzen
     setTimeout(() => this.submitStatus = 'idle', 3000);
   }
 }

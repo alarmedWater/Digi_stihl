@@ -1,12 +1,18 @@
 <!-- src/app/features/mitarbeiter/components/bearbeiten/bearbeiten.component.html -->
-<div>
-  <h2>Mitarbeiter bearbeiten</h2>
+<div class="bearbeiten-container">
+  <h2 class="title">Mitarbeiter bearbeiten</h2>
+
   <mat-form-field appearance="outline" class="filter-input">
     <mat-label>Filter</mat-label>
-    <input matInput [(ngModel)]="filterWert" (input)="applyFilter()" placeholder="Suchen..." />
+    <input
+      matInput
+      [(ngModel)]="filterWert"
+      (input)="applyFilter()"
+      placeholder="Name, Abteilung oder Bereich..."
+    />
   </mat-form-field>
 
-  <table mat-table [dataSource]="gefilterteListe" class="mat-elevation-z8">
+  <table mat-table [dataSource]="gefilterteListe" class="mat-elevation-z8 full-table">
 
     <!-- ID -->
     <ng-container matColumnDef="employeeId">
@@ -29,7 +35,7 @@
     <!-- Eintritt -->
     <ng-container matColumnDef="eintritt">
       <th mat-header-cell *matHeaderCellDef> Eintritt </th>
-      <td mat-cell *matCellDef="let e"> {{ e.eintritt | date }} </td>
+      <td mat-cell *matCellDef="let e"> {{ e.eintritt | date:'dd.MM.yyyy' }} </td>
     </ng-container>
 
     <!-- Arbeitsverhältnis -->
@@ -38,70 +44,78 @@
       <td mat-cell *matCellDef="let e"> {{ e.arbeitsverhaeltnis }} </td>
     </ng-container>
 
-    <!-- Befristung Anfang -->
+    <!-- Befristung -->
     <ng-container matColumnDef="befristung">
       <th mat-header-cell *matHeaderCellDef> Befristung bis </th>
-      <td mat-cell *matCellDef="let e"> {{ e.befristung | date }} </td>
+      <td mat-cell *matCellDef="let e">
+        {{ e.befristung ? (e.befristung | date:'dd.MM.yyyy') : '–' }}
+      </td>
     </ng-container>
 
     <!-- Befristung Max -->
     <ng-container matColumnDef="befristungMax">
       <th mat-header-cell *matHeaderCellDef> Befristung Max </th>
-      <td mat-cell *matCellDef="let e"> {{ e.befristungMax | date }} </td>
+      <td mat-cell *matCellDef="let e">
+        {{ e.befristungMax ? (e.befristungMax | date:'dd.MM.yyyy') : '–' }}
+      </td>
     </ng-container>
 
     <!-- Verlängerung 1 -->
     <ng-container matColumnDef="verlaengerung1">
       <th mat-header-cell *matHeaderCellDef> Verlängerung 1 </th>
-      <td mat-cell *matCellDef="let e"> {{ e.verlaengerung1 | date }} </td>
+      <td mat-cell *matCellDef="let e">
+        {{ e.verlaengerung1 ? (e.verlaengerung1 | date:'dd.MM.yyyy') : '–' }}
+      </td>
     </ng-container>
 
     <!-- Verlängerung 2 -->
     <ng-container matColumnDef="verlaengerung2">
       <th mat-header-cell *matHeaderCellDef> Verlängerung 2 </th>
-      <td mat-cell *matCellDef="let e"> {{ e.verlaengerung2 | date }} </td>
+      <td mat-cell *matCellDef="let e">
+        {{ e.verlaengerung2 ? (e.verlaengerung2 | date:'dd.MM.yyyy') : '–' }}
+      </td>
     </ng-container>
 
     <!-- Freistellung -->
     <ng-container matColumnDef="freistellung">
       <th mat-header-cell *matHeaderCellDef> Freistellung </th>
-      <td mat-cell *matCellDef="let e"> {{ e.freistellung | date }} </td>
+      <td mat-cell *matCellDef="let e">
+        {{ e.freistellung ? (e.freistellung | date:'dd.MM.yyyy') : '–' }}
+      </td>
     </ng-container>
 
     <!-- Kündigung -->
     <ng-container matColumnDef="kuendigung">
       <th mat-header-cell *matHeaderCellDef> Kündigung </th>
-      <td mat-cell *matCellDef="let e"> {{ e.kuendigung | date }} </td>
+      <td mat-cell *matCellDef="let e">
+        {{ e.kuendigung ? (e.kuendigung | date:'dd.MM.yyyy') : '–' }}
+      </td>
     </ng-container>
 
-    <!-- ExitReasonId -->
-    <ng-container matColumnDef="exitReasonId">
-      <th mat-header-cell *matHeaderCellDef> ExitReason ID </th>
-      <td mat-cell *matCellDef="let e"> {{ e.exitReasonId }} </td>
-    </ng-container>
-
-    <!-- Austrittsart -->
-    <ng-container matColumnDef="austrittsart">
+    <!-- Austrittsart (ExitReason) -->
+    <ng-container matColumnDef="exitReason">
       <th mat-header-cell *matHeaderCellDef> Austrittsart </th>
-      <td mat-cell *matCellDef="let e"> {{ e.austrittsart }} </td>
+      <td mat-cell *matCellDef="let e">
+        {{ e.exitReason?.description || '–' }}
+      </td>
     </ng-container>
 
     <!-- Funktion -->
     <ng-container matColumnDef="funktion">
       <th mat-header-cell *matHeaderCellDef> Funktion </th>
-      <td mat-cell *matCellDef="let e"> {{ e.funktion }} </td>
+      <td mat-cell *matCellDef="let e"> {{ e.funktion || '–' }} </td>
     </ng-container>
 
     <!-- Bemerkung -->
     <ng-container matColumnDef="bemerkung">
       <th mat-header-cell *matHeaderCellDef> Bemerkung </th>
-      <td mat-cell *matCellDef="let e"> {{ e.bemerkung }} </td>
+      <td mat-cell *matCellDef="let e"> {{ e.bemerkung || '–' }} </td>
     </ng-container>
 
-    <!-- Kostenstelle -->
-    <ng-container matColumnDef="kostenstelle">
-      <th mat-header-cell *matHeaderCellDef> Kostenstelle </th>
-      <td mat-cell *matCellDef="let e"> {{ e.kostenstelle }} </td>
+    <!-- Abteilung -->
+    <ng-container matColumnDef="abteilungsname">
+      <th mat-header-cell *matHeaderCellDef> Abteilung </th>
+      <td mat-cell *matCellDef="let e"> {{ e.abteilungsname || '–' }} </td>
     </ng-container>
 
     <!-- FTE -->
@@ -119,7 +133,9 @@
     <!-- Mengenabhängig -->
     <ng-container matColumnDef="mengenabhaengig">
       <th mat-header-cell *matHeaderCellDef> Mengenabhängig </th>
-      <td mat-cell *matCellDef="let e"> {{ e.mengenabhaengig ? 'Ja' : 'Nein' }} </td>
+      <td mat-cell *matCellDef="let e">
+        {{ e.mengenabhaengig ? 'Ja' : 'Nein' }}
+      </td>
     </ng-container>
 
     <!-- Aktionen -->

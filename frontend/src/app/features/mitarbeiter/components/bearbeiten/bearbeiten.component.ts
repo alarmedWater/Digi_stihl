@@ -22,9 +22,17 @@ import {
 } from '@angular/material/dialog';
 import { MatSelectModule }       from '@angular/material/select';
 
+import { forkJoin } from 'rxjs';
+
 import { MitarbeiterService } from '../../services/mitarbeiter.service';
+import { DepartmentService }  from '../../services/department.service';
 import { EmployeeDto }        from '../../models/employee';
 import { ExitReasonDto }      from '../../models/exit-reason';
+import { DepartmentDto }      from '../../models/department';
+
+interface EmployeeWithDept extends EmployeeDto {
+  abteilungsname?: string;
+}
 
 @Component({
   selector: 'app-bearbeiten',
@@ -60,18 +68,20 @@ export class BearbeitenComponent implements OnInit {
     'austrittsart',
     'funktion',
     'bemerkung',
-    'kostenstelle',
+    'abteilungsname',  // neu
     'fte',
     'bereich',
     'mengenabhaengig',
     'aktion'
   ];
-  mitarbeiterListe: EmployeeDto[] = [];
-  gefilterteListe: EmployeeDto[] = [];
+
+  mitarbeiterListe: EmployeeWithDept[] = [];
+  gefilterteListe:  EmployeeWithDept[] = [];
   filterWert = '';
 
   constructor(
     private svc: MitarbeiterService,
+    private deptSvc: DepartmentService,
     private dialog: MatDialog
   ) {}
 
@@ -80,9 +90,20 @@ export class BearbeitenComponent implements OnInit {
   }
 
   private loadMitarbeiter(): void {
-    this.svc.getMitarbeiter().subscribe(list => {
-      this.mitarbeiterListe = list;
-      this.gefilterteListe = [...list];
+    forkJoin({
+      emps:  this.svc.getMitarbeiter(),
+      depts: this.deptSvc.getDepartments()
+    }).subscribe(({ emps, depts }) => {
+      // Map Kostenstelle → Abteilungsname
+      const deptMap = new Map<string,string>(
+        depts.map(d => [d.kostenstelle, d.abteilungsname])
+      );
+      // Mitarbeiter erweitern
+      this.mitarbeiterListe = emps.map(e => ({
+        ...e,
+        abteilungsname: e.kostenstelle ? deptMap.get(e.kostenstelle) : undefined
+      }));
+      this.gefilterteListe = [...this.mitarbeiterListe];
     });
   }
 
@@ -91,19 +112,18 @@ export class BearbeitenComponent implements OnInit {
     this.gefilterteListe = this.mitarbeiterListe.filter(e =>
       e.vorname.toLowerCase().includes(v) ||
       e.name.toLowerCase().includes(v) ||
+      (e.abteilungsname?.toLowerCase().includes(v) ?? false) ||
       e.bereich.toLowerCase().includes(v)
     );
   }
 
-  bearbeiten(emp: EmployeeDto): void {
+  bearbeiten(emp: EmployeeWithDept): void {
     const ref = this.dialog.open(MitarbeiterBearbeitenDialog, {
       width: '700px',
       data: emp
     });
     ref.afterClosed().subscribe(changed => {
-      if (changed) {
-        this.loadMitarbeiter();
-      }
+      if (changed) this.loadMitarbeiter();
     });
   }
 }
@@ -232,7 +252,7 @@ export class BearbeitenComponent implements OnInit {
   `,
   styles: [`
     .full-width { width: 100%; margin-bottom: 1rem; }
-    .actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
+    .actions   { display:flex; justify-content:flex-end; gap:1rem; margin-top:1rem; }
   `]
 })
 export class MitarbeiterBearbeitenDialog {
@@ -246,23 +266,23 @@ export class MitarbeiterBearbeitenDialog {
     @Inject(MAT_DIALOG_DATA) public data: EmployeeDto
   ) {
     this.f = this.fb.group({
-      vorname:            [data.vorname, Validators.required],
-      name:               [data.name, Validators.required],
-      eintritt:           [data.eintritt, Validators.required],
+      vorname:         [data.vorname, Validators.required],
+      name:            [data.name, Validators.required],
+      eintritt:        [data.eintritt, Validators.required],
       arbeitsverhaeltnis: [data.arbeitsverhaeltnis, Validators.required],
-      befristung:         [data.befristung],
-      befristungMax:      [data.befristungMax],
-      verlaengerung1:     [data.verlaengerung1],
-      verlaengerung2:     [data.verlaengerung2],
-      kostenstelle:       [data.kostenstelle, Validators.required],
-      bereich:            [data.bereich, Validators.required],
-      fte:                [data.fte, [Validators.required, Validators.min(0), Validators.max(1)]],
-      mengenabhaengig:    [data.mengenabhaengig, Validators.required],
-      exitReasonId:       [data.exitReasonId],
-      kuendigung:         [data.kuendigung],
-      funktion:           [data.funktion],
-      freistellung:       [data.freistellung],
-      bemerkung:          [data.bemerkung]
+      befristung:      [data.befristung],
+      befristungMax:   [data.befristungMax],
+      verlaengerung1:  [data.verlaengerung1],
+      verlaengerung2:  [data.verlaengerung2],
+      kostenstelle:    [data.kostenstelle, Validators.required],
+      bereich:         [data.bereich, Validators.required],
+      fte:             [data.fte, [Validators.required, Validators.min(0), Validators.max(1)]],
+      mengenabhaengig: [data.mengenabhaengig, Validators.required],
+      exitReasonId:    [data.exitReasonId],
+      kuendigung:      [data.kuendigung],
+      funktion:        [data.funktion],
+      freistellung:    [data.freistellung],
+      bemerkung:       [data.bemerkung]
     });
 
     this.svc.getExitReasons().subscribe({
