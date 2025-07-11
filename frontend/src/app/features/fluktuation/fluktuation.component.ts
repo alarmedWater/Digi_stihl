@@ -1,10 +1,10 @@
 // src/app/features/mitarbeiter/components/fluktuation/fluktuation.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule }    from '@angular/common';
-import { FormsModule }     from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Subscription, switchMap, startWith } from 'rxjs';
 import { MitarbeiterService } from '../mitarbeiter/services/mitarbeiter.service';
-import { EmployeeDto }       from '../mitarbeiter/models/employee';
+import { EmployeeDto } from '../mitarbeiter/models/employee';
 
 interface FluktuationsEintrag {
   monat: string;
@@ -19,7 +19,7 @@ interface FluktuationsEintrag {
 @Component({
   selector: 'app-fluktuation',
   standalone: true,
-  imports: [ CommonModule, FormsModule ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './fluktuation.component.html',
   styleUrls: ['./fluktuation.component.scss']
 })
@@ -75,10 +75,10 @@ export class FluktuationComponent implements OnInit, OnDestroy {
     const futureEnd = new Date(now.getFullYear(), now.getMonth() + 12, 1);
     const earliestDate = Array.from(map.keys())
       .map(k => {
-        const [y,m] = k.split('-').map(Number);
+        const [y, m] = k.split('-').map(Number);
         return new Date(y, m - 1, 1);
       })
-      .sort((a,b) => a.getTime() - b.getTime())[0]
+      .sort((a, b) => a.getTime() - b.getTime())[0]
       ?? new Date(now.getFullYear(), now.getMonth(), 1);
 
     const timeline: { jahr: number; monat: number; name: string }[] = [];
@@ -92,7 +92,6 @@ export class FluktuationComponent implements OnInit, OnDestroy {
       cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
     }
 
-      // **LOG 2: generierte Timeline-Schlüssel**
     console.log(
       'Timeline Monate:',
       timeline.map(t => `${t.jahr}-${t.monat}`)
@@ -102,15 +101,18 @@ export class FluktuationComponent implements OnInit, OnDestroy {
     this.daten = timeline.map(({ jahr, monat, name }) => {
       const key = `${jahr}-${monat}`;
       const group = map.get(key) || [];
-      const ag    = group.filter(e => e.exitReasonId === 2).length;
-      const an    = group.filter(e => e.exitReasonId === 1).length;
-      const other = group.length - ag - an;
+
+      const ag = group.filter(e => e.exitReasonId === 2).length;  // Arbeitgeberkündigungen
+      const an = group.filter(e => e.exitReasonId === 1).length;  // Arbeitnehmerkündigungen
+      
+      // Sonstige Kündigungen: alle, die NICHT 1 oder 2 sind
+      const other = group.filter(e => e.exitReasonId !== 1 && e.exitReasonId !== 2).length;
 
       // Gesamt-MA zum Monatsende
       const cutoff = new Date(jahr, monat, 0); // letzter Tag im Monat
       const total = allEmps.filter(e => {
         const start = this.parseLocalDate(e.eintritt);
-        const end   = e.kuendigung ? this.parseLocalDate(e.kuendigung) : null;
+        const end = e.kuendigung ? this.parseLocalDate(e.kuendigung) : null;
         return start <= cutoff && (!end || end > cutoff);
       }).length;
 
@@ -118,15 +120,14 @@ export class FluktuationComponent implements OnInit, OnDestroy {
       return {
         monat: name,
         jahr,
-        agKuendigungen:       ag,
-        anKuendigungen:       an,
+        agKuendigungen: ag,
+        anKuendigungen: an,
         sonstigeKuendigungen: other,
-        gesamtmitarbeiter:    total,
-        fluktuationsrate:     parseFloat(rate.toFixed(2))
+        gesamtmitarbeiter: total,
+        fluktuationsrate: parseFloat(rate.toFixed(2))
       };
     });
 
-    // **LOG 3: finales daten-Array**
     console.log('Fluktuations-Daten:', this.daten);
 
     // 4) Standard-Jahr voreinstellen

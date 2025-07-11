@@ -1,17 +1,20 @@
 // src/app/features/mitarbeiter/components/atz/atz.component.ts
-
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // für *ngFor
-import { FormsModule } from '@angular/forms';   // für [(ngModel)]
+import { CommonModule }      from '@angular/common';
+import { FormsModule }       from '@angular/forms';
+import { forkJoin }          from 'rxjs';
+
 import { MitarbeiterService } from '../mitarbeiter/services/mitarbeiter.service';
-import { EmployeeDto } from '../mitarbeiter/models/employee';
- 
-// Ein Interface zur Typisierung der ATZ-Mitarbeiterdaten
+import { DepartmentService }  from '../mitarbeiter/services/department.service';
+import { EmployeeDto }        from '../mitarbeiter/models/employee';
+import { DepartmentDto }      from '../mitarbeiter/models/department';
+
+// Typ für unsere angezeigten ATZ-Einträge
 interface ATZMitarbeiter {
   name: string;
   abteilung: string;
   austrittsdatum: string;
-  bemerkung: string; // NEU
+  bemerkung: string;
 }
 
 @Component({
@@ -22,49 +25,57 @@ interface ATZMitarbeiter {
   styleUrls: ['./atz.component.scss']
 })
 export class ATZComponent implements OnInit {
-
-  // Liste der ATZ-Mitarbeiter aus dem Service
   atzMitarbeiter: ATZMitarbeiter[] = [];
+  suchbegriff = '';
 
-  // Suchfeld zur Filterung
-  suchbegriff: string = '';
-
-  constructor(private svc: MitarbeiterService) {}
+  constructor(
+    private svc: MitarbeiterService,
+    private deptSvc: DepartmentService
+  ) {}
 
   ngOnInit(): void {
-    this.svc.getMitarbeiter()
-      .subscribe({
-        next: (list: EmployeeDto[]) => {
-          const ATZ_EXIT_REASON_ID = 3;  // Seeded ID für "Altersteilzeit"
-          const atzList = list.filter(e => e.exitReasonId === ATZ_EXIT_REASON_ID);
-
-          this.atzMitarbeiter = atzList.map(e => ({
-            name: `${e.vorname} ${e.name}`,
-            abteilung: e.kostenstelle,
-            austrittsdatum:  e.kuendigung ? this.formatDatum(e.kuendigung) : '', //e.kuendigung ?? ''
-            bemerkung: e.bemerkung ?? '' // NEU
-          }));
-        },
-        error: err => console.error('Fehler beim Laden der ATZ-Mitarbeiter:', err)
-      });
+    // parallel Empfänger-Daten und Abteilungen laden
+    forkJoin({
+      emps:  this.svc.getMitarbeiter(),
+      depts: this.deptSvc.getDepartments()
+    }).subscribe(({ emps, depts }) => {
+      // Map: Kostenstelle → Abteilungsname
+      const deptMap = new Map<string,string>(
+        depts.map(d => [d.kostenstelle, d.abteilungsname])
+      );
+      // Nur ATZ (ExitReasonId === 3) filtern und umwandeln
+      const ATZ_ID = 3;
+      this.atzMitarbeiter = emps
+        .filter(e => e.exitReasonId === ATZ_ID)
+        .map(e => ({
+          name: `${e.vorname} ${e.name}`,
+          abteilung: e.kostenstelle
+            ? (deptMap.get(e.kostenstelle) ?? '–')
+            : '–',
+          austrittsdatum: e.kuendigung
+            ? this.formatDatum(e.kuendigung)
+            : '–',
+          bemerkung: e.bemerkung ?? ''
+        }));
+    });
   }
 
-  // Gefilterte Ausgabe
+  /** Live-Filter über Name, Abteilung oder Datum */
   get gefilterteMitarbeiter(): ATZMitarbeiter[] {
-    const begriff = this.suchbegriff.toLowerCase();
+    const q = this.suchbegriff.trim().toLowerCase();
     return this.atzMitarbeiter.filter(m =>
-      m.name.toLowerCase().includes(begriff) ||
-      m.abteilung.toLowerCase().includes(begriff) ||
-      m.austrittsdatum.includes(begriff)
+      m.name.toLowerCase().includes(q) ||
+      m.abteilung.toLowerCase().includes(q) ||
+      m.austrittsdatum.includes(q)
     );
   }
 
-  private formatDatum(isoString: string): string {
-    const datum = new Date(isoString);
-    const tag = datum.getDate().toString().padStart(2, '0');
-    const monat = (datum.getMonth() + 1).toString().padStart(2, '0');
-    const jahr = datum.getFullYear();
-    return `${tag}-${monat}-${jahr}`;
+  /** Kurzformat DD-MM-YYYY */
+  private formatDatum(iso: string): string {
+    const d = new Date(iso);
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const yyyy = d.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
   }
-  
 }

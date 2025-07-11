@@ -1,29 +1,34 @@
-<h2>Befristete Mitarbeitende</h2>
+<!-- src/app/features/befristung/befristung.component.html -->
+<div class="befristung-container">
+  <h2>Befristete Mitarbeitende</h2>
 
-<!-- Eingabefeld für Suchfilter -->
-<input
-  type="text"
-  [(ngModel)]="suchbegriff"
-  placeholder="Suche nach Name, Abteilung, Beschäftigungsart..."
-/>
+  <!-- Angular Material Suchfeld -->
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Suche nach Name, Abteilung, Beschäftigungsart…</mat-label>
+    <input matInput [(ngModel)]="suchbegriff" placeholder="Suchbegriff" />
+  </mat-form-field>
 
-<!-- Tabelle mit gefilterten Mitarbeitenden -->
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Abteilung</th>
-      <th>Beschäftigungsart</th>
-      <th>Befristet bis</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let mitarbeiter of gefilterteBefristete">
-      <td>{{ mitarbeiter.name }}</td>
-      <td>{{ mitarbeiter.abteilung }}</td>
-      <td>{{ mitarbeiter.beschaeftigungsart }}</td>
-      <td>{{ mitarbeiter.befristetBis }}</td>
-    </tr>
-  </tbody>
-</table>
+  <!-- Dark-Theme-Tabelle -->
+  <table class="app-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Abteilung</th>
+        <th>Beschäftigungsart</th>
+        <th>Befristet bis</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of gefilterteBefristete">
+        <td>{{ m.name }}</td>
+        <td>{{ m.abteilungsname }}</td>
+        <td>{{ m.beschaeftigungsart }}</td>
+        <td>{{ m.befristetBis }}</td>
+      </tr>
+    </tbody>
+  </table>
 
+  <p *ngIf="gefilterteBefristete.length === 0" class="no-data">
+    Keine Einträge gefunden.
+  </p>
+</div>

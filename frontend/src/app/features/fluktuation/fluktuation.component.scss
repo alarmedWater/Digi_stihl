@@ -1,6 +1,6 @@
 /* src/app/features/mitarbeiter/components/fluktuation/fluktuation.component.scss */
 
-/* Container für die Filterelemente */
+/* Filter-Bar bleibt komponentenspezifisch */
 .filter-container {
   display: flex;
   flex-wrap: wrap;
@@ -10,39 +10,32 @@
 
   label {
     font-weight: bold;
+    color: #eee;
   }
+
   select {
     padding: 0.4rem;
     border-radius: 4px;
-    border: 1px solid #ccc;
+    border: 1px solid #555;
+    background-color: #2c2c2c;
+    color: #eee;
     min-width: 120px;
   }
 }
 
-/* Tabelle für Fluktuationsdaten */
-.fluktuationstabelle {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-
-  th {
-    background-color: #f2f2f2;
+/* Hier nur noch Ausrichtung der Spalten, Styling stammt aus .app-table (global) */
+.app-table.by-fluktuation {
+  /* Kopfzeile linksbündig */
+  thead th {
     text-align: left;
-    padding: 0.75rem;
-    border-bottom: 2px solid #ddd;
   }
-  td {
-    padding: 0.75rem;
-    border-bottom: 1px solid #e0e0e0;
+  /* Erste Spalte links, alle anderen rechts ausrichten */
+  tbody td {
+    &:first-child {
+      text-align: left;
+    }
+    &:not(:first-child) {
+      text-align: right;
+    }
   }
-  tr:hover {
-    background-color: #f9f9f9;
-  }
-}
-
-/* Hinweistext bei keinen Daten */
-p {
-  margin-top: 2rem;
-  color: #666;
-  font-style: italic;
 }

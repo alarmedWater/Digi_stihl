@@ -1,12 +1,20 @@
 // src/app/features/befristung/befristung.component.ts
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule }  from '@angular/forms';
+import { CommonModule }      from '@angular/common';
+import { FormsModule }       from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule }     from '@angular/material/input';
+import { MatTableModule }     from '@angular/material/table';
+import { forkJoin }           from 'rxjs';
+
 import { MitarbeiterService } from '../mitarbeiter/services/mitarbeiter.service';
+import { DepartmentService }  from '../mitarbeiter/services/department.service';
+import { EmployeeDto } from '../mitarbeiter/models/employee';
+
 
 interface BefristeterMitarbeiter {
   name: string;
-  abteilung: string;
+  abteilungsname: string;
   beschaeftigungsart: string;
   befristetBis: string;
 }
@@ -14,54 +22,62 @@ interface BefristeterMitarbeiter {
 @Component({
   selector: 'app-befristung',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTableModule
+  ],
   templateUrl: './befristung.component.html',
   styleUrls: ['./befristung.component.scss']
 })
 export class BefristungComponent implements OnInit {
-  // die initial leere Liste, gefüllt aus dem Service
+  suchbegriff = '';
   befristeteMitarbeiter: BefristeterMitarbeiter[] = [];
+  
+  constructor(
+    private mitarbeiterService: MitarbeiterService,
+    private deptService: DepartmentService
+  ) {}
 
-  suchbegriff: string = '';
-
-  constructor(private mitarbeiterService: MitarbeiterService) {}
-
-  ngOnInit() {
-    // nur Befristete laden
-    this.mitarbeiterService
-      .getMitarbeiter({ arbeitsverhaeltnis: 'Befristet' })
-      .subscribe({
-        next: list => {
-          // Mappe aus EmployeeDto zu Deinem Interface:
-          this.befristeteMitarbeiter = list.map(e => ({
-            name: `${e.vorname} ${e.name}`,
-            abteilung: e.kostenstelle,           // oder: e.abteilung falls Du das mitjoinst
-            beschaeftigungsart: e.arbeitsverhaeltnis,
-            befristetBis: e.befristungMax ? this.formatDatum(e.befristungMax) : '' // Dein Feld für „bis“    
-          }));
-        },
-        error: err => {
-          console.error('Fehler beim Laden der befristeten MA:', err);
-        }
-      });
+  ngOnInit(): void {
+    // Lade zunächst alle Departments und Befristete gleichzeitig
+    forkJoin({
+      depts: this.deptService.getDepartments(),
+      emps:  this.mitarbeiterService.getMitarbeiter({ arbeitsverhaeltnis: 'Befristet' })
+    }).subscribe(({ depts, emps }) => {
+      const deptMap = new Map<string,string>(
+        depts.map(d => [d.kostenstelle, d.abteilungsname])
+      );
+      this.befristeteMitarbeiter = emps.map(e => ({
+        name: `${e.vorname} ${e.name}`,
+        abteilungsname: e.kostenstelle
+          ? (deptMap.get(e.kostenstelle) ?? '–')
+          : '–',
+        beschaeftigungsart: e.arbeitsverhaeltnis,
+        befristetBis: e.befristungMax
+          ? this.formatDatum(e.befristungMax)
+          : '–'
+      }));
+    });
   }
 
   get gefilterteBefristete(): BefristeterMitarbeiter[] {
-    const begriff = this.suchbegriff.toLowerCase();
+    const q = this.suchbegriff.trim().toLowerCase();
     return this.befristeteMitarbeiter.filter(m =>
-      m.name.toLowerCase().includes(begriff) ||
-      m.abteilung.toLowerCase().includes(begriff) ||
-      m.beschaeftigungsart.toLowerCase().includes(begriff) ||
-      m.befristetBis.includes(begriff)
+      m.name.toLowerCase().includes(q) ||
+      m.abteilungsname.toLowerCase().includes(q) ||
+      m.beschaeftigungsart.toLowerCase().includes(q) ||
+      m.befristetBis.includes(q)
     );
   }
 
-  private formatDatum(isoString: string): string {
-    const datum = new Date(isoString);
-    const tag = datum.getDate().toString().padStart(2, '0');
-    const monat = (datum.getMonth() + 1).toString().padStart(2, '0');
-    const jahr = datum.getFullYear();
-    return `${tag}-${monat}-${jahr}`;
+  private formatDatum(iso: string): string {
+    const d = new Date(iso);
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const yyyy = d.getFullYear();
+    return `${dd}.${mm}.${yyyy}`;
   }
-  
 }

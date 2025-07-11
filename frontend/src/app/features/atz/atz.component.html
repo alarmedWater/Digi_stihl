@@ -1,38 +1,37 @@
-<h2>ATZ</h2>
+<!-- src/app/features/mitarbeiter/components/atz/atz.component.html -->
 <div class="atz-wrapper">
-      <!-- Suchfeld zur Filterung -->
-      
-      <input
-        type="text"
-        [(ngModel)]="suchbegriff"
-        placeholder="Suchen nach Name, Abteilung oder Datum"
-        class="suchfeld"
-      />
-    
-      <!-- Tabelle mit gefilterten ATZ-Mitarbeitern -->
-      <table class="atz-tabelle">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Abteilung</th>
-            <th>Austrittsdatum</th>
-            <th>Bemerkung</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- ngFor zur dynamischen Anzeige der gefilterten Mitarbeiter -->
-          <tr *ngFor="let mitarbeiter of gefilterteMitarbeiter">
-            <td>{{ mitarbeiter.name }}</td>
-            <td>{{ mitarbeiter.abteilung }}</td>
-            <td>{{ mitarbeiter.austrittsdatum }}</td>
-            <td>{{ mitarbeiter.bemerkung }}</td>
-          </tr>
-        </tbody>
-      </table>
-    
-      <!-- Anzeige bei keinem Treffer -->
-      <div *ngIf="gefilterteMitarbeiter.length === 0" class="kein-treffer">
-        Keine passenden ATZ-Mitarbeitenden gefunden.
-      </div>
-    </div>
-    
+  <h2>ATZ</h2>
+
+  <!-- Suchfeld -->
+  <input
+    type="text"
+    [(ngModel)]="suchbegriff"
+    placeholder="Suchen nach Name, Abteilung oder Datum"
+    class="suchfeld"
+  />
+
+  <!-- Tabelle mit gefilterten ATZ-Mitarbeitern -->
+  <table class="atz-tabelle">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Abteilung</th>
+        <th>Austrittsdatum</th>
+        <th>Bemerkung</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of gefilterteMitarbeiter">
+        <td>{{ m.name }}</td>
+        <td>{{ m.abteilung }}</td>
+        <td>{{ m.austrittsdatum }}</td>
+        <td>{{ m.bemerkung }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Anzeige, wenn nichts gefunden wurde -->
+  <div *ngIf="gefilterteMitarbeiter.length === 0" class="kein-treffer">
+    Keine passenden ATZ-Mitarbeitenden gefunden.
+  </div>
+</div>

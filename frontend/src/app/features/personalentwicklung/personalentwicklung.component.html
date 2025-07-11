@@ -1,30 +1,31 @@
+<!-- src/app/features/personalentwicklung/personalentwicklung.component.html -->
 <div class="personalentwicklung-wrapper">
-      <h2>Personalentwicklung – Übersicht</h2>
-    
-      <!-- Tabelle mit Personalentwicklungsdaten -->
-      <table class="entwicklungstabelle">
-        <thead>
-          <tr>
-            <th>Jahr</th>
-            <th>Monat</th>
-            <th>Direkte</th>
-            <th>Indirekte</th>
-            <th>Gesamt ohne Azubis</th>
-            <th>Sonstige Belegschaft</th>
-            <th>Gesamt</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let eintrag of daten">
-            <td>{{ eintrag.jahr }}</td>
-            <td>{{ eintrag.monat }}</td>
-            <td>{{ eintrag.direkte }}</td>
-            <td>{{ eintrag.indirekte }}</td>
-            <td>{{ eintrag.ohneAzubis }}</td>
-            <td>{{ eintrag.sonstige }}</td>
-            <td>{{ eintrag.gesamt }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    
+  <h2>Personalentwicklung – 12-Monats-Trend</h2>
+
+  <table class="app-table by-month">
+    <thead>
+      <tr>
+        <th>Gruppe \ Monat</th>
+        <th *ngFor="let m of timeline">{{ m.label }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Direkte Kapazität (FTE)</td>
+        <td *ngFor="let v of directRow">{{ v | number:'1.2-2' }}</td>
+      </tr>
+      <tr>
+        <td>Indirekte Kapazität (FTE)</td>
+        <td *ngFor="let v of indirectRow">{{ v | number:'1.2-2' }}</td>
+      </tr>
+      <tr>
+        <td>Gesamt ohne Azubis (FTE)</td>
+        <td *ngFor="let v of ohneAzubisRow">{{ v | number:'1.2-2' }}</td>
+      </tr>
+      <tr>
+        <td>Gesamt (FTE)</td>
+        <td *ngFor="let v of gesamtRow">{{ v | number:'1.2-2' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

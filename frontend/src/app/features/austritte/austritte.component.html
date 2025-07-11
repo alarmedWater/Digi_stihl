@@ -3,10 +3,14 @@
 <h2>Austritte</h2>
 
 <!-- Suchfeld -->
-<input type="text" [(ngModel)]="suchbegriff" placeholder="Suche nach Name oder Datum" />
+<input
+  type="text"
+  [(ngModel)]="suchbegriff"
+  placeholder="Suche nach Name oder Datum"
+/>
 
 <!-- Tabelle mit gefilterten Daten -->
-<table>
+<table class="app-table by-austritte">
   <thead>
     <tr>
       <th>Name</th>
@@ -24,4 +28,3 @@
     </tr>
   </tbody>
 </table>
-
