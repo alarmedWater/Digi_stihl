@@ -2,42 +2,54 @@
 <mat-sidenav-container class="sidenav-container">
 
   <!-- Sidebar für die Navigation (Menü) -->
-  <mat-sidenav mode="side" [(opened)]="isSidebarOpen" class="sidenav">
+  <mat-sidenav
+    mode="side"
+    [(opened)]="isSidebarOpen"
+    class="sidenav"
+    aria-label="Seitennavigation">
 
     <!-- Button zum Ein- und Ausklappen der Sidebar -->
-    <button (click)="toggleSidebar()" class="toggle-btn">☰ Menü</button>
+    <button
+      (click)="toggleSidebar()"
+      class="toggle-btn"
+      [attr.aria-expanded]="isSidebarOpen"
+      aria-controls="main-menu"
+      aria-label="Sidebar ein- und ausklappen">
+      ☰ Menü
+    </button>
 
     <!-- Navigationsliste in der Sidebar -->
-    <mat-nav-list>
-      <!-- Link zur Maske "Mitarbeiter anlegen" -->
-      <a mat-list-item routerLink="/mitarbeiter-anlegen" routerLinkActive="active-link">Mitarbeiter anlegen</a>
-
-      <!-- Link zur Maske "Mitarbeiter bearbeiten" -->
-      <a mat-list-item routerLink="/mitarbeiter-bearbeiten" routerLinkActive="active-link">Mitarbeiter bearbeiten</a>
-
-      <!-- Link zur Maske "Kapazitätsabweichungen" -->
-      <a mat-list-item routerLink="/kapazitaetsabweichung" routerLinkActive="active-link">Kapazitätsabweichungen</a>
-
-      <!-- Link zur Maske "Kapazitätsauswertung Direkt" -->
-      <a mat-list-item routerLink="/kapazitaetsauswertung-dir" routerLinkActive="active-link">Kapazitätsauswertung Direkt</a>
-
-      <!-- Link zur Maske "Kapazitätsauswertung Indirekt" -->
-      <a mat-list-item routerLink="/kapazitaetsauswertung-indir" routerLinkActive="active-link">Kapazitätsauswertung Indirekt</a>
-
-      <!-- Link zur Maske "ATZ" -->
-      <a mat-list-item routerLink="/atz" routerLinkActive="active-link">ATZ</a>
-
-      <!-- Link zur Maske "Befristung" -->
-      <a mat-list-item routerLink="/befristung" routerLinkActive="active-link">Befristung</a>
-
-      <!-- Link zur Maske "Austritte" -->
-      <a mat-list-item routerLink="/austritte" routerLinkActive="active-link">Austritte</a>
-
-      <!-- Link zur Maske "Fluktuation" -->
-      <a mat-list-item routerLink="/fluktuation" routerLinkActive="active-link">Fluktuation</a>
-
-      <!-- Link zur Maske "Personalentwicklung" -->
-      <a mat-list-item routerLink="/personalentwicklung" routerLinkActive="active-link">Personalentwicklung</a>
+    <mat-nav-list id="main-menu" role="navigation" aria-label="Hauptmenü">
+      <a mat-list-item routerLink="/mitarbeiter-anlegen" routerLinkActive="active-link" tabindex="0">
+        Mitarbeiter anlegen
+      </a>
+      <a mat-list-item routerLink="/mitarbeiter-bearbeiten" routerLinkActive="active-link" tabindex="0">
+        Mitarbeiter bearbeiten
+      </a>
+      <a mat-list-item routerLink="/kapazitaetsabweichung" routerLinkActive="active-link" tabindex="0">
+        Kapazitätsabweichungen
+      </a>
+      <a mat-list-item routerLink="/kapazitaetsauswertung-dir" routerLinkActive="active-link" tabindex="0">
+        Kapazitätsauswertung Direkt
+      </a>
+      <a mat-list-item routerLink="/kapazitaetsauswertung-indir" routerLinkActive="active-link" tabindex="0">
+        Kapazitätsauswertung Indirekt
+      </a>
+      <a mat-list-item routerLink="/atz" routerLinkActive="active-link" tabindex="0">
+        ATZ
+      </a>
+      <a mat-list-item routerLink="/befristung" routerLinkActive="active-link" tabindex="0">
+        Befristung
+      </a>
+      <a mat-list-item routerLink="/austritte" routerLinkActive="active-link" tabindex="0">
+        Austritte
+      </a>
+      <a mat-list-item routerLink="/fluktuation" routerLinkActive="active-link" tabindex="0">
+        Fluktuation
+      </a>
+      <a mat-list-item routerLink="/personalentwicklung" routerLinkActive="active-link" tabindex="0">
+        Personalentwicklung
+      </a>
     </mat-nav-list>
 
   </mat-sidenav>
@@ -46,9 +58,17 @@
   <mat-sidenav-content class="main-content">
 
     <!-- Button zum Öffnen der Sidebar, wird nur angezeigt wenn die Sidebar geschlossen ist -->
-    <button *ngIf="!isSidebarOpen" (click)="toggleSidebar()" class="toggle-btn">☰ Menü</button>
+    <button
+      *ngIf="!isSidebarOpen"
+      (click)="toggleSidebar()"
+      class="toggle-btn"
+      aria-expanded="false"
+      aria-controls="main-menu"
+      aria-label="Sidebar öffnen">
+      ☰ Menü
+    </button>
 
-    <!-- Platzhalter, in dem die aktiven Komponenten (Seiten) der Anwendung angezeigt werden -->
+    <!-- Platzhalter für die aktiven Komponenten -->
     <router-outlet></router-outlet>
 
   </mat-sidenav-content>

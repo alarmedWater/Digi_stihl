@@ -1,65 +1,85 @@
 // Grundstil der Host-Komponente; sorgt für Flexbox-Layout
 :host {
-      display: flex;
-      height: 100vh; 
-      overflow: hidden;
-    }
-    
-    // Container, der Sidebar und Hauptinhalt umschließt; Höhe ist volle Bildschirmhöhe
-    .sidenav-container {
-      height: 100vh;
-    }
-    
-    // Styling der Sidebar (Navigationsleiste)
-    .sidenav {
-      width: 280px;                       // feste Breite der Sidebar
-      padding: 1rem;                      // Innenabstand
-      background-color: #f37a1f;          // hellorange Hintergrundfarbe
-      color: white;                       // Textfarbe in der Sidebar
-      font-weight: 600;                   // Schriftstärke
-    }
-    
-    // Styling der Navigationslinks innerhalb der Sidebar
-    mat-nav-list a {
-      color: #111;                        // Schriftfarbe der Navigationslinks (schwarz)
-      text-decoration: none;              // keine Unterstreichung der Links
-      margin-bottom: 0.5rem;              // Abstand zwischen Links nach unten
-      border-radius: 4px;                 // abgerundete Ecken
-      white-space: normal;                // erlaubt Zeilenumbrüche, sodass Text nicht über Sidebar hinausragt
-      word-break: break-word;             // lange Wörter werden umgebrochen
-      font-size: 1rem;                    // Schriftgröße der Links
-      display: block;
-      line-height: 1.2;
-    }
-    
-    // Styling des aktiven Navigationslinks
-    mat-nav-list a.active-link {
-      background-color: #111;             // Hintergrundfarbe schwarz für aktiven Link
-      color: white;                       // Schriftfarbe weiß für Kontrast
-    }
-    
-    // Hover-Effekt der Navigationslinks beim Mouseover
-    mat-nav-list a:hover {
-      background-color: #524e4a;          // dunkelgrauer Hover-Effekt
-      color: white;                       // Schriftfarbe weiß für gute Lesbarkeit
-    }
-    
-    // Styling des Hauptinhaltsbereichs rechts neben der Sidebar
-    .main-content {
-      padding: 2rem;                      // großzügiger Innenabstand
-      flex: 1;                            // nimmt verfügbaren Raum ein
-      background-color: #fdfdfd;          // heller Hintergrund für den Inhaltsbereich
-      color: #111;                        // Schriftfarbe schwarz
-      font-family: Arial, sans-serif;     // Schriftart
-    }
-    
-    // Styling des Buttons zum Ein- und Ausklappen der Sidebar
-    .toggle-btn {
-      background-color: transparent;      // transparenter Hintergrund
-      border: none;                       // keine sichtbare Umrandung
-      color: #111;                        // Schriftfarbe Schwarz (angepasst)
-      cursor: pointer;                    // zeigt klickbare Schaltfläche an
-      font-size: 1.2rem;                  // etwas größere Schriftgröße
-      padding: 0.5rem 1rem;               // Innenabstand für Klickkomfort
-    }
-    
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+// Container, der Sidebar und Hauptinhalt umschließt; Höhe ist volle Bildschirmhöhe
+.sidenav-container {
+  height: 100vh;
+}
+
+// Styling der Sidebar (Navigationsleiste)
+.sidenav {
+  width: 280px;                       // feste Breite der Sidebar
+  padding: 1rem;                     // Innenabstand
+  background-color: #f37a1f;          // hellorange Hintergrundfarbe
+  color: white;                      // Textfarbe in der Sidebar
+  font-weight: 600;                  // Schriftstärke
+}
+
+// Styling der Navigationslinks innerhalb der Sidebar
+mat-nav-list a {
+  color: #111;                      // Schriftfarbe der Navigationslinks (schwarz)
+  text-decoration: none;            // keine Unterstreichung der Links
+  margin-bottom: 0.5rem;            // Abstand zwischen Links nach unten
+  border-radius: 4px;               // abgerundete Ecken
+  white-space: normal;              // erlaubt Zeilenumbrüche
+  word-break: break-word;           // lange Wörter werden umgebrochen
+  font-size: 1rem;                  // Schriftgröße der Links
+  display: flex !important;         // Flexbox für bessere Ausrichtung
+  align-items: center !important;   // Vertikale Zentrierung
+  height: 40px !important;          // Einheitliche Höhe für Menüeinträge
+  line-height: normal !important;   // Verhindert Textverschiebung durch Zeilenhöhe
+  padding-top: 0 !important;        // Entfernt extra Padding oben
+  padding-bottom: 0 !important;     // Entfernt extra Padding unten
+  box-sizing: border-box;
+}
+
+// Innerer Textcontainer der mat-list-item (Angular Material nutzt .mat-list-item-content)
+mat-nav-list a .mat-list-item-content {
+  display: flex !important;
+  align-items: center !important;
+  height: 100% !important;
+  width: 100% !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+// Styling des aktiven Navigationslinks
+mat-nav-list a.active-link {
+  background-color: #111;             // Hintergrundfarbe schwarz für aktiven Link
+  color: white;                      // Schriftfarbe weiß für Kontrast
+  font-weight: 600;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+// Hover-Effekt der Navigationslinks beim Mouseover
+mat-nav-list a:hover {
+  background-color: #524e4a;          // dunkelgrauer Hover-Effekt
+  color: white;                      // Schriftfarbe weiß für gute Lesbarkeit
+}
+
+// Styling des Hauptinhaltsbereichs rechts neben der Sidebar
+.main-content {
+  padding: 2rem;                      // großzügiger Innenabstand
+  flex: 1;                           // nimmt verfügbaren Raum ein
+  background-color: #fdfdfd;          // heller Hintergrund für den Inhaltsbereich
+  color: #111;                      // Schriftfarbe schwarz
+  font-family: Arial, sans-serif;   // Schriftart
+}
+
+// Styling des Buttons zum Ein- und Ausklappen der Sidebar
+.toggle-btn {
+  background-color: transparent;      // transparenter Hintergrund
+  border: none;                      // keine sichtbare Umrandung
+  color: #111;                      // Schriftfarbe Schwarz (angepasst)
+  cursor: pointer;                  // zeigt klickbare Schaltfläche an
+  font-size: 1.2rem;                // etwas größere Schriftgröße
+  padding: 0.5rem 1rem;             // Innenabstand für Klickkomfort
+}
