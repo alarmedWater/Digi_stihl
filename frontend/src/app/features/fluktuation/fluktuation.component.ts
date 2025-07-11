@@ -1,4 +1,3 @@
-// src/app/features/mitarbeiter/components/fluktuation/fluktuation.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,16 +5,30 @@ import { Subscription, switchMap, startWith } from 'rxjs';
 import { MitarbeiterService } from '../mitarbeiter/services/mitarbeiter.service';
 import { EmployeeDto } from '../mitarbeiter/models/employee';
 
+/**
+ * Represents a single entry in the fluctuation report.
+ */
 interface FluktuationsEintrag {
+  /** The month name (e.g., "Januar"). */
   monat: string;
+  /** The year. */
   jahr: number;
+  /** Number of terminations by employer. */
   agKuendigungen: number;
+  /** Number of terminations by employee. */
   anKuendigungen: number;
+  /** Number of other types of terminations. */
   sonstigeKuendigungen: number;
+  /** Total number of employees at the end of the month. */
   gesamtmitarbeiter: number;
-  fluktuationsrate: number; // in Prozent, 2 Nachkommastellen
+  /** Fluctuation rate in percentage, rounded to 2 decimal places. */
+  fluktuationsrate: number;
 }
 
+/**
+ * Component for displaying employee fluctuation data.
+ * It calculates and presents termination statistics and fluctuation rates over time.
+ */
 @Component({
   selector: 'app-fluktuation',
   standalone: true,
@@ -24,16 +37,23 @@ interface FluktuationsEintrag {
   styleUrls: ['./fluktuation.component.scss']
 })
 export class FluktuationComponent implements OnInit, OnDestroy {
+  /** The processed fluctuation data for display. */
   daten: FluktuationsEintrag[] = [];
+  /** The currently selected month for filtering. */
   ausgewaehlterMonat = '';
+  /** The currently selected year for filtering. */
   ausgewaehltesJahr: number | null = null;
 
   private sub?: Subscription;
 
   constructor(private svc: MitarbeiterService) {}
 
+  /**
+   * Initializes the component.
+   * Subscribes to employee data changes to recalculate fluctuation data.
+   */
   ngOnInit(): void {
-    // Immer neu berechnen, wenn Mitarbeiter-Daten sich ändern (create/update/delete)
+    // Recalculate whenever employee data changes (create/update/delete).
     this.sub = this.svc.refresh$
       .pipe(
         startWith<void>(undefined),
@@ -41,23 +61,34 @@ export class FluktuationComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: emps => this.buildFluktuation(emps),
-        error: err => console.error('Fluktuation-Laden fehlgeschlagen', err)
+        error: err => console.error('Failed to load fluctuation data', err)
       });
   }
 
+  /**
+   * Cleans up the subscription when the component is destroyed.
+   */
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
   }
 
-  /** Parse nur Datumsteil, ohne Zeitzone-Offset */
+  /**
+   * Parses an ISO date string to a local Date object, ignoring time zone offset.
+   * @param iso The ISO date string (e.g., "2025-06-16T...").
+   * @returns A Date object representing the local date.
+   */
   private parseLocalDate(iso: string): Date {
     const [y, m, d] = iso.split('T')[0].split('-').map(n => +n);
     return new Date(y, m - 1, d);
   }
 
-  /** Baut das Fluktuations-Datenmodell auf */
+  /**
+   * Builds the fluctuation data model from the raw employee data.
+   * Groups terminations by month and calculates fluctuation rates.
+   * @param allEmps An array of all employee DTOs.
+   */
   private buildFluktuation(allEmps: EmployeeDto[]): void {
-    // 1) Kündigungen nach Jahr-Monat gruppieren (ohne Zeitversatz!)
+    // 1) Group terminations by year-month (without time offset!).
     const map = new Map<string, EmployeeDto[]>();
     for (const e of allEmps) {
       if (!e.kuendigung) continue;
@@ -68,9 +99,7 @@ export class FluktuationComponent implements OnInit, OnDestroy {
       map.set(key, arr);
     }
 
-    console.log('Raw Kündigungs-Keys:', Array.from(map.keys()));
-
-    // 2) Zeitraum von frühester Kündigung bis 12 Monate in die Zukunft
+    // 2) Determine the timeline from the earliest termination to 12 months into the future.
     const now = new Date();
     const futureEnd = new Date(now.getFullYear(), now.getMonth() + 12, 1);
     const earliestDate = Array.from(map.keys())
@@ -92,24 +121,19 @@ export class FluktuationComponent implements OnInit, OnDestroy {
       cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
     }
 
-    console.log(
-      'Timeline Monate:',
-      timeline.map(t => `${t.jahr}-${t.monat}`)
-    );
-
-    // 3) Datenpunkte erzeugen
+    // 3) Generate data points for each month in the timeline.
     this.daten = timeline.map(({ jahr, monat, name }) => {
       const key = `${jahr}-${monat}`;
       const group = map.get(key) || [];
 
-      const ag = group.filter(e => e.exitReasonId === 2).length;  // Arbeitgeberkündigungen
-      const an = group.filter(e => e.exitReasonId === 1).length;  // Arbeitnehmerkündigungen
+      const ag = group.filter(e => e.exitReasonId === 2).length;  // Employer terminations
+      const an = group.filter(e => e.exitReasonId === 1).length;  // Employee terminations
       
-      // Sonstige Kündigungen: alle, die NICHT 1 oder 2 sind
+      // Other terminations: all that are NOT 1 or 2.
       const other = group.filter(e => e.exitReasonId !== 1 && e.exitReasonId !== 2).length;
 
-      // Gesamt-MA zum Monatsende
-      const cutoff = new Date(jahr, monat, 0); // letzter Tag im Monat
+      // Total employees at month end.
+      const cutoff = new Date(jahr, monat, 0); // Last day of the month.
       const total = allEmps.filter(e => {
         const start = this.parseLocalDate(e.eintritt);
         const end = e.kuendigung ? this.parseLocalDate(e.kuendigung) : null;
@@ -128,15 +152,16 @@ export class FluktuationComponent implements OnInit, OnDestroy {
       };
     });
 
-    console.log('Fluktuations-Daten:', this.daten);
-
-    // 4) Standard-Jahr voreinstellen
+    // 4) Set default year if data is available.
     if (this.daten.length) {
       this.ausgewaehltesJahr = this.daten[0].jahr;
     }
   }
 
-  /** Für die Tabelle: Filter nach Jahr und Monat */
+  /**
+   * Returns the filtered fluctuation data based on the selected year and month.
+   * @returns An array of FluktuationsEintrag objects.
+   */
   get gefilterteDaten(): FluktuationsEintrag[] {
     return this.daten.filter(e =>
       (this.ausgewaehltesJahr == null || e.jahr === this.ausgewaehltesJahr) &&
@@ -144,10 +169,18 @@ export class FluktuationComponent implements OnInit, OnDestroy {
     );
   }
 
-  /** Dropdown-Listen */
+  /**
+   * Returns a list of available months from the fluctuation data for dropdown selection.
+   * @returns An array of unique month names.
+   */
   get verfuegbareMonate(): string[] {
     return Array.from(new Set(this.daten.map(e => e.monat)));
   }
+
+  /**
+   * Returns a sorted list of available years from the fluctuation data for dropdown selection.
+   * @returns An array of unique years, sorted in descending order.
+   */
   get verfuegbareJahre(): number[] {
     const jahre = Array.from(new Set(this.daten.map(e => e.jahr)));
     return jahre.sort((a, b) => b - a);

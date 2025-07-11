@@ -1,31 +1,29 @@
-// src/app/features/models/employee-filter.ts
-
 /**
- * Data Transfer Object für das Filtern von Mitarbeitern in der REST-API
+ * Data Transfer Object for filtering employees in the REST API.
  */
 export interface EmployeeFilterDto {
-  /** Nachname-Teilstring */
+  /** Partial string for last name. */
   name?: string;
-  /** Vorname-Teilstring */
+  /** Partial string for first name. */
   vorname?: string;
-  /** Eintrittsdatum ab (ISO-String, z.B. "2025-01-15") */
+  /** Entry date from (ISO string, e.g., "2025-01-15"). */
   eintrittFrom?: string;
-  /** Eintrittsdatum bis (ISO-String) */
+  /** Entry date to (ISO string). */
   eintrittTo?: string;
-  /** Funktion-Teilstring */
+  /** Partial string for function/role. */
   funktion?: string;
-  /** Kostenstellen-Code */
+  /** Cost center code. */
   kostenstelle?: string;
-  /** Bereichstyp, z.B. "Direkt" oder "Indirekt" */
+  /** Area type, e.g., "Direkt" (Direct) or "Indirekt" (Indirect). */
   bereich?: 'Direkt' | 'Indirekt';
-  /** Mengenabhängig (falls verwendet) */
+  /** Quantity-dependent (if applicable). */
   mengenabhaengig?: string;
-  /** Arbeitsverhältnis, z.B. "Befristet" или "Unbefristet" */
+  /** Employment relationship, e.g., "Befristet" (Fixed-term) or "Unbefristet" (Permanent). */
   arbeitsverhaeltnis?: 'Befristet' | 'Unbefristet';
-  /** Austrittsart (optional) */
+  /** Type of exit (optional). */
   austrittsart?: string;
-  /** Minimale FTE */
+  /** Minimum Full-Time Equivalent (FTE). */
   minFTE?: number;
-  /** Maximale FTE */
+  /** Maximum Full-Time Equivalent (FTE). */
   maxFTE?: number;
 }

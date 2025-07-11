@@ -15,10 +15,17 @@ import { EmployeeDto }        from '../../models/employee';
 import { ExitReasonDto }      from '../../models/exit-reason';
 import { DepartmentDto }      from '../../models/department';
 
+/**
+ * Interface extending EmployeeDto to include the department name.
+ */
 interface EmployeeWithDept extends EmployeeDto {
   abteilungsname?: string;
 }
 
+/**
+ * Component for editing and managing employees.
+ * Displays a filterable list of employees and allows editing each one in a dialog.
+ */
 @Component({
   selector: 'app-bearbeiten',
   standalone: true,
@@ -37,6 +44,9 @@ interface EmployeeWithDept extends EmployeeDto {
   styleUrls: ['./bearbeiten.component.scss'],
 })
 export class BearbeitenComponent implements OnInit {
+  /**
+   * Columns to be displayed in the employee table.
+   */
   displayedColumns = [
     'employeeId',
     'vorname',
@@ -49,7 +59,7 @@ export class BearbeitenComponent implements OnInit {
     'verlaengerung2',
     'freistellung',
     'kuendigung',
-    'exitReason',     // show description
+    'exitReason',
     'funktion',
     'bemerkung',
     'abteilungsname',
@@ -59,8 +69,17 @@ export class BearbeitenComponent implements OnInit {
     'aktion'
   ];
 
+  /**
+   * The complete list of employees with department information.
+   */
   mitarbeiterListe: EmployeeWithDept[] = [];
+  /**
+   * The filtered list of employees currently displayed in the table.
+   */
   gefilterteListe: EmployeeWithDept[] = [];
+  /**
+   * The current value of the filter input field.
+   */
   filterWert = '';
 
   constructor(
@@ -69,10 +88,17 @@ export class BearbeitenComponent implements OnInit {
     private dialog: MatDialog
   ) {}
 
+  /**
+   * Initializes the component by loading the employee data.
+   */
   ngOnInit(): void {
     this.loadMitarbeiter();
   }
 
+  /**
+   * Fetches employees and departments concurrently.
+   * Maps department names to employees using their cost center ID.
+   */
   private loadMitarbeiter(): void {
     forkJoin({
       emps:  this.svc.getMitarbeiter(),
@@ -89,6 +115,10 @@ export class BearbeitenComponent implements OnInit {
     });
   }
 
+  /**
+   * Filters the employee list based on the filterWert.
+   * The filter is applied to first name, last name, department name, and area.
+   */
   applyFilter(): void {
     const v = this.filterWert.trim().toLowerCase();
     this.gefilterteListe = this.mitarbeiterListe.filter(e =>
@@ -99,6 +129,10 @@ export class BearbeitenComponent implements OnInit {
     );
   }
 
+  /**
+   * Opens the employee editing dialog.
+   * @param emp The employee to be edited.
+   */
   bearbeiten(emp: EmployeeWithDept): void {
     const ref = this.dialog.open(MitarbeiterBearbeitenDialog, {
       width: '700px',
@@ -110,6 +144,9 @@ export class BearbeitenComponent implements OnInit {
   }
 }
 
+/**
+ * Dialog component for editing an employee's details.
+ */
 @Component({
   selector: 'mitarbeiter-bearbeiten-dialog',
   standalone: true,
@@ -124,9 +161,8 @@ export class BearbeitenComponent implements OnInit {
   ],
   template: `
     <h2 mat-dialog-title>Mitarbeiter bearbeiten</h2>
-    <mat-dialog-content [formGroup]="f">
+    <mat-dialog-content [formGroup]="form">
       <form class="bearbeiten-form">
-        <!-- Persönliche Daten -->
         <mat-form-field class="full-width">
           <mat-label>Vorname</mat-label>
           <input matInput formControlName="vorname" />
@@ -135,7 +171,6 @@ export class BearbeitenComponent implements OnInit {
           <mat-label>Nachname</mat-label>
           <input matInput formControlName="name" />
         </mat-form-field>
-        <!-- Eintritt & Arbeitsverhältnis -->
         <mat-form-field class="full-width">
           <mat-label>Eintritt</mat-label>
           <input matInput type="date" formControlName="eintritt" />
@@ -147,7 +182,6 @@ export class BearbeitenComponent implements OnInit {
             <mat-option value="Unbefristet">Unbefristet</mat-option>
           </mat-select>
         </mat-form-field>
-        <!-- Befristungen & Verlängerungen -->
         <mat-form-field class="full-width">
           <mat-label>Befristung Anfang</mat-label>
           <input matInput type="date" formControlName="befristung" />
@@ -156,7 +190,6 @@ export class BearbeitenComponent implements OnInit {
           <mat-label>Befristung Max</mat-label>
           <input matInput type="date" formControlName="befristungMax" />
         </mat-form-field>
-        <!-- Organisatorisches -->
         <mat-form-field class="full-width">
           <mat-label>Kostenstelle</mat-label>
           <input matInput formControlName="kostenstelle" />
@@ -168,7 +201,6 @@ export class BearbeitenComponent implements OnInit {
             <mat-option value="Indirekt">Indirekt</mat-option>
           </mat-select>
         </mat-form-field>
-        <!-- Arbeitsumfang -->
         <mat-form-field class="full-width">
           <mat-label>FTE</mat-label>
           <input matInput type="number" formControlName="fte" min="0" max="1" step="0.01" />
@@ -180,7 +212,6 @@ export class BearbeitenComponent implements OnInit {
             <mat-option [value]="false">Nein</mat-option>
           </mat-select>
         </mat-form-field>
-        <!-- Austritt & Grund -->
         <mat-form-field class="full-width">
           <mat-label>Exit Reason</mat-label>
           <mat-select formControlName="exitReasonId">
@@ -209,7 +240,7 @@ export class BearbeitenComponent implements OnInit {
     </mat-dialog-content>
     <mat-dialog-actions align="end" class="actions">
       <button mat-button (click)="abbrechen()">Abbrechen</button>
-      <button mat-flat-button color="primary" (click)="speichern()" [disabled]="f.invalid">
+      <button mat-flat-button color="primary" (click)="speichern()" [disabled]="form.invalid">
         Speichern
       </button>
     </mat-dialog-actions>
@@ -220,7 +251,13 @@ export class BearbeitenComponent implements OnInit {
   `]
 })
 export class MitarbeiterBearbeitenDialog {
-  f: FormGroup;
+  /**
+   * The form group for editing employee data.
+   */
+  form: FormGroup;
+  /**
+   * List of available exit reasons for an employee.
+   */
   exitReasons: ExitReasonDto[] = [];
 
   constructor(
@@ -229,7 +266,7 @@ export class MitarbeiterBearbeitenDialog {
     public dialogRef: MatDialogRef<MitarbeiterBearbeitenDialog>,
     @Inject(MAT_DIALOG_DATA) public data: EmployeeDto
   ) {
-    this.f = this.fb.group({
+    this.form = this.fb.group({
       vorname:          [data.vorname, Validators.required],
       name:             [data.name, Validators.required],
       eintritt:         [data.eintritt, Validators.required],
@@ -252,11 +289,18 @@ export class MitarbeiterBearbeitenDialog {
     this.svc.getExitReasons().subscribe({ next: list => this.exitReasons = list, error: () => this.exitReasons = [] });
   }
 
+  /**
+   * Saves the changes made to the employee.
+   * If the form is valid, it sends the updated data to the service and closes the dialog.
+   */
   speichern(): void {
-    if (this.f.invalid) return;
-    const updateDto: EmployeeDto = { ...this.data, ...this.f.value };
-    this.svc.updateMitarbeiter(updateDto.employeeId!, updateDto).subscribe({ next: () => this.dialogRef.close(true), error: err => console.error('Update-Fehler', err) });
+    if (this.form.invalid) return;
+    const updateDto: EmployeeDto = { ...this.data, ...this.form.value };
+    this.svc.updateMitarbeiter(updateDto.employeeId!, updateDto).subscribe({ next: () => this.dialogRef.close(true), error: err => console.error('Update failed', err) });
   }
 
+  /**
+   * Closes the dialog without saving any changes.
+   */
   abbrechen(): void { this.dialogRef.close(false); }
 }

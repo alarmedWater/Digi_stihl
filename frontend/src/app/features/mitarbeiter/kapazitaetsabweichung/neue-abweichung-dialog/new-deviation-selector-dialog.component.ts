@@ -1,4 +1,3 @@
-// src/app/features/mitarbeiter/kapazitaetsabweichung/new-deviation-selector-dialog.component.ts
 import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -11,10 +10,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { EmployeeDto } from '../../models/employee';
 import { MitarbeiterService } from '../../services/mitarbeiter.service';
 
+/**
+ * Interface for the result returned when the NewDeviationSelectorDialogComponent is closed.
+ */
 export interface NewDeviationSelectorResult {
+  /** The ID of the selected employee. */
   employeeId: number;
 }
 
+/**
+ * Dialog component for selecting an employee to create a new capacity deviation.
+ * Allows searching and selecting an employee from a list.
+ */
 @Component({
   selector: 'app-new-deviation-selector-dialog',
   standalone: true,
@@ -42,10 +49,11 @@ export interface NewDeviationSelectorResult {
   ]
 })
 export class NewDeviationSelectorDialogComponent implements OnInit {
+  /** The form group for the employee selection. */
   form!: FormGroup;
-  /** Alle Mitarbeitenden */
+  /** All employees fetched from the service. */
   allEmployees: EmployeeDto[] = [];
-  /** Gefilterte Liste nach Name */
+  /** Employees filtered based on the search query. */
   filteredEmployees: EmployeeDto[] = [];
 
   constructor(
@@ -55,35 +63,46 @@ export class NewDeviationSelectorDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: { mitarbeiter: EmployeeDto[] }
   ) {}
 
+  /**
+   * Initializes the component and sets up the form and employee data loading.
+   */
   ngOnInit(): void {
     this.form = this.fb.group({
       search:     ['', Validators.minLength(1)],
       employeeId: [null, Validators.required]
     });
 
-    // Lade alle Mitarbeiter aus dem Service
+    // Load all employees from the service.
     this.mitarbeiterService.getMitarbeiter().subscribe(list => {
       this.allEmployees = list;
       this.filteredEmployees = [...this.allEmployees];
     });
 
-    // Filter per Name
+    // Apply filter by name when search query changes.
     this.form.get('search')!.valueChanges.subscribe(query => {
       const q = (query || '').toLowerCase();
       this.filteredEmployees = this.allEmployees.filter(e =>
         (`${e.vorname} ${e.name}`).toLowerCase().includes(q)
       );
-      // Rücksetzen der Auswahl
+      // Reset selected employee when search query changes.
       this.form.get('employeeId')!.reset(null);
     });
   }
 
+  /**
+   * Handles the "Next" action.
+   * Closes the dialog with the selected employee ID if the form is valid.
+   */
   onNext(): void {
     if (this.form.valid) {
       this.dialogRef.close({ employeeId: this.form.value.employeeId });
     }
   }
 
+  /**
+   * Handles the "Cancel" action.
+   * Closes the dialog without returning any data.
+   */
   onCancel(): void {
     this.dialogRef.close();
   }

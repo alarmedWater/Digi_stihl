@@ -1,4 +1,3 @@
-// src/app/features/mitarbeiter/kapazitaetsabweichung/kapazitaetsabweichung.component.ts
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -32,6 +31,9 @@ import { MitarbeiterService } from '../services/mitarbeiter.service';
 import { EmployeeDto } from '../models/employee';
 import { CreateCapacityDeviationDto } from '../models/capacity.dtos';
 
+/**
+ * Interface representing a capacity deviation for display in the table.
+ */
 interface AbweichungView {
   capacityDeviationId: number;
   employeeId: number;
@@ -42,6 +44,10 @@ interface AbweichungView {
   enddatum: Date;
 }
 
+/**
+ * Component for managing and displaying capacity deviations.
+ * Allows filtering, adding, editing, and deleting deviations, and exporting data.
+ */
 @Component({
   selector: 'app-kapazitaetsabweichung',
   standalone: true,
@@ -64,11 +70,26 @@ interface AbweichungView {
   styleUrls: ['./kapazitaetsabweichung.component.scss'],
 })
 export class KapazitaetsabweichungComponent implements OnInit, AfterViewInit {
+  /**
+   * Defines the columns to be displayed in the capacity deviation table.
+   */
   displayedColumns = ['name', 'zeitraum', 'kapazitaet', 'bemerkung', 'aktion'];
+  /**
+   * Data source for the MatTable, providing data to be rendered.
+   */
   dataSource = new MatTableDataSource<AbweichungView>();
+  /**
+   * Stores the list of all employees, used for mapping employee IDs to names.
+   */
   private employees: EmployeeDto[] = [];
 
+  /**
+   * Reference to the MatPaginator component for pagination controls.
+   */
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+  /**
+   * Reference to the MatSort component for sorting table columns.
+   */
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
@@ -78,20 +99,31 @@ export class KapazitaetsabweichungComponent implements OnInit, AfterViewInit {
     private mitarbeiterService: MitarbeiterService
   ) {}
 
+  /**
+   * Initializes the component.
+   * Sets up the filter predicate for the data source and loads initial data.
+   */
   ngOnInit(): void {
-    // Filter-Logik (Name oder Bemerkung)
+    // Filter logic: filter by employee name or remark.
     this.dataSource.filterPredicate = (data, filter) =>
       data.name.toLowerCase().includes(filter) ||
       (data.bemerkung?.toLowerCase().includes(filter) ?? false);
     this.loadData();
   }
 
+  /**
+   * Lifecycle hook called after the component's view has been fully initialized.
+   * Assigns the paginator and sort to the data source.
+   */
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
 
-  /** Lädt Mitarbeitende und Abweichungen und befüllt die Tabelle */
+  /**
+   * Loads employee and capacity deviation data from services and populates the table.
+   * Handles errors during data loading and displays a snackbar notification.
+   */
   private loadData(): void {
     forkJoin({
       emps: this.mitarbeiterService.getMitarbeiter(),
@@ -99,7 +131,7 @@ export class KapazitaetsabweichungComponent implements OnInit, AfterViewInit {
     })
       .pipe(
         catchError((err) => {
-          this.snackBar.open('Fehler beim Laden der Daten', 'Schließen', { duration: 3000 });
+          this.snackBar.open('Error loading data', 'Close', { duration: 3000 });
           return throwError(() => err);
         })
       )
@@ -120,14 +152,21 @@ export class KapazitaetsabweichungComponent implements OnInit, AfterViewInit {
       });
   }
 
-  /** Wendet den Textfilter auf die Tabelle an */
+  /**
+   * Applies a text filter to the table data.
+   * @param event The input event from the filter field.
+   */
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
     this.dataSource.filter = filterValue;
     this.dataSource.paginator?.firstPage();
   }
 
-  /** Öffnet erst den Auswahl- und dann den Detail-Dialog für eine neue Abweichung */
+  /**
+   * Opens a dialog to select an employee for a new capacity deviation,
+   * then opens another dialog to enter the deviation details.
+   * Creates the new deviation via the capacity service.
+   */
   neueAbweichung(): void {
   this.dialog
     .open<NewDeviationSelectorDialogComponent, void, NewDeviationSelectorResult>(
@@ -139,7 +178,7 @@ export class KapazitaetsabweichungComponent implements OnInit, AfterViewInit {
       if (!res?.employeeId) {
         return;
       }
-      // Vorkonfiguriertes Abweichungs‐Objekt
+      // Pre-configure the deviation object with initial values.
       const initialAbweichung: AbweichungData = {
         employeeId:     res.employeeId,
         startdatum:     new Date(),
@@ -173,19 +212,23 @@ export class KapazitaetsabweichungComponent implements OnInit, AfterViewInit {
           };
           this.capacityService.createAbweichung(dto).pipe(
             catchError(err => {
-              this.snackBar.open('Fehler beim Erstellen', 'Schließen', { duration: 3000 });
+              this.snackBar.open('Error creating deviation', 'Close', { duration: 3000 });
               return throwError(() => err);
             }),
             finalize(() => {
               this.loadData();
-              this.snackBar.open('Abweichung erstellt', 'OK', { duration: 2000 });
+              this.snackBar.open('Deviation created', 'OK', { duration: 2000 });
             })
           ).subscribe();
         });
     });
 }
 
-  
+  /**
+   * Opens a dialog to edit an existing capacity deviation.
+   * Updates the deviation via the capacity service upon dialog close.
+   * @param row The deviation data to be edited.
+   */
 bearbeiten(row: AbweichungView): void {
   const payload: AbweichungData = {
     id:             row.capacityDeviationId,
@@ -215,31 +258,38 @@ bearbeiten(row: AbweichungView): void {
         };
         this.capacityService.updateAbweichung(row.capacityDeviationId, dto).pipe(
           catchError(err => {
-            this.snackBar.open('Fehler beim Aktualisieren', 'Schließen', { duration: 3000 });
+            this.snackBar.open('Error updating deviation', 'Close', { duration: 3000 });
             return throwError(() => err);
           }),
           finalize(() => {
             this.loadData();
-            this.snackBar.open('Abweichung aktualisiert', 'OK', { duration: 2000 });
+            this.snackBar.open('Deviation updated', 'OK', { duration: 2000 });
           })
         ).subscribe();
       });
   }
+  /**
+   * Deletes a capacity deviation after user confirmation.
+   * @param row The deviation to be deleted.
+   * @param event The mouse event that triggered the deletion.
+   */
   loeschen(row: AbweichungView, event: MouseEvent): void {
     event.stopPropagation();
-    if (!confirm(`Löschen der Abweichung von ${row.name}?`)) return;
+    if (!confirm(`Delete deviation for ${row.name}?`)) return;
 
     this.capacityService
       .deleteAbweichung(row.capacityDeviationId)
       .pipe(finalize(() => this.loadData()))
       .subscribe(() =>
-        this.snackBar.open('Abweichung gelöscht', 'OK', { duration: 2000 })
+        this.snackBar.open('Deviation deleted', 'OK', { duration: 2000 })
       );
   }
 
-  /** Exportiert die aktuell sichtbaren Abweichungen als CSV-Datei */
+  /**
+   * Exports the currently displayed capacity deviations to a CSV file.
+   */
   exportieren(): void {
-    const header = ['Name', 'Startdatum', 'Enddatum', 'Neue Kapazität', 'Bemerkung'];
+    const header = ['Name', 'Start Date', 'End Date', 'New Capacity', 'Remark'];
     const rows = this.dataSource.data.map((d) => [
       d.name,
       d.startdatum.toISOString().slice(0, 10),
@@ -262,7 +312,7 @@ bearbeiten(row: AbweichungView): void {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'abweichungen.csv';
+    a.download = 'deviations.csv';
     a.click();
     URL.revokeObjectURL(url);
   }

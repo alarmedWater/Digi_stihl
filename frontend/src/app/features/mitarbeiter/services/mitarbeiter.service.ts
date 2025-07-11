@@ -1,4 +1,3 @@
-// src/app/services/mitarbeiter.service.ts
 import { Injectable } from '@angular/core';
 import {
   HttpClient,
@@ -19,27 +18,32 @@ import { EmployeeFilterDto } from '../models/employee-filter';
 import { EmployeeCreateDto } from '../models/employee-create';
 import { ExitReasonDto } from '../models/exit-reason';
 
+/**
+ * Service for managing employee-related operations.
+ * Provides methods to interact with the employee API, including CRUD operations and fetching exit reasons.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class MitarbeiterService {
-  /** Basis-URL für die Employees-API */
+  /** Base URL for the Employees API. */
   private readonly baseUrl = `${environment.apiUrl}/Employees`;
-  /** Gemeinsame JSON-Header für POST/PUT */
+  /** Common JSON headers for POST/PUT requests. */
   private readonly jsonHeaders = new HttpHeaders({
     'Content-Type': 'application/json'
   });
 
-  /** Subject, das nach jeder Änderung feuert */
+  /** Subject that emits a signal after any data modification (create/update/delete) to trigger UI refreshes. */
   private _refresh$ = new BehaviorSubject<void>(undefined);
-  /** Öffentliches Observable zum Abonnieren */
+  /** Public Observable to subscribe to for data refresh notifications. */
   public readonly refresh$ = this._refresh$.asObservable();
 
   constructor(private http: HttpClient) {}
 
   /**
-   * Liefert alle Mitarbeitenden (optional gefiltert)
-   * @param filters DTO mit Filteroptionen
+   * Retrieves all employees, optionally filtered.
+   * @param filters DTO containing filter options.
+   * @returns An Observable that emits an array of EmployeeDto objects.
    */
   getMitarbeiter(filters?: EmployeeFilterDto): Observable<EmployeeDto[]> {
     let params = new HttpParams();
@@ -53,35 +57,37 @@ export class MitarbeiterService {
     return this.http
       .get<EmployeeDto[]>(this.baseUrl, { params })
       .pipe(
-        tap(list => console.debug('Fetched Mitarbeitende:', list)),
+        tap(list => console.debug('Fetched employees:', list)),
         catchError(this.handleError)
       );
   }
 
   /**
-   * Holt einen einzelnen Mitarbeitenden nach ID
-   * @param id Mitarbeiter-ID
+   * Retrieves a single employee by ID.
+   * @param id The ID of the employee.
+   * @returns An Observable that emits an EmployeeDto object.
    */
   getMitarbeiterById(id: number): Observable<EmployeeDto> {
     return this.http
       .get<EmployeeDto>(`${this.baseUrl}/${id}`)
       .pipe(
-        tap(emp => console.debug(`Fetched Mitarbeiter ${id}:`, emp)),
+        tap(emp => console.debug(`Fetched employee ${id}:`, emp)),
         catchError(this.handleError)
       );
   }
 
   /**
-   * Legt einen neuen Mitarbeitenden an
-   * und feuert anschließend ein Refresh-Signal
-   * @param emp Payload für neuen Mitarbeitenden
+   * Creates a new employee.
+   * Emits a refresh signal after successful creation.
+   * @param emp Payload for the new employee.
+   * @returns An Observable that emits the created EmployeeDto object.
    */
   createMitarbeiter(emp: EmployeeCreateDto): Observable<EmployeeDto> {
     return this.http
       .post<EmployeeDto>(this.baseUrl, emp, { headers: this.jsonHeaders })
       .pipe(
         tap(created => {
-          console.debug('Created Mitarbeiter:', created);
+          console.debug('Created employee:', created);
           this._refresh$.next();
         }),
         catchError(this.handleError)
@@ -89,17 +95,18 @@ export class MitarbeiterService {
   }
 
   /**
-   * Aktualisiert einen bestehenden Mitarbeitenden
-   * und feuert anschließend ein Refresh-Signal
-   * @param id ID des zu aktualisierenden Mitarbeitenden
-   * @param emp Die neuen Daten
+   * Updates an existing employee.
+   * Emits a refresh signal after successful update.
+   * @param id The ID of the employee to update.
+   * @param emp The updated employee data.
+   * @returns An Observable that emits the updated EmployeeDto object.
    */
   updateMitarbeiter(id: number, emp: EmployeeDto): Observable<EmployeeDto> {
     return this.http
       .put<EmployeeDto>(`${this.baseUrl}/${id}`, emp, { headers: this.jsonHeaders })
       .pipe(
         tap(updated => {
-          console.debug(`Updated Mitarbeiter ${id}:`, updated);
+          console.debug(`Updated employee ${id}:`, updated);
           this._refresh$.next();
         }),
         catchError(this.handleError)
@@ -107,16 +114,17 @@ export class MitarbeiterService {
   }
 
   /**
-   * Löscht einen Mitarbeitenden
-   * und feuert anschließend ein Refresh-Signal
-   * @param id ID des zu löschenden Mitarbeitenden
+   * Deletes an employee.
+   * Emits a refresh signal after successful deletion.
+   * @param id The ID of the employee to delete.
+   * @returns An Observable that emits void upon successful deletion.
    */
   deleteMitarbeiter(id: number): Observable<void> {
     return this.http
       .delete<void>(`${this.baseUrl}/${id}`)
       .pipe(
         tap(() => {
-          console.debug(`Deleted Mitarbeiter ${id}`);
+          console.debug(`Deleted employee ${id}`);
           this._refresh$.next();
         }),
         catchError(this.handleError)
@@ -124,7 +132,8 @@ export class MitarbeiterService {
   }
 
   /**
-   * Holt alle Austrittsgründe
+   * Retrieves all exit reasons.
+   * @returns An Observable that emits an array of ExitReasonDto objects.
    */
   getExitReasons(): Observable<ExitReasonDto[]> {
     return this.http
@@ -136,11 +145,13 @@ export class MitarbeiterService {
   }
 
   /**
-   * Zentrale Fehlerbehandlung für HTTP-Calls
-   * @param error das HTTP-Fehlerobjekt
+   * Centralized error handling for HTTP calls.
+   * Logs the error and throws a new error with a user-friendly message.
+   * @param error The HTTP error object.
+   * @returns An Observable that emits an error.
    */
   private handleError(error: HttpErrorResponse) {
-    console.error('API-Error:', error);
+    console.error('API Error:', error);
     const msg =
       error.error?.detail ||
       error.error?.message ||

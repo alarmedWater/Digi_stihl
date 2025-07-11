@@ -1,4 +1,3 @@
-// src/app/features/mitarbeiter/components/anlegen/anlegen.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -19,6 +18,10 @@ import { MitarbeiterService } from '../../services/mitarbeiter.service';
 import { EmployeeCreateDto }  from '../../models/employee-create';
 import { ExitReasonDto }      from '../../models/exit-reason';
 
+/**
+ * Component for creating new employee records.
+ * Provides a form to input employee details and submit them to the backend.
+ */
 @Component({
   selector: 'app-anlegen',
   standalone: true,
@@ -40,11 +43,16 @@ import { ExitReasonDto }      from '../../models/exit-reason';
   styleUrls: ['./anlegen.component.scss']
 })
 export class AnlegenComponent implements OnInit {
+  /** The form group for the new employee data. */
   mitarbeiterForm!: FormGroup;
+  /** Status of the form submission, used for feedback. */
   submitStatus: 'idle' | 'success' | 'error' = 'idle';
 
+  /** Available employment areas (e.g., Direct, Indirect). */
   bereiche = ['Direkt', 'Indirekt'];
+  /** Available employment relationship types (e.g., Fixed-term, Permanent). */
   arbeitsverhaeltnisse = ['Befristet', 'Unbefristet'];
+  /** List of possible exit reasons, fetched from the backend. */
   exitReasons: ExitReasonDto[] = [];
 
   constructor(
@@ -54,8 +62,12 @@ export class AnlegenComponent implements OnInit {
     private snack: MatSnackBar
   ) {}
 
+  /**
+   * Initializes the component.
+   * Sets up the employee creation form with validators and loads exit reasons.
+   */
   ngOnInit(): void {
-    // Formular initialisieren
+    // Initialize the form with default values and validators.
     this.mitarbeiterForm = this.fb.group({
       vorname:            ['', Validators.required],
       name:               ['', Validators.required],
@@ -72,25 +84,30 @@ export class AnlegenComponent implements OnInit {
       bemerkung:          ['']
     });
 
-    // ExitReasons vom Backend laden (Fallback auf Hardcoded-Liste bei Fehler)
+    // Load exit reasons from the backend. Fallback to a hardcoded list on error.
     this.service.getExitReasons().subscribe({
       next: list => this.exitReasons = list,
       error: () => {
-        console.warn('ExitReasons konnten nicht geladen werden, verwende Default.');
+        console.warn('Exit reasons could not be loaded, using default list.');
         this.exitReasons = [
-          { exitReasonId: 1, reason: 'AN_Kuendigung',  description: 'Eigenkündigung' },
-          { exitReasonId: 2, reason: 'AG_Kuendigung',  description: 'Kündigung durch Arbeitgeber' },
-          { exitReasonId: 3, reason: 'Altersteilzeit', description: 'Eintritt in Altersteilzeit' },
-          { exitReasonId: 4, reason: 'Ruhestand',     description: 'Ruhestand' },
-          { exitReasonId: 5, reason: 'Probezeitende',  description: 'Ende der Probezeit' }
+          { exitReasonId: 1, reason: 'AN_Kuendigung',  description: 'Employee Resignation' },
+          { exitReasonId: 2, reason: 'AG_Kuendigung',  description: 'Employer Termination' },
+          { exitReasonId: 3, reason: 'Altersteilzeit', description: 'Entry into Partial Retirement' },
+          { exitReasonId: 4, reason: 'Ruhestand',     description: 'Retirement' },
+          { exitReasonId: 5, reason: 'Probezeitende',  description: 'End of Probation Period' }
         ];
       }
     });
   }
 
+  /**
+   * Handles the form submission.
+   * Validates the form, constructs the DTO, and sends it to the service to create a new employee.
+   * Provides user feedback via snackbar and navigates after successful submission.
+   */
   onSubmit(): void {
     if (this.mitarbeiterForm.invalid) {
-      this.snack.open('Bitte alle Pflichtfelder ausfüllen', 'OK', { duration: 3000 });
+      this.snack.open('Please fill in all required fields', 'OK', { duration: 3000 });
       return;
     }
 
@@ -113,24 +130,30 @@ export class AnlegenComponent implements OnInit {
 
     this.service.createMitarbeiter(dto).subscribe({
       next: () => {
-        this.giveFeedback('success', '✔ Mitarbeiter erfolgreich angelegt!');
-        // Nach 3 Sek. zurück zur Liste navigieren
+        this.giveFeedback('success', '✔ Employee successfully created!');
+        // Navigate back to the employee list after 3 seconds.
         setTimeout(() => this.router.navigate(['/mitarbeiter']), 3000);
       },
       error: err => {
-        const msg = err.error?.detail || err.message || 'Unbekannter Fehler';
+        const msg = err.error?.detail || err.message || 'Unknown error';
         this.giveFeedback('error', `✖ ${msg}`);
       }
     });
   }
 
+  /**
+   * Displays a snackbar message to provide feedback to the user.
+   * Sets the submit status and clears it after a duration.
+   * @param status The type of feedback: 'success' or 'error'.
+   * @param message The message to display.
+   */
   private giveFeedback(status: 'success'|'error', message: string) {
     this.submitStatus = status;
     this.snack.open(message, 'OK', {
       duration: 3000,
       panelClass: status === 'error' ? ['snackbar-error'] : undefined
     });
-    // Status nach Ablauf zurücksetzen
+    // Reset status after duration.
     setTimeout(() => this.submitStatus = 'idle', 3000);
   }
 }

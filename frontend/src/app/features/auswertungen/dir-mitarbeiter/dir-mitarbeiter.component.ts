@@ -1,4 +1,3 @@
-// src/app/features/mitarbeiter/dir-mitarbeiter/dir-mitarbeiter.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule }        from '@angular/common';
 import { FormsModule }         from '@angular/forms';
@@ -14,29 +13,29 @@ import {
 import { CapacityService } from '../../mitarbeiter/services/capacity.service';
 
 /**
- * Ein einzelner Mitarbeiter mit seinen 24-Monats-FTE-Werten.
+ * Represents a single employee entry with their 24-month FTE values.
  */
 interface MitarbeiterEintrag {
   name: string;
-  fte:  number[];  // 24 Werte
+  fte:  number[];  // 24 values
 }
 
 /**
- * Block-Definition pro Abteilung:
- * - Name der Abteilung
- * - Anzahl Köpfe in der Abteilung
- * - Zwischensumme FTE pro Monat
- * - Gesamtsumme FTE über 24 Monate
- * - Liste der einzelnen Mitarbeitereinträge
+ * Defines a block of data per department for the direct capacity overview.
+ * Includes department name, headcount, monthly FTE subtotals, total FTE, and a list of employees.
  */
 interface AbteilungsBlock {
   departmentName: string;
   headCount:      number;
-  subtotalFte:    number[];          // 24 Werte
-  totalFte:       number;            // Summe aller subtotalFte
+  subtotalFte:    number[];          // 24 values
+  totalFte:       number;            // Sum of all subtotalFte
   employees:      MitarbeiterEintrag[];
 }
 
+/**
+ * Component for displaying the direct employee capacity overview.
+ * It fetches capacity data and organizes it by department, showing FTE values over 24 months.
+ */
 @Component({
   selector: 'app-dir-mitarbeiter',
   standalone: true,
@@ -51,22 +50,27 @@ interface AbteilungsBlock {
   styleUrls: ['./dir-mitarbeiter.component.scss']
 })
 export class DirMitarbeiterComponent implements OnInit {
-  /** Beschriftungen für die nächsten 24 Monate im Header */
+  /** Labels for the next 24 months, used in the table header. */
   monateLabels:     string[]           = [];
 
-  /** Spaltennamen: zuerst Name, dann monat1…monat24 */
+  /** Column names: first 'name', then 'month1' through 'month24'. */
   displayedColumns: string[]           = ['name', ...Array.from({ length: 24 }, (_, i) => `monat${i+1}`)];
 
-  /** Alle Abteilungsblöcke aus dem API-Datenmodell */
+  /** All department blocks derived from the API data model. */
   abteilungen:      AbteilungsBlock[]  = [];
 
-  /** Gefilterter Name der gewählten Abteilung */
+  /** The currently selected department name for filtering. */
   gewaehlteAbteilung = '';
 
   constructor(private capacityService: CapacityService) {}
 
+  /**
+   * Initializes the component.
+   * 1. Generates month labels for the next 24 months.
+   * 2. Loads the direct capacity overview data from the service.
+   */
   ngOnInit(): void {
-    // 1) Erzeuge Monats-Labels
+    // 1) Generate month labels
     const heute = new Date();
     for (let i = 0; i < 24; i++) {
       const m = new Date(heute.getFullYear(), heute.getMonth() + i, 1);
@@ -75,17 +79,18 @@ export class DirMitarbeiterComponent implements OnInit {
       );
     }
 
-    // 2) Lade die direkte Kapazitätsübersicht vom Service
+    // 2) Load the direct capacity overview from the service
     const startYear  = heute.getFullYear();
-    const startMonth = heute.getMonth() + 1;  // Angular erwartet 1–12
+    const startMonth = heute.getMonth() + 1;  // Angular expects 1-12
     this.capacityService
       .getDirectOverview(startYear, startMonth)
       .subscribe(dto => this.buildAbteilungsBlocks(dto));
   }
 
   /**
-   * Wandelt das DirectCapacityOverviewDto in unser Anzeigenmodell um:
-   * für jede Abteilung einen Block mit Mitarbeitern und Summen.
+   * Transforms the DirectCapacityOverviewDto into our display model:
+   * a block for each department with employees and their FTE sums.
+   * @param dto The DirectCapacityOverviewDto received from the service.
    */
   private buildAbteilungsBlocks(dto: DirectCapacityOverviewDto): void {
     this.abteilungen = dto.departments.map((dept: DepartmentCapacityOverviewDto) => {
@@ -105,8 +110,8 @@ export class DirMitarbeiterComponent implements OnInit {
   }
 
   /**
-   * Liefert nur die Abteilungsblöcke, die zur gewählten Abteilung passen.
-   * Wird im Template über *ngFor genutzt.
+   * Returns only the department blocks that match the selected department.
+   * Used in the template with *ngFor.
    */
   get gefilterteAbteilungen(): AbteilungsBlock[] {
     return this.gewaehlteAbteilung

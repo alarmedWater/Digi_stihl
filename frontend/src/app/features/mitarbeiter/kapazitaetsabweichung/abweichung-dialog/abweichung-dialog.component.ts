@@ -1,4 +1,3 @@
-// src/app/features/mitarbeiter/kapazitaetsabweichung/abweichung-dialog/abweichung-dialog.component.ts
 import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -13,25 +12,37 @@ import { MatButtonModule } from '@angular/material/button';
 import { EmployeeDto } from '../../models/employee';
 
 /**
- * Payload, das der aufrufende Component dem Dialog übergibt.
- * - `abweichung` enthält ggf. die zu bearbeitende Abweichung
- * - `mitarbeiter` ist die Liste aller Mitarbeiter für das Dropdown
+ * Payload passed to the AbweichungDialogComponent.
+ * - `abweichung` (optional) contains the deviation data to be edited.
+ * - `mitarbeiter` is the list of all employees for the dropdown selection.
  */
 export interface AbweichungDialogData {
   abweichung?: AbweichungData;
   mitarbeiter: EmployeeDto[];
 }
 
-/** Struktur der Abweichungsdaten, die zurückgegeben werden */
+/**
+ * Structure of the deviation data returned by the dialog.
+ */
 export interface AbweichungData {
+  /** Optional: The ID of the capacity deviation. Present if editing an existing deviation. */
   id?: number;
+  /** The ID of the employee associated with the deviation. */
   employeeId:    number;
+  /** The start date of the deviation. */
   startdatum:    Date;
+  /** The end date of the deviation. */
   enddatum:      Date;
+  /** The new capacity value for the employee during the deviation period. */
   neueKapazitaet:number;
+  /** Remarks or notes about the deviation. */
   bemerkung:     string;
 }
 
+/**
+ * Dialog component for creating or editing a capacity deviation.
+ * Provides a form to input deviation details and select an employee.
+ */
 @Component({
   selector: 'app-abweichung-dialog',
   standalone: true,
@@ -50,10 +61,10 @@ export interface AbweichungData {
   styleUrls: ['./abweichung-dialog.component.scss'],
 })
 export class AbweichungDialogComponent implements OnInit {
-  /** Reactive-Form für die Abweichung */
+  /** The reactive form group for the capacity deviation. */
   abweichungForm!: FormGroup;
 
-  /** Liste aller Mitarbeiter für das Dropdown */
+  /** The list of all employees available for selection in the dropdown. */
   mitarbeiterListe: EmployeeDto[] = [];
 
   constructor(
@@ -62,6 +73,10 @@ export class AbweichungDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: AbweichungDialogData
   ) {}
 
+  /**
+   * Initializes the component.
+   * Sets up the employee list and initializes the form with existing data if provided.
+   */
   ngOnInit(): void {
     this.mitarbeiterListe = this.data.mitarbeiter;
     this.abweichungForm = this.fb.group({
@@ -73,7 +88,10 @@ export class AbweichungDialogComponent implements OnInit {
     });
   }
 
-  /** Schließt den Dialog und liefert die vollständigen Daten zurück, inkl. id */
+  /**
+   * Handles the save action.
+   * Closes the dialog and returns the complete deviation data, including the ID if editing.
+   */
   onSpeichern(): void {
     if (this.abweichungForm.valid) {
       const formValues = this.abweichungForm.value as Omit<AbweichungData, 'id'>;
@@ -85,7 +103,10 @@ export class AbweichungDialogComponent implements OnInit {
     }
   }
 
-  /** Schließt den Dialog ohne Rückgabe */
+  /**
+   * Handles the cancel action.
+   * Closes the dialog without returning any data.
+   */
   onAbbrechen(): void {
     this.dialogRef.close();
   }

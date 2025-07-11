@@ -1,4 +1,3 @@
-// src/app/features/mitarbeiter/indir-mitarbeiter/indir-mitarbeiter.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule }        from '@angular/common';
 import { FormsModule }         from '@angular/forms';
@@ -12,21 +11,29 @@ import {
 } from '../../mitarbeiter/models/capacity.dtos';
 import { CapacityService } from '../../mitarbeiter/services/capacity.service';
 
-/** Ein einzelner Mitarbeiter mit seinen 24-Monats-FTE-Werten */
+/**
+ * Represents a single employee entry with their 24-month FTE values.
+ */
 interface MitarbeiterEintrag {
   name: string;
-  fte:  number[]; // 24 Werte
+  fte:  number[]; // 24 values
 }
 
-/** Block-Definition pro Abteilung */
+/**
+ * Defines a block of data per department for capacity overview.
+ */
 interface AbteilungsBlock {
   departmentName: string;
   headCount:      number;
-  subtotalFte:    number[]; // 24 Werte
+  subtotalFte:    number[]; // 24 values
   totalFte:       number;
   employees:      MitarbeiterEintrag[];
 }
 
+/**
+ * Component for displaying the indirect employee capacity overview.
+ * It fetches capacity data and organizes it by department, showing FTE values over 24 months.
+ */
 @Component({
   selector: 'app-indir-mitarbeiter',
   standalone: true,
@@ -40,30 +47,43 @@ interface AbteilungsBlock {
   styleUrls: ['./indir-mitarbeiter.component.scss']
 })
 export class IndirMitarbeiterComponent implements OnInit {
-  /** Labels für die nächsten 24 Monate im Header */
+  /**
+   * Labels for the next 24 months, used in the table header.
+   */
   monateLabels:       string[]           = [];
-  /** Alle Blöcke nach Abteilung */
+  /**
+   * All department blocks containing employee and FTE data.
+   */
   abteilungen:        AbteilungsBlock[]  = [];
-  /** Aktuell gewählte Abteilung für Filter */
+  /**
+   * The currently selected department for filtering.
+   */
   ausgewaehlteAbteilung = '';
 
   constructor(private capacityService: CapacityService) {}
 
+  /**
+   * Initializes the component.
+   * Generates month labels and loads indirect capacity overview data.
+   */
   ngOnInit(): void {
-    // Monats-Labels erzeugen
+    // Generate month labels for the next 24 months.
     const heute = new Date();
     for (let i = 0; i < 24; i++) {
       const m = new Date(heute.getFullYear(), heute.getMonth() + i, 1);
       this.monateLabels.push(m.toLocaleString('de-DE', { month: 'short', year: 'numeric' }));
     }
 
-    // Indirekte Übersicht laden
+    // Load indirect overview data from the capacity service.
     this.capacityService
       .getIndirectOverview(heute.getFullYear(), heute.getMonth() + 1)
       .subscribe(dto => this.buildAbteilungsBlocks(dto));
   }
 
-  /** Mappt DTO in Abteilungs-Blöcke */
+  /**
+   * Maps the DTO (Data Transfer Object) into department blocks for display.
+   * @param dto The IndirectCapacityOverviewDto received from the service.
+   */
   private buildAbteilungsBlocks(dto: IndirectCapacityOverviewDto): void {
     this.abteilungen = dto.departments.map((dept: DepartmentCapacityOverviewDto) => {
       const subtotal = dept.subtotalFte;
@@ -82,7 +102,10 @@ export class IndirMitarbeiterComponent implements OnInit {
     });
   }
 
-  /** Gefilterte Abteilungs-Blöcke gemäß Auswahl */
+  /**
+   * Returns the filtered department blocks based on the selected department.
+   * If no department is selected, all blocks are returned.
+   */
   get gefilterteAbteilungen(): AbteilungsBlock[] {
     if (!this.ausgewaehlteAbteilung) {
       return this.abteilungen;

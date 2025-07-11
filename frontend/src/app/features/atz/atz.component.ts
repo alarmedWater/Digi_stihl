@@ -1,4 +1,3 @@
-// src/app/features/mitarbeiter/components/atz/atz.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule }      from '@angular/common';
 import { FormsModule }       from '@angular/forms';
@@ -9,14 +8,19 @@ import { DepartmentService }  from '../mitarbeiter/services/department.service';
 import { EmployeeDto }        from '../mitarbeiter/models/employee';
 import { DepartmentDto }      from '../mitarbeiter/models/department';
 
-// Typ für unsere angezeigten ATZ-Einträge
-interface ATZMitarbeiter {
+/**
+ * Interface for displaying ATZ (partial retirement) entries.
+ */
+interface AtzMitarbeiter {
   name: string;
   abteilung: string;
   austrittsdatum: string;
   bemerkung: string;
 }
 
+/**
+ * Component to display employees in partial retirement (ATZ).
+ */
 @Component({
   selector: 'app-atz',
   standalone: true,
@@ -24,8 +28,14 @@ interface ATZMitarbeiter {
   templateUrl: './atz.component.html',
   styleUrls: ['./atz.component.scss']
 })
-export class ATZComponent implements OnInit {
-  atzMitarbeiter: ATZMitarbeiter[] = [];
+export class AtzComponent implements OnInit {
+  /**
+   * List of employees in partial retirement.
+   */
+  atzMitarbeiter: AtzMitarbeiter[] = [];
+  /**
+   * The search term for filtering the list.
+   */
   suchbegriff = '';
 
   constructor(
@@ -33,20 +43,23 @@ export class ATZComponent implements OnInit {
     private deptSvc: DepartmentService
   ) {}
 
+  /**
+   * Initializes the component by loading and processing employee and department data.
+   */
   ngOnInit(): void {
-    // parallel Empfänger-Daten und Abteilungen laden
+    // Load employee and department data in parallel.
     forkJoin({
       emps:  this.svc.getMitarbeiter(),
       depts: this.deptSvc.getDepartments()
     }).subscribe(({ emps, depts }) => {
-      // Map: Kostenstelle → Abteilungsname
+      // Create a map from cost center to department name.
       const deptMap = new Map<string,string>(
         depts.map(d => [d.kostenstelle, d.abteilungsname])
       );
-      // Nur ATZ (ExitReasonId === 3) filtern und umwandeln
-      const ATZ_ID = 3;
+      // Filter for employees with ExitReasonId === 3 (ATZ) and map to the display format.
+      const atzId = 3;
       this.atzMitarbeiter = emps
-        .filter(e => e.exitReasonId === ATZ_ID)
+        .filter(e => e.exitReasonId === atzId)
         .map(e => ({
           name: `${e.vorname} ${e.name}`,
           abteilung: e.kostenstelle
@@ -60,8 +73,10 @@ export class ATZComponent implements OnInit {
     });
   }
 
-  /** Live-Filter über Name, Abteilung oder Datum */
-  get gefilterteMitarbeiter(): ATZMitarbeiter[] {
+  /**
+   * Filters the employee list based on the search term (name, department, or date).
+   */
+  get gefilterteMitarbeiter(): AtzMitarbeiter[] {
     const q = this.suchbegriff.trim().toLowerCase();
     return this.atzMitarbeiter.filter(m =>
       m.name.toLowerCase().includes(q) ||
@@ -70,7 +85,11 @@ export class ATZComponent implements OnInit {
     );
   }
 
-  /** Kurzformat DD-MM-YYYY */
+  /**
+   * Formats an ISO date string to DD-MM-YYYY format.
+   * @param iso The ISO date string.
+   * @returns The formatted date string.
+   */
   private formatDatum(iso: string): string {
     const d = new Date(iso);
     const dd = String(d.getDate()).padStart(2,'0');
