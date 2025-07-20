@@ -124,7 +124,13 @@
     
     <ng-container matColumnDef="aktion">
       <th mat-header-cell *matHeaderCellDef> Aktionen </th>
-      <td mat-cell *matCellDef="let e"> <button mat-button (click)="bearbeiten(e)">Bearbeiten</button> </td>
+      <td mat-cell *matCellDef="let e">
+        <button mat-button (click)="bearbeiten(e)">Bearbeiten</button>
+        &nbsp;
+        <button mat-button color="warn" (click)="loeschen(e)">
+          Löschen
+        </button>
+      </td>
     </ng-container>
 
     

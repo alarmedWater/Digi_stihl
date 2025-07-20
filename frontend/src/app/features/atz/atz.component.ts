@@ -76,7 +76,7 @@ export class AtzComponent implements OnInit {
    * Filters the employee list based on the search term.
    * The search is performed across name, department, and exit date.
    */
-  get gefilterteMitarbeiter(): AtzMitarbeiter {
+  get gefilterteMitarbeiter(): AtzMitarbeiter[] {
     const q = this.suchbegriff.trim().toLowerCase();
     return this.atzMitarbeiter.filter(m =>
       m.name.toLowerCase().includes(q) ||

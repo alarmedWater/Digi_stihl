@@ -39,6 +39,9 @@ namespace Digi_Stihl.Data
                 new ExitReason { ExitReasonId = 5, Reason = ExitReasonType.Probezeitende,  Description = "End of probationary period" }
             );
 
+
+
+
             // Decimal-Precision for FluctuationReport
             modelBuilder.Entity<FluctuationReport>()
                 .Property(fr => fr.Fluktuationsrate)

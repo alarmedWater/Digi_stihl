@@ -1,3 +1,12 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Digi_Stihl.Data;
+using Digi_Stihl.Models;
+using Digi_Stihl.DTOs;
+using AutoMapper; 
+
 namespace Digi_Stihl.Repositories
 {
     /// <summary>

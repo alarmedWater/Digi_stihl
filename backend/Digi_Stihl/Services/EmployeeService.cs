@@ -1,3 +1,8 @@
+using Digi_Stihl.DTOs;           
+using Digi_Stihl.Repositories;   
+using AutoMapper;                
+using Digi_Stihl.Models; 
+
 namespace Digi_Stihl.Services
 {
     /// <summary>

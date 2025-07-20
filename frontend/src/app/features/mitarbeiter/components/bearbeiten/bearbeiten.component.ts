@@ -142,7 +142,21 @@ export class BearbeitenComponent implements OnInit {
       if (changed) this.loadMitarbeiter();
     });
   }
+  /**
+   * Löscht den Mitarbeiter nach Bestätigung und erneuert die Tabelle.
+   */
+  loeschen(emp: EmployeeWithDept): void {
+    if (!confirm(`Mitarbeiter ${emp.vorname} ${emp.name} wirklich löschen?`)) {
+      return;
+    }
+    this.svc.deleteMitarbeiter(emp.employeeId!).subscribe({
+      next: () => this.loadMitarbeiter(),
+      error: err => console.error('Löschen fehlgeschlagen', err)
+    });
+  }
 }
+
+
 
 /**
  * Dialog component for editing an employee's details.
