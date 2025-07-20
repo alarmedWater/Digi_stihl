@@ -10,23 +10,41 @@ using Digi_Stihl.Repositories;
 
 namespace Digi_Stihl.Services
 {
+    /// <summary>
+    /// Provides services for managing capacity deviations and overviews.
+    /// </summary>
     public class CapacityService : ICapacityService
     {
         private readonly ICapacityRepository _repo;
         private readonly IMapper             _mapper;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CapacityService"/> class.
+        /// </summary>
+        /// <param name="repo">The capacity repository.</param>
+        /// <param name="mapper">The AutoMapper instance.</param>
         public CapacityService(ICapacityRepository repo, IMapper mapper)
         {
             _repo   = repo;
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Retrieves a list of capacity deviations based on the provided filter criteria.
+        /// </summary>
+        /// <param name="filter">The filter criteria for capacity deviations.</param>
+        /// <returns>A list of capacity deviation DTOs.</returns>
         public async Task<IList<CapacityDeviationDto>> GetDeviationsAsync(CapacityFilterDto filter)
         {
             var entities = await _repo.GetDeviationsAsync(filter);
             return _mapper.Map<IList<CapacityDeviationDto>>(entities);
         }
 
+        /// <summary>
+        /// Retrieves a single capacity deviation by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the capacity deviation to retrieve.</param>
+        /// <returns>The capacity deviation DTO if found, otherwise null.</returns>
         public async Task<CapacityDeviationDto?> GetDeviationByIdAsync(int id)
         {
             var entity = await _repo.GetDeviationByIdAsync(id);
@@ -35,6 +53,12 @@ namespace Digi_Stihl.Services
                 : _mapper.Map<CapacityDeviationDto>(entity);
         }
 
+        /// <summary>
+        /// Creates a new capacity deviation.
+        /// </summary>
+        /// <param name="dto">The DTO containing data for the new capacity deviation.</param>
+        /// <returns>The created capacity deviation DTO.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if an overlapping deviation already exists for the employee and time period.</exception>
         public async Task<CapacityDeviationDto> CreateDeviationAsync(CreateCapacityDeviationDto dto)
         {
             var overlaps = await _repo.GetDeviationsAsync(new CapacityFilterDto
@@ -43,20 +67,27 @@ namespace Digi_Stihl.Services
                 EndDate   = dto.EndDate
             });
             if (overlaps.Any(d => d.EmployeeId == dto.EmployeeId))
-                throw new InvalidOperationException("Für diesen Zeitraum existieren bereits Abweichungen.");
+                throw new InvalidOperationException("An overlapping deviation already exists for this period.");
 
             var entity = _mapper.Map<CapacityDeviation>(dto);
             await _repo.AddDeviationAsync(entity);
             return _mapper.Map<CapacityDeviationDto>(entity);
         }
 
+        /// <summary>
+        /// Updates an existing capacity deviation.
+        /// </summary>
+        /// <param name="id">The ID of the capacity deviation to update.</param>
+        /// <param name="dto">The DTO containing updated data for the capacity deviation.</param>
+        /// <returns>The updated capacity deviation DTO.</returns>
+        /// <exception cref="KeyNotFoundException">Thrown if the deviation with the specified ID is not found.</exception>
         public async Task<CapacityDeviationDto> UpdateDeviationAsync(int id, CreateCapacityDeviationDto dto)
         {
             var entity = await _repo.GetDeviationByIdAsync(id);
             if (entity == null)
-                throw new KeyNotFoundException($"Deviation {id} nicht gefunden.");
+                throw new KeyNotFoundException($"Deviation {id} not found.");
 
-            // Werte überschreiben
+            // Overwrite values
             entity.StartDate      = dto.StartDate;
             entity.EndDate        = dto.EndDate;
             entity.NeueKapazitaet = dto.NeueKapazitaet;
@@ -66,9 +97,21 @@ namespace Digi_Stihl.Services
             return _mapper.Map<CapacityDeviationDto>(entity);
         }
 
+        /// <summary>
+        /// Retrieves the direct capacity overview for a specified year and month.
+        /// </summary>
+        /// <param name="startYear">The starting year for the overview.</param>
+        /// <param name="startMonth">The starting month for the overview.</param>
+        /// <returns>A DTO containing the direct capacity overview.</returns>
         public Task<DirectCapacityOverviewDto> GetDirectCapacityOverviewAsync(int startYear, int startMonth)
             => BuildOverviewAsync(BereichTyp.Direkt, startYear, startMonth);
 
+        /// <summary>
+        /// Retrieves the indirect capacity overview for a specified year and month.
+        /// </summary>
+        /// <param name="startYear">The starting year for the overview.</param>
+        /// <param name="startMonth">The starting month for the overview.</param>
+        /// <returns>A DTO containing the indirect capacity overview.</returns>
         public async Task<IndirectCapacityOverviewDto> GetIndirectCapacityOverviewAsync(int startYear, int startMonth)
         {
             var direct = await BuildOverviewAsync(BereichTyp.Indirekt, startYear, startMonth);
@@ -80,6 +123,13 @@ namespace Digi_Stihl.Services
             };
         }
 
+        /// <summary>
+        /// Builds a capacity overview for a given employee type, starting year, and month.
+        /// </summary>
+        /// <param name="bereich">The type of employee area (Direct or Indirect).</param>
+        /// <param name="startYear">The starting year for the overview.</param>
+        /// <param name="startMonth">The starting month for the overview.</param>
+        /// <returns>A DTO containing the capacity overview.</returns>
         private async Task<DirectCapacityOverviewDto> BuildOverviewAsync(BereichTyp bereich, int startYear, int startMonth)
         {
             var employees  = await _repo.GetEmployeesByTypeAsync(bereich);
@@ -120,7 +170,7 @@ namespace Digi_Stihl.Services
                             d.StartDate   <= monthDate &&
                             d.EndDate     >= monthDate);
 
-                        // Bei Abweichung nur dev.NeuKapazitaet, sonst Basis-FTE:
+                        // If there's a deviation, use the new capacity; otherwise, use the base FTE.
                         var cap = dev != null
                             ? dev.NeueKapazitaet
                             : emp.FTE;
@@ -144,14 +194,29 @@ namespace Digi_Stihl.Services
             return overview;
         }
 
+        /// <summary>
+        /// Deletes a capacity deviation by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the capacity deviation to delete.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task DeleteDeviationAsync(int id)
         {
             await _repo.DeleteDeviationAsync(id);
         }
     }
 
+    /// <summary>
+    /// Provides extension methods for collections.
+    /// </summary>
     public static class CollectionExtensions
     {
+        /// <summary>
+        /// Executes an action on an object and then returns the object. Useful for fluent API calls.
+        /// </summary>
+        /// <typeparam name="T">The type of the object.</typeparam>
+        /// <param name="obj">The object to perform the action on.</param>
+        /// <param name="act">The action to perform.</param>
+        /// <returns>The object itself, after the action has been performed.</returns>
         public static T Also<T>(this T obj, Action<T> act)
         {
             act(obj);

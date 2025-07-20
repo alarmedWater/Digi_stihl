@@ -22,7 +22,7 @@ namespace Digi_Stihl.Controllers
         }
 
         /// <summary>
-        /// Liefert alle Austrittsgründe
+        /// Returns all exit reasons.
         /// </summary>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]

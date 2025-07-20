@@ -7,16 +7,16 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ─── 1) SERVICE REGISTRATION ────────────────────────────────────
+// ─── Service Registration ───────────────────────────────────────
 
-// #1: DbContext
+// Add DbContext to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
     opts.UseSqlServer(
       builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
 
-// #2: Controllers + JSON-Enums
+// Add services to the container.
 builder.Services.AddControllers()
     .AddJsonOptions(o =>
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())
@@ -24,7 +24,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// #3: CORS – hier komplett auf „AllowAny…“ für Development
+// Add CORS policy for development.
 builder.Services.AddCors(o =>
     o.AddPolicy("DevCors", p =>
         p.AllowAnyOrigin()
@@ -33,7 +33,7 @@ builder.Services.AddCors(o =>
     )
 );
 
-// #4: DI für Repository & Service Layer
+// Dependency Injection for Repository & Service Layer
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeService,    EmployeeService>();
 builder.Services.AddScoped<ICapacityRepository, CapacityRepository>();
@@ -43,14 +43,14 @@ builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 
 
-// #5: AutoMapper
+// Configure AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 
-// ─── 2) MIDDLEWARE PIPELINE ──────────────────────────────────────
+// ─── Middleware Pipeline ────────────────────────────────────────
 
-// Swagger nur in Dev
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -60,10 +60,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// **kein** HTTPS-Redirect (wir arbeiten HTTP-only im Dev)
+// We are not using HTTPS redirection in development.
 // app.UseHttpsRedirection();
 
-// CORS muss vor Authorization
+// CORS must be configured before Authorization.
 app.UseCors("DevCors");
 
 app.UseAuthorization();

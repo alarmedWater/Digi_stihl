@@ -4,17 +4,36 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Digi_Stihl.Models
 {
-    // 1) Enum mit fünf Austrittsgründen
+    /// <summary>
+    /// Represents the type of exit reason.
+    /// </summary>
     public enum ExitReasonType
     {
-        AN_Kuendigung,       // Kündigung durch Arbeitnehmer
-        AG_Kuendigung,       // Kündigung durch Arbeitgeber
-        Altersteilzeit,      // ATZ
-        Ruhestand,           // Eintritt in den Ruhestand
-        Probezeitende        // Ende der Probezeit
+        /// <summary>
+        /// Resignation by employee.
+        /// </summary>
+        AN_Kuendigung,
+        /// <summary>
+        /// Termination by employer.
+        /// </summary>
+        AG_Kuendigung,
+        /// <summary>
+        /// Partial retirement.
+        /// </summary>
+        Altersteilzeit,
+        /// <summary>
+        /// Retirement.
+        /// </summary>
+        Ruhestand,
+        /// <summary>
+        /// End of probationary period.
+        /// </summary>
+        Probezeitende
     }
 
-    // 2) Entity-Klasse, speichert den Enum-Wert
+    /// <summary>
+    /// Represents an exit reason for an employee.
+    /// </summary>
     public class ExitReason
     {
         [Key]
@@ -23,7 +42,9 @@ namespace Digi_Stihl.Models
         [Required]
         public ExitReasonType Reason { get; set; }
 
-        // Optional: Falls du eine frei editierbare Beschreibung möchtest
+        /// <summary>
+        /// Optional description for the exit reason.
+        /// </summary>
         public string Description { get; set; } = string.Empty;
     }
 }

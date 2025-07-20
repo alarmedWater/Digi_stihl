@@ -4,7 +4,7 @@ using System;
 namespace Digi_Stihl.DTOs
 {
     /// <summary>
-    /// Filterkriterien für Mitarbeiter-Abfragen
+    /// Filter criteria for employee queries.
     /// </summary>
     public class EmployeeFilterDto
     {
@@ -15,8 +15,13 @@ namespace Digi_Stihl.DTOs
         public string? Funktion { get; set; }
         public string? Kostenstelle { get; set; }
 
-        // Enums aus dem Model
+        /// <summary>
+        /// The employee's area type (e.g., direct, indirect).
+        /// </summary>
         public Digi_Stihl.Models.BereichTyp? Bereich { get; set; }
+        /// <summary>
+        /// The employee's employment type (e.g., permanent, temporary).
+        /// </summary>
         public Digi_Stihl.Models.Arbeitsverhaeltnis? Arbeitsverhaeltnis { get; set; }
 
         public int? ExitReasonId { get; set; }

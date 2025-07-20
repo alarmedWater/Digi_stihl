@@ -1,26 +1,45 @@
-/* src/app/features/mitarbeiter/components/personalentwicklung/personalentwicklung.component.scss */
-
+/* src/app/features/personalentwicklung/personalentwicklung.component.scss */
 .personalentwicklung-wrapper {
   padding: 1rem;
+  background-color: #2c2c2c;
+  color: #fff;
 
   h2 {
     color: #fff;
     margin-bottom: 1rem;
   }
 
-  /* Statt .entwicklungstabelle: greifen wir hier auf die globale Tabelle zu */
-  .app-table {
-    /* Wenn du für den 12-Monats-Trend noch spezielle Anpassungen möchtest,
-       kannst du sie per Zusatzklasse by-month vornehmen: */
-    &.by-month {
-      /* z.B. kleine Schrift in Kopfzeilen */
-      th {
-        font-size: 0.85rem;
-        text-align: center;
-      }
-      td {
-        text-align: right;
-      }
+  /* Dark‑Theme‑Tabelle für 12‑Monats‑Trend */
+  .app-table.by-month {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #2c2c2c;
+    color: #fff;
+
+    thead {
+      background-color: #1f1f1f;
+    }
+
+    thead th {
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 0.75rem;
+      border-bottom: 1px solid #444;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #444;
+    }
+
+    tbody td {
+      padding: 0.75rem;
+      text-align: right;
+    }
+
+    /* Erste Spalte (Gruppe) linksbündig */
+    tbody td:first-child {
+      text-align: left;
+      font-weight: 600;
     }
   }
 }

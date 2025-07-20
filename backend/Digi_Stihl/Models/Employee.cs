@@ -49,7 +49,9 @@ namespace Digi_Stihl.Models
         [Column(TypeName = "decimal(3,2)")]
         public decimal FTE { get; set; }
 
-        // Foreign Key zum Department
+        /// <summary>
+        /// Foreign key for the department.
+        /// </summary>
         [ForeignKey("Department")]
         public string? Kostenstelle { get; set; }
         public bool Mengenabhaengig { get; set; }
@@ -58,7 +60,9 @@ namespace Digi_Stihl.Models
         public string? Funktion { get; set; }
         public string? Bemerkung { get; set; }
 
-        // FK auf ExitReason-Tabelle
+        /// <summary>
+        /// Foreign key for the exit reason.
+        /// </summary>
         [ForeignKey("ExitReason")]
         public int? ExitReasonId { get; set; }
         public ExitReason? ExitReason { get; set; }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Digi_Stihl.DTOs
 {
     /// <summary>
-    /// Filter-Parameter für GET /api/capacities/deviations
+    /// Filter parameters for GET /api/capacities/deviations.
     /// </summary>
     public class CapacityFilterDto
     {
@@ -16,7 +16,7 @@ namespace Digi_Stihl.DTOs
     }
 
     /// <summary>
-    /// Eingabe-Daten für POST /api/capacities/deviations
+    /// Input data for POST /api/capacities/deviations.
     /// </summary>
     public class CreateCapacityDeviationDto
     {
@@ -28,7 +28,7 @@ namespace Digi_Stihl.DTOs
     }
 
     /// <summary>
-    /// Einzelne Kapazitätsabweichung
+    /// Represents a single capacity deviation.
     /// </summary>
     public class CapacityDeviationDto
     {
@@ -41,7 +41,7 @@ namespace Digi_Stihl.DTOs
     }
 
     /// <summary>
-    /// Kapazitätsdaten je Mitarbeiter für die Übersicht (24 Monate)
+    /// Capacity data per employee for the overview (24 months).
     /// </summary>
     public class EmployeeCapacityDto
     {
@@ -52,7 +52,7 @@ namespace Digi_Stihl.DTOs
     }
 
     /// <summary>
-    /// Zusammenfassung der Kapazität pro Abteilung
+    /// Summary of capacity per department.
     /// </summary>
     public class DepartmentCapacityOverviewDto
     {
@@ -64,7 +64,7 @@ namespace Digi_Stihl.DTOs
     }
 
     /// <summary>
-    /// Top-Level DTO für direkte Mitarbeiter-Kapazitätsübersicht
+    /// Top-level DTO for direct employee capacity overview.
     /// </summary>
     public class DirectCapacityOverviewDto
     {
@@ -74,7 +74,7 @@ namespace Digi_Stihl.DTOs
     }
 
     /// <summary>
-    /// Top-Level DTO für indirekte Mitarbeiter-Kapazitätsübersicht
+    /// Top-level DTO for indirect employee capacity overview.
     /// </summary>
     public class IndirectCapacityOverviewDto
     {

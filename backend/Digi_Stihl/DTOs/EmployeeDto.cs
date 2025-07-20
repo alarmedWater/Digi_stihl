@@ -5,11 +5,14 @@ using Digi_Stihl.Models;
 namespace Digi_Stihl.DTOs
 {
     /// <summary>
-    /// Data Transfer Object für Mitarbeiter
+    /// Data Transfer Object for an employee.
     /// </summary>
     public class EmployeeDto
     {
-        public int EmployeeId { get; set; }        // für CreatedAtAction
+        /// <summary>
+        /// The employee's ID. Used for the CreatedAtAction result.
+        /// </summary>
+        public int EmployeeId { get; set; }
 
         public string Name { get; set; } = string.Empty;
         public string Vorname { get; set; } = string.Empty;
@@ -27,13 +30,20 @@ namespace Digi_Stihl.DTOs
         public string Kostenstelle { get; set; } = string.Empty;
         public decimal FTE { get; set; }
 
-        // Optional: Abteilung aus Deinem DepartmentDto, wenn Du es anzeigen willst
+        /// <summary>
+        /// Optional: The employee's department information.
+        /// </summary>
         public DepartmentDto? Department { get; set; }
 
         public ExitReasonDto? ExitReason { get; set; }
 
-        // Die Enums aus Deinem Models-Namespace
+        /// <summary>
+        /// The employee's area type (e.g., direct, indirect).
+        /// </summary>
         public BereichTyp Bereich { get; set; }
+        /// <summary>
+        /// The employee's employment type (e.g., permanent, temporary).
+        /// </summary>
         public Arbeitsverhaeltnis Arbeitsverhaeltnis { get; set; }
     }
 }

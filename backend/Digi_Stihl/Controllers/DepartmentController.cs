@@ -14,12 +14,17 @@ namespace Digi_Stihl.Controllers
         private readonly IDepartmentService _svc;
         public DepartmentsController(IDepartmentService svc) => _svc = svc;
 
-        // GET api/departments
+        /// <summary>
+        /// Gets all departments.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IList<DepartmentDto>>> GetAll()
             => Ok(await _svc.GetAllAsync());
 
-        // GET api/departments/{id}
+        /// <summary>
+        /// Gets a department by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the department.</param>
         [HttpGet("{id}")]
         public async Task<ActionResult<DepartmentDto>> Get(string id)
         {

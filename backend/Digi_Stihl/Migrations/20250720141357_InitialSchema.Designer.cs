@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Digi_Stihl.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250709180514_SeedAuszubildendeDepartment")]
-    partial class SeedAuszubildendeDepartment
+    [Migration("20250720141357_InitialSchema")]
+    partial class InitialSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

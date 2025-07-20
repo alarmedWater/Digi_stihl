@@ -19,7 +19,7 @@ namespace Digi_Stihl.Repositories
         }
 
         /// <summary>
-        /// Liefert alle Abweichungen gemäß Filter (inkl. Employee-Navigation).
+        /// Retrieves all capacity deviations based on the provided filter, including employee navigation.
         /// </summary>
         public async Task<IList<CapacityDeviation>> GetDeviationsAsync(CapacityFilterDto filter)
         {
@@ -47,7 +47,7 @@ namespace Digi_Stihl.Repositories
         }
 
         /// <summary>
-        /// Fügt eine neue Abweichung hinzu und speichert sie.
+        /// Adds a new capacity deviation and saves it to the database.
         /// </summary>
         public async Task AddDeviationAsync(CapacityDeviation deviation)
         {
@@ -56,7 +56,7 @@ namespace Digi_Stihl.Repositories
         }
 
         /// <summary>
-        /// Holt eine einzelne Abweichung per Primärschlüssel (inkl. Employee).
+        /// Retrieves a single capacity deviation by its primary key, including employee navigation.
         /// </summary>
         public async Task<CapacityDeviation?> GetDeviationByIdAsync(int id)
         {
@@ -66,7 +66,7 @@ namespace Digi_Stihl.Repositories
         }
 
         /// <summary>
-        /// Aktualisiert eine bestehende Abweichung und speichert die Änderungen.
+        /// Updates an existing capacity deviation and saves the changes.
         /// </summary>
         public async Task UpdateDeviationAsync(CapacityDeviation deviation)
         {
@@ -75,7 +75,7 @@ namespace Digi_Stihl.Repositories
         }
 
         /// <summary>
-        /// Löscht die Abweichung mit der angegebenen ID.
+        /// Deletes the capacity deviation with the specified ID.
         /// </summary>
         public async Task DeleteDeviationAsync(int id)
         {
@@ -88,7 +88,7 @@ namespace Digi_Stihl.Repositories
         }
 
         /// <summary>
-        /// Liefert alle Mitarbeiter eines bestimmten Bereichs (inkl. Department-Navigation).
+        /// Retrieves all employees of a specific type (e.g., direct or indirect), including department navigation.
         /// </summary>
         public async Task<IList<Employee>> GetEmployeesByTypeAsync(BereichTyp bereich)
         {

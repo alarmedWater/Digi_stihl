@@ -6,43 +6,60 @@ using Digi_Stihl.DTOs;
 namespace Digi_Stihl.Services
 {
     /// <summary>
-    /// Definiert die Operationen für das Management von Kapazitätsabweichungen.
+    /// Defines the operations for managing capacity deviations.
     /// </summary>
     public interface ICapacityService
     {
         /// <summary>
-        /// Liefert alle Kapazitätsabweichungen entsprechend der übergebenen Filterkriterien.
+        /// Retrieves all capacity deviations according to the provided filter criteria.
         /// </summary>
+        /// <param name="filter">The filter criteria for capacity deviations.</param>
+        /// <returns>A list of capacity deviation DTOs.</returns>
         Task<IList<CapacityDeviationDto>> GetDeviationsAsync(CapacityFilterDto filter);
 
         /// <summary>
-        /// Legt eine neue Kapazitätsabweichung an.
+        /// Creates a new capacity deviation.
         /// </summary>
+        /// <param name="dto">The DTO containing data for the new capacity deviation.</param>
+        /// <returns>The created capacity deviation DTO.</returns>
         Task<CapacityDeviationDto> CreateDeviationAsync(CreateCapacityDeviationDto dto);
 
         /// <summary>
-        /// Holt eine einzelne Kapazitätsabweichung anhand ihrer ID.
+        /// Retrieves a single capacity deviation by its ID.
         /// </summary>
+        /// <param name="id">The ID of the capacity deviation to retrieve.</param>
+        /// <returns>The capacity deviation DTO if found, otherwise null.</returns>
         Task<CapacityDeviationDto?> GetDeviationByIdAsync(int id);
 
         /// <summary>
-        /// Aktualisiert eine bestehende Kapazitätsabweichung.
+        /// Updates an existing capacity deviation.
         /// </summary>
+        /// <param name="id">The ID of the capacity deviation to update.</param>
+        /// <param name="dto">The DTO containing updated data for the capacity deviation.</param>
+        /// <returns>The updated capacity deviation DTO.</returns>
         Task<CapacityDeviationDto> UpdateDeviationAsync(int id, CreateCapacityDeviationDto dto);
 
         /// <summary>
-        /// Erstellt eine Übersicht der direkten Kapazitäten für 24 Monate ab dem angegebenen Startzeitpunkt.
+        /// Creates an overview of direct capacities for 24 months starting from the specified time.
         /// </summary>
+        /// <param name="startYear">The starting year for the overview.</param>
+        /// <param name="startMonth">The starting month for the overview.</param>
+        /// <returns>A DTO containing the direct capacity overview.</returns>
         Task<DirectCapacityOverviewDto> GetDirectCapacityOverviewAsync(int startYear, int startMonth);
 
         /// <summary>
-        /// Erstellt eine Übersicht der indirekten Kapazitäten für 24 Monate ab dem angegebenen Startzeitpunkt.
+        /// Creates an overview of indirect capacities for 24 months starting from the specified time.
         /// </summary>
+        /// <param name="startYear">The starting year for the overview.</param>
+        /// <param name="startMonth">The starting month for the overview.</param>
+        /// <returns>A DTO containing the indirect capacity overview.</returns>
         Task<IndirectCapacityOverviewDto> GetIndirectCapacityOverviewAsync(int startYear, int startMonth);
 
         /// <summary>
-        /// Löscht eine Kapazitätsabweichung anhand ihrer ID.
+        /// Deletes a capacity deviation by its ID.
         /// </summary>
+        /// <param name="id">The ID of the capacity deviation to delete.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         Task DeleteDeviationAsync(int id);
     }
 }

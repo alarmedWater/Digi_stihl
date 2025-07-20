@@ -5,7 +5,7 @@ using Digi_Stihl.Models;
 namespace Digi_Stihl.DTOs
 {
     /// <summary>
-    /// Wird nur für POST /api/Employees verwendet, um einen neuen Mitarbeitenden anzulegen.
+    /// Data transfer object for creating a new employee. Used for POST /api/Employees.
     /// </summary>
     public class EmployeeCreateDto
     {
@@ -17,16 +17,31 @@ namespace Digi_Stihl.DTOs
         public Arbeitsverhaeltnis Arbeitsverhaeltnis { get; set; }
         public string Kostenstelle { get; set; } = string.Empty;
 
-        // Neu: Mengenabhängig, wenn in Deinem Model ein bool ist
+        /// <summary>
+        /// Indicates whether the employee's work is quantity-dependent.
+        /// </summary>
         public bool Mengenabhaengig { get; set; }
 
-        // Optional: schon Austrittsgrund mitliefern
+        /// <summary>
+        /// Optional: The ID of the exit reason.
+        /// </summary>
         public int? ExitReasonId { get; set; }
 
-        // Optional:
+        /// <summary>
+        /// Optional: The employee's function or role.
+        /// </summary>
         public string? Funktion { get; set; }
+        /// <summary>
+        /// Optional: The date the contract is fixed-term until.
+        /// </summary>
         public DateTime? Befristung { get; set; }
+        /// <summary>
+        /// Optional: The date of termination.
+        /// </summary>
         public DateTime? Kuendigung { get; set; }
+        /// <summary>
+        /// Optional: General remarks.
+        /// </summary>
         public string? Bemerkung { get; set; }
     }
 }

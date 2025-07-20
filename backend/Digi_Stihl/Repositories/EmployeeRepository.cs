@@ -1,27 +1,42 @@
-using Digi_Stihl.Data;
-using Digi_Stihl.DTOs;
-using Digi_Stihl.Models;
-using Microsoft.EntityFrameworkCore;
-
 namespace Digi_Stihl.Repositories
 {
+    /// <summary>
+    /// Repository for managing employee data.
+    /// </summary>
     public class EmployeeRepository : IEmployeeRepository
     {
         private readonly ApplicationDbContext _db;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EmployeeRepository"/> class.
+        /// </summary>
+        /// <param name="db">The application database context.</param>
         public EmployeeRepository(ApplicationDbContext db) => _db = db;
 
+        /// <summary>
+        /// Adds a new employee entity to the database.
+        /// </summary>
+        /// <param name="entity">The employee entity to add.</param>
         public async Task AddAsync(Employee entity)
         {
             await _db.Employees.AddAsync(entity);
             await _db.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Updates an existing employee entity in the database.
+        /// </summary>
+        /// <param name="entity">The employee entity to update.</param>
         public async Task UpdateAsync(Employee entity)
         {
             _db.Employees.Update(entity);
             await _db.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Deletes an employee by their ID from the database.
+        /// </summary>
+        /// <param name="id">The ID of the employee to delete.</param>
         public async Task DeleteByIdAsync(int id)
         {
             var emp = await _db.Employees.FindAsync(id);
@@ -32,17 +47,31 @@ namespace Digi_Stihl.Repositories
             }
         }
 
+        /// <summary>
+        /// Retrieves an employee by their ID.
+        /// </summary>
+        /// <param name="id">The ID of the employee to retrieve.</param>
+        /// <returns>The employee if found, otherwise null.</returns>
         public async Task<Employee?> GetByIdAsync(int id)
         {
             return await _db.Employees
                             .FirstOrDefaultAsync(e => e.EmployeeId == id);
         }
 
+        /// <summary>
+        /// Retrieves all employees.
+        /// </summary>
+        /// <returns>A list of all employees.</returns>
         public async Task<IList<Employee>> GetAllAsync()
         {
             return await _db.Employees.ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves a filtered list of employees based on the provided criteria.
+        /// </summary>
+        /// <param name="f">The filter criteria.</param>
+        /// <returns>A list of employees matching the filter criteria.</returns>
         public async Task<IList<Employee>> GetFilteredAsync(EmployeeFilterDto f)
         {
             var q = _db.Employees
@@ -68,15 +97,15 @@ namespace Digi_Stihl.Repositories
             if (!string.IsNullOrWhiteSpace(f.Kostenstelle))
                 q = q.Where(e => e.Kostenstelle == f.Kostenstelle);
 
-            // Bereich (Enum) filtern
+            // Filter by Bereich (Enum)
             if (f.Bereich.HasValue)
                 q = q.Where(e => e.Bereich == f.Bereich.Value);
 
-            // Arbeitsverhaeltnis (Enum) filtern
+            // Filter by Arbeitsverhaeltnis (Enum)
             if (f.Arbeitsverhaeltnis.HasValue)
                 q = q.Where(e => e.Arbeitsverhaeltnis == f.Arbeitsverhaeltnis.Value);
 
-            // Optional: nach ExitReasonId filtern
+            // Optional: Filter by ExitReasonId
             if (f.ExitReasonId.HasValue)
                 q = q.Where(e => e.ExitReasonId == f.ExitReasonId.Value);
 

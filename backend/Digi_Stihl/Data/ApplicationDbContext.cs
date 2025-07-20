@@ -20,7 +20,7 @@ namespace Digi_Stihl.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // 1) Seed Departments (jetzt inkl. D007 “Auszubildende”)
+            // Seed Departments (now including D007 “Trainees”)
             modelBuilder.Entity<Department>().HasData(
                 new Department { Kostenstelle = "D001", Abteilungsname = "Produktion",  Bereichsnummer = "01" },
                 new Department { Kostenstelle = "D002", Abteilungsname = "Vertrieb",    Bereichsnummer = "02" },
@@ -30,21 +30,21 @@ namespace Digi_Stihl.Data
                 new Department { Kostenstelle = "D007", Abteilungsname = "Auszubildende", Bereichsnummer = "07" }
             );
 
-            // 2) Seed ExitReasons
+            // Seed ExitReasons
             modelBuilder.Entity<ExitReason>().HasData(
-                new ExitReason { ExitReasonId = 1, Reason = ExitReasonType.AN_Kuendigung,  Description = "Eigenkündigung" },
-                new ExitReason { ExitReasonId = 2, Reason = ExitReasonType.AG_Kuendigung,  Description = "Kündigung durch Arbeitgeber" },
-                new ExitReason { ExitReasonId = 3, Reason = ExitReasonType.Altersteilzeit, Description = "Eintritt in Altersteilzeit" },
-                new ExitReason { ExitReasonId = 4, Reason = ExitReasonType.Ruhestand,     Description = "Ruhestand" },
-                new ExitReason { ExitReasonId = 5, Reason = ExitReasonType.Probezeitende,  Description = "Ende der Probezeit" }
+                new ExitReason { ExitReasonId = 1, Reason = ExitReasonType.AN_Kuendigung,  Description = "Resignation by employee" },
+                new ExitReason { ExitReasonId = 2, Reason = ExitReasonType.AG_Kuendigung,  Description = "Termination by employer" },
+                new ExitReason { ExitReasonId = 3, Reason = ExitReasonType.Altersteilzeit, Description = "Entry into partial retirement" },
+                new ExitReason { ExitReasonId = 4, Reason = ExitReasonType.Ruhestand,     Description = "Retirement" },
+                new ExitReason { ExitReasonId = 5, Reason = ExitReasonType.Probezeitende,  Description = "End of probationary period" }
             );
 
-            // 3) Decimal-Precision für FluctuationReport
+            // Decimal-Precision for FluctuationReport
             modelBuilder.Entity<FluctuationReport>()
                 .Property(fr => fr.Fluktuationsrate)
                 .HasColumnType("decimal(5,2)");
 
-            // 4) Unique Index auf (EmployeeId, StartDate, EndDate)
+            // Unique Index on (EmployeeId, StartDate, EndDate)
             modelBuilder.Entity<CapacityDeviation>()
                 .HasIndex(cd => new { cd.EmployeeId, cd.StartDate, cd.EndDate })
                 .IsUnique();

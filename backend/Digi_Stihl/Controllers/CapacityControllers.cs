@@ -17,8 +17,7 @@ namespace Digi_Stihl.Controllers
             => _service = service;
 
         /// <summary>
-        /// GET  /api/capacities/deviations
-        /// Liefert alle Kapazitätsabweichungen gemäß Filter.
+        /// Gets all capacity deviations according to the filter.
         /// </summary>
         [HttpGet("deviations")]
         public async Task<ActionResult<IList<CapacityDeviationDto>>> GetDeviations(
@@ -29,8 +28,7 @@ namespace Digi_Stihl.Controllers
         }
 
         /// <summary>
-        /// GET  /api/capacities/deviations/{id}
-        /// Liefert eine einzelne Kapazitätsabweichung.
+        /// Returns a single capacity deviation.
         /// </summary>
         [HttpGet("deviations/{id}")]
         public async Task<ActionResult<CapacityDeviationDto>> GetDeviation(int id)
@@ -42,8 +40,7 @@ namespace Digi_Stihl.Controllers
         }
 
         /// <summary>
-        /// POST /api/capacities/deviations
-        /// Legt eine neue Kapazitätsabweichung an.
+        /// Creates a new capacity deviation.
         /// </summary>
         [HttpPost("deviations")]
         public async Task<ActionResult<CapacityDeviationDto>> CreateDeviation(
@@ -58,8 +55,7 @@ namespace Digi_Stihl.Controllers
         }
 
         /// <summary>
-        /// PUT /api/capacities/deviations/{id}
-        /// Aktualisiert eine bestehende Kapazitätsabweichung.
+        /// Updates an existing capacity deviation.
         /// </summary>
         [HttpPut("deviations/{id}")]
         public async Task<ActionResult<CapacityDeviationDto>> UpdateDeviation(
@@ -75,8 +71,7 @@ namespace Digi_Stihl.Controllers
         }
 
         /// <summary>
-        /// DELETE /api/capacities/deviations/{id}
-        /// Löscht eine Kapazitätsabweichung.
+        /// Deletes a capacity deviation.
         /// </summary>
         [HttpDelete("deviations/{id}")]
         public async Task<IActionResult> DeleteDeviation(int id)
@@ -90,8 +85,7 @@ namespace Digi_Stihl.Controllers
         }
 
         /// <summary>
-        /// GET  /api/capacities/direct-overview
-        /// Übersicht der direkten Kapazität (24 Monate).
+        /// Overview of direct capacity (24 months).
         /// </summary>
         [HttpGet("direct-overview")]
         public async Task<ActionResult<DirectCapacityOverviewDto>> GetDirectOverview(
@@ -106,8 +100,7 @@ namespace Digi_Stihl.Controllers
         }
 
         /// <summary>
-        /// GET  /api/capacities/indirect-overview
-        /// Übersicht der indirekten Kapazität (24 Monate).
+        /// Overview of indirect capacity (24 months).
         /// </summary>
         [HttpGet("indirect-overview")]
         public async Task<ActionResult<IndirectCapacityOverviewDto>> GetIndirectOverview(

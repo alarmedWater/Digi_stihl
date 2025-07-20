@@ -1,6 +1,9 @@
 //DTOs/ExitReasonDto.cs
 namespace Digi_Stihl.DTOs
 {
+    /// <summary>
+    /// Data Transfer Object for an exit reason.
+    /// </summary>
     public class ExitReasonDto
     {
         public int ExitReasonId { get; set; }

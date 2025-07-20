@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Digi_Stihl.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialSchema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -79,6 +79,7 @@ namespace Digi_Stihl.Migrations
                     Bereich = table.Column<int>(type: "int", nullable: false),
                     FTE = table.Column<decimal>(type: "decimal(3,2)", nullable: false),
                     Kostenstelle = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Mengenabhaengig = table.Column<bool>(type: "bit", nullable: false),
                     Funktion = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Bemerkung = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ExitReasonId = table.Column<int>(type: "int", nullable: true)
@@ -105,8 +106,8 @@ namespace Digi_Stihl.Migrations
                     CapacityDeviationId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    Year = table.Column<int>(type: "int", nullable: false),
-                    Month = table.Column<int>(type: "int", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "date", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "date", nullable: false),
                     NeueKapazitaet = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
                     Bemerkung = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -130,7 +131,8 @@ namespace Digi_Stihl.Migrations
                     { "D002", "Vertrieb", "02" },
                     { "D003", "Personal", "03" },
                     { "D004", "IT", "04" },
-                    { "D005", "Verwaltung", "05" }
+                    { "D005", "Verwaltung", "05" },
+                    { "D007", "Auszubildende", "07" }
                 });
 
             migrationBuilder.InsertData(
@@ -146,9 +148,9 @@ namespace Digi_Stihl.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CapacityDeviations_EmployeeId_Year_Month",
+                name: "IX_CapacityDeviations_EmployeeId_StartDate_EndDate",
                 table: "CapacityDeviations",
-                columns: new[] { "EmployeeId", "Year", "Month" },
+                columns: new[] { "EmployeeId", "StartDate", "EndDate" },
                 unique: true);
 
             migrationBuilder.CreateIndex(

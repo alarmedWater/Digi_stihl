@@ -7,14 +7,22 @@ namespace Digi_Stihl.Models
 {
     [Key] public int CapacityDeviationId { get; set; }
 
+    /// <summary>
+    /// Foreign key for the employee.
+    /// </summary>
     [ForeignKey("Employee")]
     public int EmployeeId { get; set; }
     public Employee? Employee { get; set; }
 
-    // replace Year+Month
+    /// <summary>
+    /// The start date of the capacity deviation.
+    /// </summary>
     [Column(TypeName = "date")]
     public DateTime StartDate { get; set; }
 
+    /// <summary>
+    /// The end date of the capacity deviation.
+    /// </summary>
     [Column(TypeName = "date")]
     public DateTime EndDate { get; set; }
 

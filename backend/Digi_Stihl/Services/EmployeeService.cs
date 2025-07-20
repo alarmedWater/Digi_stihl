@@ -1,36 +1,50 @@
-using AutoMapper;
-using Digi_Stihl.DTOs;
-using Digi_Stihl.Models;
-using Digi_Stihl.Repositories;
-
 namespace Digi_Stihl.Services
 {
+    /// <summary>
+    /// Provides services for managing employee data.
+    /// </summary>
     public class EmployeeService : IEmployeeService
     {
         private readonly IEmployeeRepository _repo;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EmployeeService"/> class.
+        /// </summary>
+        /// <param name="repo">The employee repository.</param>
+        /// <param name="mapper">The AutoMapper instance.</param>
         public EmployeeService(IEmployeeRepository repo, IMapper mapper)
         {
             _repo   = repo;
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Creates a new employee asynchronously.
+        /// </summary>
+        /// <param name="dto">The DTO containing data for the new employee.</param>
+        /// <returns>The created employee DTO.</returns>
         public async Task<EmployeeDto> CreateEmployeeAsync(EmployeeCreateDto dto)
         {
-            // DTO -> Entity
+            // Map DTO to entity
             var entity = _mapper.Map<Employee>(dto);
 
-            // GUID einmalig generieren
+            // Generate a unique GUID for the employee
             entity.EmployeeGuid = Guid.NewGuid();
 
-            // Speichern
+            // Save the new employee
             await _repo.AddAsync(entity);
 
-            // Entity (with generated ID) -> DTO
+            // Map the entity (with generated ID) back to DTO
             return _mapper.Map<EmployeeDto>(entity);
         }
 
+        /// <summary>
+        /// Updates an existing employee asynchronously.
+        /// </summary>
+        /// <param name="id">The ID of the employee to update.</param>
+        /// <param name="dto">The DTO containing updated data for the employee.</param>
+        /// <returns>The updated employee DTO if found, otherwise null.</returns>
         public async Task<EmployeeDto?> UpdateEmployeeAsync(int id, EmployeeDto dto)
         {
             var existing = await _repo.GetByIdAsync(id);
@@ -45,6 +59,11 @@ namespace Digi_Stihl.Services
             return _mapper.Map<EmployeeDto>(existing);
         }
 
+        /// <summary>
+        /// Deletes an employee by their ID asynchronously.
+        /// </summary>
+        /// <param name="id">The ID of the employee to delete.</param>
+        /// <returns>True if the employee was deleted, false otherwise.</returns>
         public async Task<bool> DeleteEmployeeAsync(int id)
         {
             var existing = await _repo.GetByIdAsync(id);
@@ -55,6 +74,11 @@ namespace Digi_Stihl.Services
             return true;
         }
 
+        /// <summary>
+        /// Retrieves an employee by their ID asynchronously.
+        /// </summary>
+        /// <param name="id">The ID of the employee to retrieve.</param>
+        /// <returns>The employee DTO if found, otherwise null.</returns>
         public async Task<EmployeeDto?> GetEmployeeByIdAsync(int id)
         {
             var entity = await _repo.GetByIdAsync(id);
@@ -63,6 +87,11 @@ namespace Digi_Stihl.Services
                 : _mapper.Map<EmployeeDto>(entity);
         }
 
+        /// <summary>
+        /// Retrieves a filtered list of employees based on the provided criteria asynchronously.
+        /// </summary>
+        /// <param name="filters">The filter criteria.</param>
+        /// <returns>A list of employee DTOs matching the filter criteria.</returns>
         public async Task<IList<EmployeeDto>> GetEmployeesAsync(EmployeeFilterDto filters)
         {
             var entities = await _repo.GetFilteredAsync(filters);

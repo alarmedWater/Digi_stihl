@@ -7,23 +7,54 @@
     margin-bottom: 1rem;
   }
 
+  /* Suchfeld-Styling mit Angular Material */
   .search-field {
     width: 100%;
     max-width: 400px;
     margin-bottom: 1rem;
 
+    /* Rahmenfarbe */
     .mat-form-field-outline {
       border-color: #555;
     }
+
+    /* Eingabe-Hintergrund und Textfarbe */
     input.mat-input-element {
       background-color: #2c2c2c;
-      color: #eee;
+      color: #000 !important; /* Text in Schwarz */
+      caret-color: #fff;      /* Eingabecursor sichtbar halten */
     }
-    .mat-form-field-label {
-      color: #aaa;
+
+    /* Platzhalter-Textfarbe */
+    input.mat-input-element::placeholder {
+      color: #888 !important;
+    }
+
+    /* Label (schwebender Platzhalter) in Schwarz */
+    ::ng-deep .mat-form-field-label {
+      color: #000 !important;
     }
   }
 
+  /* Tabelle mit dunklem Theme */
+  .app-table {
+    width: 100%;
+    background-color: #2c2c2c;
+    color: #fff;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #444;
+    }
+
+    th {
+      text-align: left;
+      font-weight: 600;
+    }
+  }
+
+  /* Kein-Daten-Hinweis */
   .no-data {
     margin-top: 1rem;
     color: #aaa;
