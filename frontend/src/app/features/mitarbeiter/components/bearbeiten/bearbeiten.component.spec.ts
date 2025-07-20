@@ -2,9 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BearbeitenComponent } from './bearbeiten.component';
 
-/**
- * Test suite for the BearbeitenComponent.
- */
+// Test suite for the BearbeitenComponent.
 describe('BearbeitenComponent', () => {
   let component: BearbeitenComponent;
   let fixture: ComponentFixture<BearbeitenComponent>;

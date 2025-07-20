@@ -1,6 +1,5 @@
 /**
- * Data Transfer Object for an exit reason.
- * Represents a reason for an employee's departure.
+ * Defines the structure for an employee exit reason.
  */
 export interface ExitReasonDto {
   /** The unique identifier for the exit reason. */

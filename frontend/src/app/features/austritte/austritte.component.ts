@@ -5,7 +5,7 @@ import { MitarbeiterService } from '../mitarbeiter/services/mitarbeiter.service'
 import { EmployeeDto } from '../mitarbeiter/models/employee';
 
 /**
- * Interface representing an employee departure for display.
+ * Defines the structure for displaying employee departure information.
  */
 interface Austritt {
   name: string;
@@ -15,8 +15,8 @@ interface Austritt {
 }
 
 /**
- * Component for displaying and filtering employee departures.
- * It fetches employee data and presents information about employees who have left.
+ * Component responsible for displaying and filtering employee departures.
+ * It fetches employee data, identifies departures, and presents them in a user-friendly format.
  */
 @Component({
   selector: 'app-austritte',
@@ -34,20 +34,19 @@ export class AustritteComponent implements OnInit {
   constructor(private mitarbeiterService: MitarbeiterService) {}
 
   /**
-   * Initializes the component.
-   * Fetches employee data, filters for departures, and maps them to the display format.
+   * Initializes the component by fetching employee data,
+   * filtering for those with a termination date, and mapping them
+   * to the `Austritt` display format.
    */
   ngOnInit(): void {
     this.mitarbeiterService.getMitarbeiter()
       .subscribe({
         next: (list: EmployeeDto[]) => {
           this.austritte = list
-            // Filter for employees with a termination date.
             .filter(e => !!e.kuendigung)
-            // Map to our display data format.
             .map(e => ({
               name: `${e.vorname} ${e.name}`,
-              abteilung: e.kostenstelle,     // Or other info if you join.
+              abteilung: e.kostenstelle,
               austrittsdatum: e.kuendigung ? this.formatDatum(e.kuendigung) : '',
               austrittsart: e.exitReason?.description ?? ''
             }));

@@ -9,7 +9,7 @@ import { EmployeeDto }        from '../mitarbeiter/models/employee';
 import { DepartmentDto }      from '../mitarbeiter/models/department';
 
 /**
- * Interface for displaying ATZ (partial retirement) entries.
+ * Represents an employee in partial retirement (ATZ) for display purposes.
  */
 interface AtzMitarbeiter {
   name: string;
@@ -19,7 +19,7 @@ interface AtzMitarbeiter {
 }
 
 /**
- * Component to display employees in partial retirement (ATZ).
+ * Component for managing and displaying employees in partial retirement (ATZ).
  */
 @Component({
   selector: 'app-atz',
@@ -44,20 +44,19 @@ export class AtzComponent implements OnInit {
   ) {}
 
   /**
-   * Initializes the component by loading and processing employee and department data.
+   * Initializes the component by loading employee and department data,
+   * then filters for employees in partial retirement (ATZ) and maps them
+   * to the display format.
    */
   ngOnInit(): void {
-    // Load employee and department data in parallel.
     forkJoin({
       emps:  this.svc.getMitarbeiter(),
       depts: this.deptSvc.getDepartments()
     }).subscribe(({ emps, depts }) => {
-      // Create a map from cost center to department name.
       const deptMap = new Map<string,string>(
         depts.map(d => [d.kostenstelle, d.abteilungsname])
       );
-      // Filter for employees with ExitReasonId === 3 (ATZ) and map to the display format.
-      const atzId = 3;
+      const atzId = 3; // ID for partial retirement (ATZ)
       this.atzMitarbeiter = emps
         .filter(e => e.exitReasonId === atzId)
         .map(e => ({
@@ -74,9 +73,10 @@ export class AtzComponent implements OnInit {
   }
 
   /**
-   * Filters the employee list based on the search term (name, department, or date).
+   * Filters the employee list based on the search term.
+   * The search is performed across name, department, and exit date.
    */
-  get gefilterteMitarbeiter(): AtzMitarbeiter[] {
+  get gefilterteMitarbeiter(): AtzMitarbeiter {
     const q = this.suchbegriff.trim().toLowerCase();
     return this.atzMitarbeiter.filter(m =>
       m.name.toLowerCase().includes(q) ||

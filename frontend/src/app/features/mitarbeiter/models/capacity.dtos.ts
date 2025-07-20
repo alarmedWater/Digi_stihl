@@ -1,5 +1,5 @@
 /**
- * Data Transfer Object for filtering capacity deviations.
+ * DTO for filtering capacity deviations.
  */
 export interface CapacityFilterDto {
   /** Optional: Filter by employee name. */

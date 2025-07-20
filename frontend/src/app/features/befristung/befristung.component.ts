@@ -11,7 +11,7 @@ import { DepartmentService }  from '../mitarbeiter/services/department.service';
 import { EmployeeDto } from '../mitarbeiter/models/employee';
 
 /**
- * Interface representing a fixed-term employee for display.
+ * Defines the structure for displaying fixed-term employee information.
  */
 interface BefristeterMitarbeiter {
   name: string;

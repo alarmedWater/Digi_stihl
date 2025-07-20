@@ -2,9 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { IndirMitarbeiterComponent } from './indir-mitarbeiter.component';
 
-/**
- * Test suite for the IndirMitarbeiterComponent.
- */
+// Test suite for the IndirMitarbeiterComponent.
 describe('IndirMitarbeiterComponent', () => {
   let component: IndirMitarbeiterComponent;
   let fixture: ComponentFixture<IndirMitarbeiterComponent>;

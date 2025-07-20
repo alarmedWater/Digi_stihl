@@ -1,8 +1,6 @@
-<!-- src/app/features/mitarbeiter/components/atz/atz.component.html -->
 <div class="atz-wrapper">
   <h2>ATZ</h2>
 
-  <!-- Suchfeld -->
   <input
     type="text"
     [(ngModel)]="suchbegriff"
@@ -10,7 +8,6 @@
     class="suchfeld"
   />
 
-  <!-- Tabelle mit gefilterten ATZ-Mitarbeitern -->
   <table class="atz-tabelle">
     <thead>
       <tr>
@@ -30,7 +27,6 @@
     </tbody>
   </table>
 
-  <!-- Anzeige, wenn nichts gefunden wurde -->
   <div *ngIf="gefilterteMitarbeiter.length === 0" class="kein-treffer">
     Keine passenden ATZ-Mitarbeitenden gefunden.
   </div>

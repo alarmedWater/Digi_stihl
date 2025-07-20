@@ -13,7 +13,7 @@ import {
 import { CapacityService } from '../../mitarbeiter/services/capacity.service';
 
 /**
- * Represents a single employee entry with their 24-month FTE values.
+ * Represents an employee entry with their 24-month FTE values.
  */
 interface MitarbeiterEintrag {
   name: string;
@@ -21,8 +21,8 @@ interface MitarbeiterEintrag {
 }
 
 /**
- * Defines a block of data per department for the direct capacity overview.
- * Includes department name, headcount, monthly FTE subtotals, total FTE, and a list of employees.
+ * Defines a data block for a department in the direct capacity overview.
+ * Includes department details, headcount, monthly FTE subtotals, total FTE, and employee list.
  */
 interface AbteilungsBlock {
   departmentName: string;

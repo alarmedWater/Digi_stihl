@@ -6,7 +6,7 @@ import { MitarbeiterService } from '../mitarbeiter/services/mitarbeiter.service'
 import { EmployeeDto } from '../mitarbeiter/models/employee';
 
 /**
- * Represents a single entry in the fluctuation report.
+ * Defines the structure for a single entry in the fluctuation report.
  */
 interface FluktuationsEintrag {
   /** The month name (e.g., "Januar"). */

@@ -67,7 +67,6 @@ export class AnlegenComponent implements OnInit {
    * Sets up the employee creation form with validators and loads exit reasons.
    */
   ngOnInit(): void {
-    // Initialize the form with default values and validators.
     this.mitarbeiterForm = this.fb.group({
       vorname:            ['', Validators.required],
       name:               ['', Validators.required],
@@ -84,7 +83,6 @@ export class AnlegenComponent implements OnInit {
       bemerkung:          ['']
     });
 
-    // Load exit reasons from the backend. Fallback to a hardcoded list on error.
     this.service.getExitReasons().subscribe({
       next: list => this.exitReasons = list,
       error: () => {

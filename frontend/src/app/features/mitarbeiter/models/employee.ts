@@ -1,8 +1,7 @@
 import { ExitReasonDto } from './exit-reason';
 
 /**
- * Data Transfer Object for an Employee.
- * Represents the details of an employee, including personal, employment, and organizational data.
+ * Defines the structure for an employee record.
  */
 export interface EmployeeDto {
   /** Unique identifier for the employee. Null for new employees. */

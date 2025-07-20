@@ -3,21 +3,21 @@
 
   <form [formGroup]="mitarbeiterForm" (ngSubmit)="onSubmit()">
 
-    <!-- VORNAME -->
+    
     <mat-form-field appearance="fill">
       <mat-label>Vorname</mat-label>
       <input matInput placeholder="Max" formControlName="vorname" required>
       <mat-hint>Pflichtfeld</mat-hint>
     </mat-form-field>
 
-    <!-- NACHNAME -->
+    
     <mat-form-field appearance="fill">
       <mat-label>Nachname</mat-label>
       <input matInput placeholder="Mustermann" formControlName="name" required>
       <mat-hint>Pflichtfeld</mat-hint>
     </mat-form-field>
 
-    <!-- EINTRITTS-DATUM -->
+    
     <mat-form-field appearance="fill">
       <mat-label>Eintrittsdatum</mat-label>
       <input matInput [matDatepicker]="pickerEintritt" formControlName="eintritt" required>
@@ -26,14 +26,14 @@
       <mat-hint>z. B. 2025-07-01</mat-hint>
     </mat-form-field>
 
-    <!-- FTE -->
+    
     <mat-form-field appearance="fill">
       <mat-label>FTE</mat-label>
       <input matInput type="number" placeholder="0.8" formControlName="fte" required>
       <mat-hint>0.1 bis 1.0</mat-hint>
     </mat-form-field>
 
-    <!-- BEREICH -->
+    
     <mat-form-field appearance="fill">
       <mat-label>Bereich</mat-label>
       <mat-select formControlName="bereich" required>
@@ -42,21 +42,21 @@
       <mat-hint>Direkt oder Indirekt</mat-hint>
     </mat-form-field>
 
-    <!-- KOSTENSTELLE -->
+    
     <mat-form-field appearance="fill">
       <mat-label>Kostenstelle</mat-label>
       <input matInput placeholder="z. B. D002" formControlName="kostenstelle" required>
       <mat-hint>aus Abteilungen-Tabelle</mat-hint>
     </mat-form-field>
 
-    <!-- FUNKTION -->
+    
     <mat-form-field appearance="fill">
       <mat-label>Funktion</mat-label>
       <input matInput placeholder="z. B. Entwickler" formControlName="funktion">
       <mat-hint>Optional</mat-hint>
     </mat-form-field>
 
-    <!-- ARBEITSVERHÄLTNIS -->
+    
     <mat-form-field appearance="fill">
       <mat-label>Arbeitsverhältnis</mat-label>
       <mat-select formControlName="arbeitsverhaeltnis" required>
@@ -65,7 +65,7 @@
       <mat-hint>Befristet oder Unbefristet</mat-hint>
     </mat-form-field>
 
-    <!-- BEFRISTUNG -->
+    
     <mat-form-field appearance="fill">
       <mat-label>Befristung bis</mat-label>
       <input matInput [matDatepicker]="pickerBefristung" formControlName="befristung">
@@ -74,13 +74,13 @@
       <mat-hint>Optional</mat-hint>
     </mat-form-field>
 
-    <!-- MENGENABHÄNGIG (Checkbox – außerhalb eines mat-form-field!) -->
+    
     <mat-checkbox formControlName="mengenabhaengig">
       Mengenabhängig?
     </mat-checkbox>
     <mat-hint>Optional</mat-hint>
 
-    <!-- AUSTRITTSART -->
+    
     <mat-form-field appearance="fill">
       <mat-label>Austrittsart</mat-label>
       <mat-select formControlName="exitReasonId">
@@ -92,7 +92,7 @@
       <mat-hint>Optional</mat-hint>
     </mat-form-field>
 
-    <!-- KÜNDIGUNG -->
+    
     <mat-form-field appearance="fill">
       <mat-label>Kündigung zum</mat-label>
       <input matInput [matDatepicker]="pickerKuendigung" formControlName="kuendigung">
@@ -101,7 +101,7 @@
       <mat-hint>Optional</mat-hint>
     </mat-form-field>
 
-    <!-- BEMERKUNG -->
+    
     <mat-form-field appearance="fill">
       <mat-label>Bemerkung</mat-label>
       <textarea matInput rows="4" placeholder="z. B. Urlaubsvertretung"
@@ -109,7 +109,7 @@
       <mat-hint>Optional</mat-hint>
     </mat-form-field>
 
-    <!-- BUTTON -->
+    
     <button
       type="submit"
       mat-raised-button

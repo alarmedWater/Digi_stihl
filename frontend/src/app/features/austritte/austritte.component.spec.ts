@@ -2,9 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AustritteComponent } from './austritte.component';
 
-/**
- * Test suite for the AustritteComponent.
- */
+// Test suite for the AustritteComponent.
 describe('AustritteComponent', () => {
   let component: AustritteComponent;
   let fixture: ComponentFixture<AustritteComponent>;

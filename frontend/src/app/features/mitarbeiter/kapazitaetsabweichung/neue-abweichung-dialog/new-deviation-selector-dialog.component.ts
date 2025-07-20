@@ -11,7 +11,7 @@ import { EmployeeDto } from '../../models/employee';
 import { MitarbeiterService } from '../../services/mitarbeiter.service';
 
 /**
- * Interface for the result returned when the NewDeviationSelectorDialogComponent is closed.
+ * Result interface for the NewDeviationSelectorDialogComponent.
  */
 export interface NewDeviationSelectorResult {
   /** The ID of the selected employee. */

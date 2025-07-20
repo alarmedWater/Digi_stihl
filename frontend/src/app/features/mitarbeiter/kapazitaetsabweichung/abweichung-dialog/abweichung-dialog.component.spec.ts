@@ -2,9 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AbweichungDialogComponent } from './abweichung-dialog.component';
 
-/**
- * Test suite for the AbweichungDialogComponent.
- */
+// Test suite for the AbweichungDialogComponent.
 describe('AbweichungDialogComponent', () => {
   let component: AbweichungDialogComponent;
   let fixture: ComponentFixture<AbweichungDialogComponent>;

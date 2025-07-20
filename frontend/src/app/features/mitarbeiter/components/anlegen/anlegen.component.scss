@@ -1,29 +1,23 @@
-// src/app/features/mitarbeiter/components/anlegen/anlegen.component.scss
-
-// Container für das gesamte Mitarbeiterformular
 .mitarbeiter-form-container {
-  display: flex;                  // aktiviert flexibles Layout
-  flex-direction: column;         // ordnet alle Elemente vertikal an
-  max-width: 600px;               // maximale Breite des Containers
-  width: 100%;                    // nimmt im Parent-Container ggf. 100% ein
-  margin: 0;                 // zentriert optional
-  gap: 1rem;                      // gleichmäßiger Abstand zwischen den Formularfeldern
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+  width: 100%;
+  margin: 0;
+  gap: 1rem;
   
   height: 100vh;
   overflow-y: auto;
   padding-bottom: 2rem;
 
-  // Alle Material-Formularfelder innerhalb des Containers
   mat-form-field {
-    width: 100%;                  // volle Breite
+    width: 100%;
   }
-  // Formular-Hinweise (hints) optisch absetzen
   mat-hint {
     font-size: 0.75rem;
     color: rgba(0, 0, 0, 0.6);
   }
 
-  // Absende-Button: gemeinsamer Stil
   button {
     color: white;
     transition: background-color 0.3s ease, transform 0.1s ease;
@@ -32,41 +26,35 @@
     min-width: 140px;
   }
 
-  // Button-Zustände
   button.btn-disabled {
-    background-color: #c0bdbd !important;  // hellgrau
+    background-color: #c0bdbd !important;
     cursor: not-allowed !important;
     opacity: 0.8;
   }
 
   button.btn-enabled {
-    background-color: #424242 !important;  // dunkelgrau
+    background-color: #424242 !important;
     cursor: pointer !important;
   }
 
-  // Idle-Status (wenn enabled aber noch nicht geklickt)
   button.btn-idle.btn-enabled {
-    // evtl. ein leichter Hover-Effekt
     &:hover {
       background-color: #333333 !important;
     }
   }
 
-  // Erfolg (für 3 s grün)
   button.btn-success {
-    background-color: #388e3c !important;  // Material Grün 700
+    background-color: #388e3c !important;
     cursor: default !important;
     transform: scale(1.02);
   }
 
-  // Fehler (für 3 s rot)
   button.btn-error {
-    background-color: #d32f2f !important;  // Material Rot 700
+    background-color: #d32f2f !important;
     cursor: default !important;
     transform: scale(1.02);
   }
 
-  // Snackbar-Fehler (falls man noch weitere Overwrites braucht)
   ::ng-deep .snackbar-error {
     background-color: #d32f2f !important;
     color: white !important;

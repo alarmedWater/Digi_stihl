@@ -2,9 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DirMitarbeiterComponent } from './dir-mitarbeiter.component';
 
-/**
- * Test suite for the DirMitarbeiterComponent.
- */
+// Test suite for the DirMitarbeiterComponent.
 describe('DirMitarbeiterComponent', () => {
   let component: DirMitarbeiterComponent;
   let fixture: ComponentFixture<DirMitarbeiterComponent>;

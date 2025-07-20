@@ -1,6 +1,3 @@
-/* src/app/features/mitarbeiter/components/fluktuation/fluktuation.component.scss */
-
-/* Filter-Bar bleibt komponentenspezifisch */
 .filter-container {
   display: flex;
   flex-wrap: wrap;
@@ -23,13 +20,10 @@
   }
 }
 
-/* Hier nur noch Ausrichtung der Spalten, Styling stammt aus .app-table (global) */
 .app-table.by-fluktuation {
-  /* Kopfzeile linksbündig */
   thead th {
     text-align: left;
   }
-  /* Erste Spalte links, alle anderen rechts ausrichten */
   tbody td {
     &:first-child {
       text-align: left;

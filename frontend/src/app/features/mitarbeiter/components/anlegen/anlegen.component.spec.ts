@@ -2,9 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AnlegenComponent } from './anlegen.component';
 
-/**
- * Test suite for the AnlegenComponent.
- */
+// Test suite for the AnlegenComponent.
 describe('AnlegenComponent', () => {
   let component: AnlegenComponent;
   let fixture: ComponentFixture<AnlegenComponent>;

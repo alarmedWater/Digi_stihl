@@ -2,9 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FluktuationComponent } from './fluktuation.component';
 
-/**
- * Test suite for the FluktuationComponent.
- */
+// Test suite for the FluktuationComponent.
 describe('FluktuationComponent', () => {
   let component: FluktuationComponent;
   let fixture: ComponentFixture<FluktuationComponent>;

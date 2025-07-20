@@ -2,9 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BefristungComponent } from './befristung.component';
 
-/**
- * Test suite for the BefristungComponent.
- */
+// Test suite for the BefristungComponent.
 describe('BefristungComponent', () => {
   let component: BefristungComponent;
   let fixture: ComponentFixture<BefristungComponent>;

@@ -1,5 +1,3 @@
-/* src/app/features/mitarbeiter/components/atz/atz.component.scss */
-
 .atz-wrapper {
   max-width: 800px;
   margin: 2rem 0;
@@ -11,7 +9,6 @@
   }
 }
 
-/* Such-Input im Light/Dark-Kontrast */
 .suchfeld {
   width: 100%;
   padding: 0.6rem;
@@ -27,7 +24,6 @@
   }
 }
 
-/* Tabelle */
 .atz-tabelle {
   width: 100%;
   border-collapse: collapse;
@@ -58,7 +54,6 @@
   }
 }
 
-/* Hinweis bei leerer Tabelle */
 .kein-treffer {
   margin-top: 1rem;
   color: #aaa;

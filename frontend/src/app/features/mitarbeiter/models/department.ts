@@ -1,5 +1,4 @@
 /**
- * Data Transfer Object for a Department.
  * Represents a department with its cost center, name, and area number.
  */
 export interface DepartmentDto {

@@ -16,7 +16,7 @@ import { ExitReasonDto }      from '../../models/exit-reason';
 import { DepartmentDto }      from '../../models/department';
 
 /**
- * Interface extending EmployeeDto to include the department name.
+ * Extends EmployeeDto to include the department name for display purposes.
  */
 interface EmployeeWithDept extends EmployeeDto {
   abteilungsname?: string;

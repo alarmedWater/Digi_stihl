@@ -12,9 +12,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { EmployeeDto } from '../../models/employee';
 
 /**
- * Payload passed to the AbweichungDialogComponent.
- * - `abweichung` (optional) contains the deviation data to be edited.
- * - `mitarbeiter` is the list of all employees for the dropdown selection.
+ * Data structure for the capacity deviation dialog.
+ * `abweichung` (optional) contains the deviation data to be edited.
+ * `mitarbeiter` is the list of all employees for the dropdown selection.
  */
 export interface AbweichungDialogData {
   abweichung?: AbweichungData;

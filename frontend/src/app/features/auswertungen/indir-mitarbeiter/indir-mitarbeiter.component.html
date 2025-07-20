@@ -1,8 +1,6 @@
-<!-- src/app/features/auswertungen/indir-mitarbeiter/indir-mitarbeiter.component.html -->
 <div class="auswertung-container">
   <h2>Kapazitätsauswertung – Indirekte Mitarbeitende</h2>
 
-  <!-- Filter nach Abteilung -->
   <mat-form-field appearance="outline" class="filter-dropdown">
     <mat-label>Abteilung wählen</mat-label>
     <mat-select [(ngModel)]="ausgewaehlteAbteilung">
@@ -16,11 +14,9 @@
     </mat-select>
   </mat-form-field>
 
-  <!-- Scrollbarer Tabellen-Container -->
   <div class="table-scroll-container">
     <table class="fte-tabelle">
 
-      <!-- Tabellen-Kopf mit Monats-Labels -->
       <thead>
         <tr>
           <th>Name</th>
@@ -29,10 +25,8 @@
       </thead>
 
       <tbody>
-        <!-- Pro Abteilung ein Block -->
         <ng-container *ngFor="let block of gefilterteAbteilungen">
 
-          <!-- Abteilungs-Header mit Köpfen & Gesamt-FTE -->
           <tr class="dept-block-header">
             <td [attr.colspan]="monateLabels.length + 1">
               <strong>{{ block.departmentName }}</strong>
@@ -41,7 +35,6 @@
             </td>
           </tr>
 
-          <!-- Mitarbeitende je Abteilung -->
           <tr *ngFor="let emp of block.employees" class="data-row">
             <td>{{ emp.name }}</td>
             <td
@@ -52,7 +45,6 @@
             </td>
           </tr>
 
-          <!-- Zwischensumme pro Monat -->
           <tr class="dept-block-footer">
             <td><em>Summe {{ block.departmentName }}</em></td>
             <td *ngFor="let s of block.subtotalFte">

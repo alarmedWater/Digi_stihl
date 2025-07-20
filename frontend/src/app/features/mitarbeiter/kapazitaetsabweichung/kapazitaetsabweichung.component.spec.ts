@@ -2,9 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { KapazitaetsabweichungComponent } from './kapazitaetsabweichung.component';
 
-/**
- * Test suite for the KapazitaetsabweichungComponent.
- */
+// Test suite for the KapazitaetsabweichungComponent.
 describe('KapazitaetsabweichungComponent', () => {
   let component: KapazitaetsabweichungComponent;
   let fixture: ComponentFixture<KapazitaetsabweichungComponent>;

@@ -32,7 +32,7 @@ import { EmployeeDto } from '../models/employee';
 import { CreateCapacityDeviationDto } from '../models/capacity.dtos';
 
 /**
- * Interface representing a capacity deviation for display in the table.
+ * Defines the structure for displaying a capacity deviation in the table.
  */
 interface AbweichungView {
   capacityDeviationId: number;
@@ -46,7 +46,7 @@ interface AbweichungView {
 
 /**
  * Component for managing and displaying capacity deviations.
- * Allows filtering, adding, editing, and deleting deviations, and exporting data.
+ * Provides functionalities for filtering, adding, editing, deleting, and exporting deviations.
  */
 @Component({
   selector: 'app-kapazitaetsabweichung',
@@ -104,7 +104,6 @@ export class KapazitaetsabweichungComponent implements OnInit, AfterViewInit {
    * Sets up the filter predicate for the data source and loads initial data.
    */
   ngOnInit(): void {
-    // Filter logic: filter by employee name or remark.
     this.dataSource.filterPredicate = (data, filter) =>
       data.name.toLowerCase().includes(filter) ||
       (data.bemerkung?.toLowerCase().includes(filter) ?? false);

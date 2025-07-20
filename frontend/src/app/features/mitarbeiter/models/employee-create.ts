@@ -1,6 +1,5 @@
 /**
- * Data Transfer Object for creating a new Employee.
- * Contains the necessary fields for employee creation.
+ * Defines the structure for creating a new employee record.
  */
 export interface EmployeeCreateDto {
   /** Last name of the employee. */

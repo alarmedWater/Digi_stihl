@@ -1,5 +1,5 @@
 /**
- * Data Transfer Object for filtering employees in the REST API.
+ * Defines the structure for filtering employee records.
  */
 export interface EmployeeFilterDto {
   /** Partial string for last name. */

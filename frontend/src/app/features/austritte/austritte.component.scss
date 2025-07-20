@@ -1,6 +1,3 @@
-/* src/app/features/austritte/austritte.component.scss */
-
-/* Such-Input im Dark Theme */
 input {
   margin-bottom: 1rem;
   padding: 0.5rem;
@@ -17,14 +14,11 @@ input {
   }
 }
 
-/* Komponenten-spezifische Anpassungen für die globale Tabelle */
 .app-table.by-austritte {
-  /* Linksbündige Kopfzeile */
   thead th {
     text-align: left;
   }
 
-  /* Erste Spalte linksbündig, Rest rechtsbündig */
   tbody td {
     &:first-child {
       text-align: left;
